@@ -1,0 +1,52 @@
+<html>
+  <head>
+    <script src="jquery.js"></script>
+    <script src="jqconsole.js"></script>
+    <style>
+      #console{
+        color: white;
+        background-color: black;
+      }
+      #jq-console-cursor{
+        background-color: green;
+        height:15px;
+        width: 0.5em;
+        display: inline-block;
+      }
+      pre{
+        margin:0;
+        display: inline;
+      }
+    </style>
+    <script>
+      $(function(){
+        $('#console').console(
+        {
+          label: "javascript>",
+          greetings: "JSREPL, jsconsole.log() to log to this console",
+          handler: function(command, stdout, result){
+            window.jsconsole = {
+              log: stdout
+            };
+            try{
+              result(window.eval(command));
+              }catch(e){
+              console.log({a:e});
+              result(e.message)
+            }
+
+          }
+        }
+        );
+      });
+    </script>
+  </head>
+  <body>
+    <div id="console"></div>
+  
+  </body>
+
+  
+
+
+</html>
