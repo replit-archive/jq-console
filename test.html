@@ -6,6 +6,11 @@
       #console{
         color: white;
         background-color: black;
+        overflow: auto;
+        height: 200px;
+      }
+      #jq-console-prompt{
+        outline:0;
       }
       #jq-console-cursor{
         background-color: green;
@@ -20,7 +25,7 @@
     </style>
     <script>
       $(function(){
-        $('#console').console(
+        var $console = $('#console').console(
         {
           label: "javascript>",
           greetings: "JSREPL, jsconsole.log() to log to this console",
@@ -28,7 +33,8 @@
             window.jsconsole = {
               log: stdout
             };
-            try{
+            window.stdin = $console.stdin;
+              try{
               result(window.eval(command));
               }catch(e){
               console.log({a:e});

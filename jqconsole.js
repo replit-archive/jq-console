@@ -1,9 +1,9 @@
-// Simple web terminal copy rights jsrepl.com 2011
 (function ($){
 
 $.fn.console = function(options){
-  
+ 
   var $history = $('<div/>').appendTo(this);
+  var $typer = $('<textarea/>',{style: "position:absolute;left:-99999px"}).appendTo(this);
   var $prompt = $('<div/>', {tabindex:1, id:"jq-console-prompt"}).appendTo(this);
   var $promptLabel = $('<span/>', {id: "jq-console-label"}).appendTo($prompt);
   var $spanLeft = $('<pre/>').appendTo($prompt);
@@ -13,6 +13,9 @@ $.fn.console = function(options){
   var $stdoutItem = $historyItem.clone();
   var $paster = $('<textarea/>');
   var currentOut = null;
+  var history = [];
+  var history_index = 0;
+  var that = this;
 
   var settings = {
     label: '>>>',
@@ -28,17 +31,36 @@ $.fn.console = function(options){
   //mozilla prefers keypress always
   var keydown = $.browser.mozilla ? 'keypress' : 'keydown';
 //start prompt bindings
-  $prompt
+  this.click(function(){
+    console.log('s');
+    $typer.focus();
+  });
+  $prompt.focus(function(){
+    $typer.focus();
+  });
+  $typer
     .keypress(function(e){
       if (!e.charCode) return;
+      scrollToEnd();
       var char;
       char = String.fromCharCode(e.charCode);
       $spanLeft.append(char);
+      if (e.metaKey || e.ctrlKey || e.altKey){
+        backSpace();
+        return true;
+      }
+      return false;
     })
 
     [keydown](function(e){
       var char;
       switch (e.keyCode){
+       case 38:
+        getPast();
+        break;
+       case 40:
+        getFuture();
+        break;
        case 39:
         moveRight();
         break;
@@ -59,20 +81,21 @@ $.fn.console = function(options){
         break;      
       }
     })
-    
     .bind('paste', function(e){
-      $text = $paster.clone().appendTo('body');
-      $text.focus();
       setTimeout(function(){
-        console.log($text.val())
-        $spanLeft.append($text.val());
-        $text.remove();
+        $spanLeft.append($typer.val());
         $prompt.focus();
+        $typer.val('');
+        $typer.focus();
       },0);
-      console.log('s');
     });
-
 //end prompt bindings
+  var empty = function(){
+    $cursor.empty();
+    $spanLeft.empty();
+    $spanRight.empty();
+  };
+
   var moveRight = function(){
     var currentChar = $cursor.text(); 
     if (!currentChar.length) return;
@@ -98,19 +121,25 @@ $.fn.console = function(options){
     if (!text.length) return;
     $spanLeft.text(text.substr(0, text.length - 1));
   };
-
-  var enter = function(){
-    var command = $prompt.text();
-    $historyItem.clone().find('pre').html(command).end().appendTo($history);
-    $cursor.empty();
-    $spanLeft.empty();
-    $spanRight.empty();
-    currentOut = $stdoutItem.clone();
-    command = command.substr(settings.label.length);
-    console.log(settings.label);
-    settings.handler(command, stdout, result);
-  };
-
+  
+  var enterFactory = function(label, callback, remember){
+    return function(){
+      var command = $prompt.text()
+      $historyItem.clone().find('pre').html(command).end().appendTo($history);
+      command = command.substr(label.length);
+      empty();
+      currentOut = $stdoutItem.clone();
+      callback(command, stdout, result);
+      $promptLabel.text(settings.label);
+      if (remember && command) history.push(command);
+      history_index = history.length;
+      enter = _enter;
+      scrollToEnd();
+    };
+  }
+  var _enter;
+  var enter = _enter = enterFactory(settings.label, settings.handler, true);
+  
   var tab = function(){
     //tabs acting weird, If came next a two char sized word it will only craete 2 spaces tabs
    //if next a three char sized word the space will be eq to 1 space :S
@@ -130,9 +159,31 @@ $.fn.console = function(options){
     currentOut = null;
   };
   
+  var getPast = function(){
+    if (!history_index) return;
+    history_index--;
+    empty();
+    $spanLeft.text(history[history_index]);
+  };
+
+  var getFuture = function(){
+    if (history_index >= history.length - 1) {
+      empty();
+      return;
+    }
+    history_index++;
+    empty();
+    $spanLeft.text(history[history_index]);
+  };
+
+  var scrollToEnd = function(){
+    that.scrollTop(that[0].scrollHeight);
+  }
   $.extend(this, {
     stdin: function(label, callback){
-                
+      setTimeout(function(){
+      $promptLabel.text(label);
+      enter = enterFactory(label, callback);},100);
     }
   }); 
   
