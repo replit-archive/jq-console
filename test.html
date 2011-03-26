@@ -16,7 +16,7 @@
         background-color: green;
         height:15px;
         width: 0.5em;
-        display: inline-block;
+       /* display: inline-block;*/
       }
       pre{
         margin:0;
@@ -35,7 +35,7 @@
             };
             window.stdin = $console.stdin;
               try{
-              result(window.eval(command));
+                result(window.eval(command));
               }catch(e){
               console.log({a:e});
               result(e.message)

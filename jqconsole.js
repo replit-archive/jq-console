@@ -9,8 +9,8 @@ $.fn.console = function(options){
   var $spanLeft = $('<pre/>').appendTo($prompt);
   var $cursor = $('<pre/>',{id:"jq-console-cursor"}).appendTo($prompt);
   var $spanRight = $('<pre/>').appendTo($prompt);
-  var $historyItem = $('<div><pre></pre></div>');
-  var $stdoutItem = $historyItem.clone();
+  var $historyItem = $('<div class="result"><pre></pre></div>');
+  var $stdoutItem = $historyItem.clone().addClass('out');
   var $paster = $('<textarea/>');
   var currentOut = null;
   var history = [];
@@ -32,7 +32,6 @@ $.fn.console = function(options){
   var keydown = $.browser.mozilla ? 'keypress' : 'keydown';
 //start prompt bindings
   this.click(function(){
-    console.log('s');
     $typer.focus();
   });
   $prompt.focus(function(){
@@ -40,10 +39,10 @@ $.fn.console = function(options){
   });
   $typer
     .keypress(function(e){
-      if (!e.charCode) return;
+      charCode = e.keyCode || e.charCode;
+      if ($.inArray([38, 40, 39, 37, 8, 9, 13], charCode) > -1) return;
       scrollToEnd();
-      var char;
-      char = String.fromCharCode(e.charCode);
+      var char = String.fromCharCode(charCode);
       $spanLeft.append(char);
       if (e.metaKey || e.ctrlKey || e.altKey){
         backSpace();
@@ -110,7 +109,7 @@ $.fn.console = function(options){
     var currentChar = $cursor.text();
     var text = $spanLeft.text();
     if (!text.length) return;
-    var char = text.substr(-1);
+    var char = text.charAt(text.length-1);
     $spanRight.prepend(currentChar);
     $cursor.text(char);
     $spanLeft.text(text.substr(0, text.length - 1));
@@ -141,9 +140,6 @@ $.fn.console = function(options){
   var enter = _enter = enterFactory(settings.label, settings.handler, true);
   
   var tab = function(){
-    //tabs acting weird, If came next a two char sized word it will only craete 2 spaces tabs
-   //if next a three char sized word the space will be eq to 1 space :S
-   // var text = document.createTextNode('\t');
     $spanLeft.append('    ');  
   };
   
