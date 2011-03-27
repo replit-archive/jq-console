@@ -13,12 +13,15 @@ $.fn.console = function(options) {
   var $stdoutItem = $historyItem.clone().addClass('out');
   var $paster = $('<textarea/>');
 
-  // Setup other stuff.
-  // TODO(max99x): Elaborate.
+  // Remember this element for use in callback.
+  var that = this;
+
+  // The element where output is currently being written.
   var currentOut = null;
+
+  // Setup history track.
   var history = [];
   var history_index = 0;
-  var that = this;
 
   // Setup configurable settings.
   var settings = {
