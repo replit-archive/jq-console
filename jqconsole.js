@@ -9,7 +9,7 @@ $.fn.console = function(options){
   var $spanLeft = $('<pre/>').appendTo($prompt);
   var $cursor = $('<pre/>',{id:"jq-console-cursor"}).appendTo($prompt);
   var $spanRight = $('<pre/>').appendTo($prompt);
-  var $historyItem = $('<div class="result"><pre></pre></div>');
+  var $historyItem = $('<div><pre></pre></div>');
   var $stdoutItem = $historyItem.clone().addClass('out');
   var $paster = $('<textarea/>');
   var currentOut = null;
@@ -39,8 +39,13 @@ $.fn.console = function(options){
   });
   $typer
     .keypress(function(e){
-      charCode = e.keyCode || e.charCode;
-      if ($.inArray([38, 40, 39, 37, 8, 9, 13], charCode) > -1) return;
+      //IE & Chrome captures charecters and return
+      //Mozilla captures all
+      //IE captures on keyCode
+      
+      if ($.browser.mozilla && !e.charCode) return;
+      charCode = e.charCode || e.keyCode;
+      if (charCode == 13) return;
       scrollToEnd();
       var char = String.fromCharCode(charCode);
       $spanLeft.append(char);
@@ -75,7 +80,7 @@ $.fn.console = function(options){
         return false;
         break;
       case 13:
-        enter();
+        enter(); 
         return false;
         break;      
       }
@@ -126,14 +131,13 @@ $.fn.console = function(options){
       var command = $prompt.text()
       $historyItem.clone().find('pre').html(command).end().appendTo($history);
       command = command.substr(label.length);
-      empty();
       currentOut = $stdoutItem.clone();
       callback(command, stdout, result);
       $promptLabel.text(settings.label);
       if (remember && command) history.push(command);
       history_index = history.length;
       enter = _enter;
-      scrollToEnd();
+      setContent("");
     };
   }
   var _enter;
@@ -145,21 +149,22 @@ $.fn.console = function(options){
   
   var stdout = function(text){
     // Lazy appending. I.e. on the first call to out append the output field
-    if (!currentOut.parent().length) currentOut.appendTo($history);
+    if (!currentOut.parent().is($history)) currentOut.appendTo($history);
     currentOut.find('pre').append(text);
+    scrollToEnd();
   };
 
   var result = function (text){
     text = text || '';
     $historyItem.clone().find('pre').html(text).end().appendTo($history); 
     currentOut = null;
+    scrollToEnd();
   };
   
   var getPast = function(){
     if (!history_index) return;
     history_index--;
-    empty();
-    $spanLeft.text(history[history_index]);
+    setContent(history[history_index]);
   };
 
   var getFuture = function(){
@@ -168,19 +173,57 @@ $.fn.console = function(options){
       return;
     }
     history_index++;
-    empty();
-    $spanLeft.text(history[history_index]);
+    setContent(history[history_index]);
   };
-
-  var scrollToEnd = function(){
-    that.scrollTop(that[0].scrollHeight);
+  
+  var setContent = function(text){
+    empty();
+    $spanLeft.text(text);
+    scrollToEnd();
   }
+
+  var scrollToEnd = function(wait){
+    var scroll = function(){that.scrollTop(that[0].scrollHeight);};
+    if (wait)
+      setTimeout(scroll, 100);
+    else
+      scroll();
+  }
+  var stdinQueue = [];
+  var stdinInFlight = false;
+  // Public API
   $.extend(this, {
     stdin: function(label, callback){
-      setTimeout(function(){
-      $promptLabel.text(label);
-      enter = enterFactory(label, callback);},100);
-    }
+      var cb = function (){
+        callback.apply(this,[].slice.call(arguments));
+        stdinInFlight = false;
+        check();
+      };
+      var qItem = function(){
+          stdinInFlight = true;
+          $promptLabel.text(label);
+          enter = enterFactory(label, cb);
+       
+      };
+      function check(){
+        setTimeout(function(){
+          if (!stdinInFlight && stdinQueue.length) stdinQueue.shift()();
+        }, 100);
+      }
+      stdinQueue.push(qItem);
+      check();
+  },
+    setText: function(text){
+      if (text){
+        setContent(text);
+      }
+    },
+    reset: function(){
+      empty();
+      $history.empty();
+    },
+    scrollToEnd: scrollToEnd
+
   }); 
   
 
@@ -188,3 +231,6 @@ $.fn.console = function(options){
 };
 
 })(jQuery);
+
+
+
