@@ -204,9 +204,8 @@ $.fn.console = function(options) {
   // Public API.
   $.extend(this, {
     stdin: function(callback) {
-      setTimeout(function() {
-        enter = enterFactory('', callback);
-      }, 100);
+      $promptLabel.text('');
+      enter = enterFactory('', callback);
     },
     setText: setContent,
     reset: function() {
