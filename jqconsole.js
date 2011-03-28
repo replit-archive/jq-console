@@ -144,15 +144,18 @@ $.fn.console = function(options) {
   var enterFactory = function(label, callback, remember) {
     return function() {
       var command = $prompt.text()
+      empty();
       $historyItem.clone().find('pre').html(command).end().appendTo($history);
       command = command.substr(label.length);
       currentOut = $stdoutItem.clone();
-      callback(command, stdout, result);
-      $promptLabel.text(settings.label);
-      if (remember && command) history.push(command);
-      history_index = history.length;
-      enter = _enter;
-      setContent("");
+      callback(command, stdout, function(text) {
+        $promptLabel.text(settings.label);
+        if (remember && command) history.push(command);
+        history_index = history.length;
+        enter = _enter;
+        setContent("");
+        result(text);
+      });
     };
   }
   var _enter;
@@ -172,7 +175,7 @@ $.fn.console = function(options) {
   var result = function (text) {
     text = text || '';
     $historyItem.clone().find('pre').html(text).end().appendTo($history); 
-    currentOut = null;
+    //currentOut = null;
     scrollToEnd();
   };
   
@@ -205,7 +208,10 @@ $.fn.console = function(options) {
   $.extend(this, {
     stdin: function(callback) {
       $promptLabel.text('');
-      enter = enterFactory('', callback);
+      enter = enterFactory('', function(text, stdout, complete) {
+        callback(text);
+        complete();
+      });
     },
     setText: setContent,
     reset: function() {
