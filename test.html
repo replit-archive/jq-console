@@ -1,3 +1,5 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
     <script src="jquery.js"></script>
@@ -10,8 +12,22 @@
       #console {
         background-color: black;
         color: white;
-        height: 200px;
-        padding: 5px;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 0;
+        margin: 0;
+      }
+      .jqconsole {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 10px;
+        margin: 0;
       }
       .jqconsole-cursor {
         background-color: gray;
@@ -24,7 +40,7 @@
 
         window.jqconsole = {
           print: function(s) { $console.Write(s + '\n'); },
-          input: function(cb) { $console.Input(false, cb); },
+          input: function(cb) { $console.Input(false, cb); }
         };
 
         var handler = function(command) {

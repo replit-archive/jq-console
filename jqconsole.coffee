@@ -53,14 +53,14 @@ class JQConsole
     @shortcuts = {}
 
     # The main console area. Everything else happens inside this.
-    @$console = $('<pre class="jqconsole">').appendTo container
+    @$console = $('<pre class="jqconsole"/>').appendTo container
 
     # The movable prompt span. When the console is in input mode, this is shown
     # and allows user input. Divided into the areas before and after the cursor.
-    @$prompt = $('<span class="jqconsole-input">')
-    @$prompt_left = $('<span>').appendTo @$prompt
+    @$prompt = $('<span class="jqconsole-input"/>')
+    @$prompt_left = $('<span/>').appendTo @$prompt
     @$prompt_left.css position: 'relative'
-    @$prompt_right = $('<span>').appendTo @$prompt
+    @$prompt_right = $('<span/>').appendTo @$prompt
     @$prompt_right.css position: 'relative'
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
@@ -69,13 +69,14 @@ class JQConsole
     @$prompt_cursor.insertBefore @$prompt_right
     @$prompt_cursor.css
       color: 'transparent'
-      display: 'inline-block'
+      display: 'inline'
       position: 'absolute'
       zIndex: 0
 
     # A hidden textbox which captures the user input when the console is in
     # input mode. Needed to be able to intercept paste events.
-    @$input_source = $('<textarea>', style: "position: absolute; left: -9999px")
+    @$input_source = $('<textarea/>')
+    @$input_source.css position: 'absolute', left: '-9999px'
     @$input_source.appendTo container
 
     # Prepare console for interaction.
@@ -183,11 +184,9 @@ class JQConsole
         @$input_source.focus()  # TODO(max99x): Check if needed.
       setTimeout handlePaste, 0
 
-    @$input_source.keypress (e) =>
-      @HandleChar e
+    @$input_source.keypress (e) => @HandleChar e
     key_event = if $.browser.mozilla then 'keypress' else 'keydown'
-    @$input_source[key_event] (e) =>
-      @HandleKey e
+    @$input_source[key_event] (e) => @HandleKey e
 
   # Scrolls the console area to its bottom.
   ScrollToEnd: ->
@@ -200,16 +199,18 @@ class JQConsole
     if @state == STATE_OUTPUT then return true
 
     # IE & Chrome capture non-control characters and Enter.
-    # Mozilla captures everything.
+    # Mozilla and Opera capture everything.
 
-    # Skip control characters which are captured on Mozilla.
-    if $.browser.mozilla and not event.charCode then return false
+    # Pass control characters which are captured on Mozilla.
+    if $.browser.mozilla and not event.charCode then return true
+    # Pass control characters which are captured on Opera.
+    if $.browser.opera and not event.which then return true
 
-    # IE captures on keyCode.
-    char_code = event.charCode or event.keyCode
+    # This is the most reliable cross-browser; charCode/keyCode break on Opera.
+    char_code = event.which
 
-    # Skip Enter on IE and Chrome.
-    if char_code == 13 then return false
+    # Skip Enter on IE and Chrome and Tab on Opera.
+    if char_code == 13 or char_code == 9 then return false
 
     # Skip everything when a modifier key other than shift is held.
     if event.metaKey or event.ctrlKey or event.altKey then return false
