@@ -3,56 +3,45 @@
     <script src="jquery.js"></script>
     <script src="jqconsole.js"></script>
     <style>
-      #console{
-        color: white;
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+      #console {
         background-color: black;
-        overflow: auto;
+        color: white;
         height: 200px;
+        padding: 5px;
       }
-      #jq-console-prompt{
-        outline:0;
-      }
-      #jq-console-cursor{
-        background-color: green;
-        height:15px;
-        width: 0.5em;
-       /* display: inline-block;*/
-      }
-      pre{
-        margin:0;
-        display: inline;
+      .jqconsole-cursor {
+        background-color: gray;
       }
     </style>
     <script>
       $(function(){
-        var $console = $('#console').console(
-        {
-          label: "javascript>",
-          greetings: "JSREPL, jsconsole.log() to log to this console",
-          handler: function(command, stdout, result){
-            window.jsconsole = {
-              log: stdout
-            };
-            window.stdin = $console.stdin;
-              try{
-                result(window.eval(command));
-              }catch(e){
-              console.log({a:e});
-              result(e.message)
-            }
+        var $console = $('#console').jqconsole(
+            'JQConsole, jqconsole.print() to write to this console.');
 
+        window.jqconsole = {
+          print: function(s) { $console.Write(s + '\n'); },
+          input: function(cb) { $console.Input(false, cb); },
+        };
+
+        var handler = function(command) {
+          try {
+            $console.Write('==> ' + window.eval(command));
+          } catch (e) {
+            $console.Write('ERROR: ' + e.message);
           }
-        }
-        );
+          $console.Write('\njavascript>');
+          $console.Input(true, handler);
+        };
+        $console.Write('\njavascript>');
+        $console.Input(true, handler);
       });
     </script>
   </head>
   <body>
     <div id="console"></div>
-  
   </body>
-
-  
-
-
 </html>
