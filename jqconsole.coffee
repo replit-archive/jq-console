@@ -116,14 +116,10 @@ class JQConsole
   # Writes the given text to the console in a <span>, with an optional class.
   #   @arg text: The text to write.
   #   @arg cls: The class to give the span containing the text. Optional.
-  Write: (text, cls, unescape) ->
+  Write: (text, cls) ->
     if @state != STATE_OUTPUT
       throw new Error 'Write() is only allowed in output state.'
     span = $ '<span>'
-    #Allow new lines and tabs
-    # TODO: translate remaining needed formatting chars.
-    if (!unescape)
-      text = text.replace(/[^\\]\\n/g,'\n').replace(/[^\\]\\t/g,'\t')
     span.text text
     if cls?
       span.addClass cls
@@ -382,7 +378,7 @@ class JQConsole
         @saved_lines = []
         @$prompt.detach()
         @state = STATE_OUTPUT
-        @Write text + '\n', undefined, true
+        @Write text + '\n'
         callback = @enter_callback
         @enter_callback = null
         callback text
