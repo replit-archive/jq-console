@@ -28,6 +28,7 @@ Example:<br />
 jqconsole.RegisterShortCut(82, function (jqcnsle) {
 	jqcnsle.Reset();
 });</pre><br />
+
 ####Usage:
 Unlike most plugins, jq-console gives you complete control over the plugin,<br />
 meaning method calls must be made inorder to start input/output:<br /><br />
@@ -48,8 +49,8 @@ jqconsole.Input(true, function (input) {
 It takes two arguments, text and class, the class being the DOM element class.<br />
 Examples: <br />
 <pre>jqconsole.Write(">>>", "prompt")</pre>
-<pre>jqconsole.write(output, "output")</pre>
-<pre>jqconsole.write(err.message, "error")</pre><br />
+<pre>jqconsole.Write(output, "output")</pre>
+<pre>jqconsole.Write(err.message, "error")</pre><br />
 
 `jqconsole.SetPromptText` Sets the terminal current input text.<br />
 Example: <br />
