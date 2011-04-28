@@ -148,9 +148,9 @@ class JQConsole
   #     user can select the input from history, and their input will also be
   #     added as a new history item.
   #   @arg result_callback: A function called with the user's input when the
-  #     user presses Enter.
+  #     user presses Enter and the input operation is complete.
   #   @arg multiline_callback: If specified, this function is called when the
-  #     the user presses Enter to check whether the input should continue to the
+  #     user presses Enter to check whether the input should continue to the
   #     next line. If this function returns a falsy value, the input operation
   #     is completed. Otherwise, input continues and the cursor moves to the
   #     next line.
