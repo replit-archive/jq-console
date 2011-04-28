@@ -3,8 +3,8 @@
 A simple jQuery terminal plugin written in CoffeeScript.
 
 This project was spawned because of our need for a simple web terminal plugin 
-for the <a href="http://github.com/amasad/jsrepl">jsREPL</a> project.<br/> 
-It tries to simulate a low level terminal by providing (almost) raw input/output
+for the <a href="http://github.com/amasad/jsrepl">jsREPL</a> project. It
+tries to simulate a low level terminal by providing (almost) raw input/output
 streams as well as input and output states.
 
 ##Tested Browsers
@@ -103,5 +103,5 @@ or output:
 
 ##Contributors
 
-[Max Shawabkeh](http://max99x.com/)
+[Max Shawabkeh](http://max99x.com/)  
 [Amjad Masad](http://twitter.com/amasad)
