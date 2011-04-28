@@ -7,7 +7,7 @@ for the <a href="http://github.com/amasad/jsrepl">jsREPL</a> project.<br/>
 It tries to simulate a low level terminal by providing (almost) raw input/output
 streams as well as input and output states.
 
-##Tested browsers
+##Tested Browsers
 
 The plugin has been tested on the following browsers:
 
@@ -17,16 +17,16 @@ The plugin has been tested on the following browsers:
 * Safari 4
 * Opera 10
 
-##Getting started:
+##Getting Started
 
-###Instantiate the plugin:
+###Instantiating
 
     var jqconsole = $(div).jqconsole(welcomeString);
 
 * `div` is the div element or selector.
 * `welcomeString` is the string to be shown when the terminal is first rendered.
 
-###Configuration:
+###Configuration
 
 There isn't much initial configuration needed, because the user must supply
 options and callbacks with each state change. The only config method is used to
@@ -41,7 +41,7 @@ create custom shortcuts:
     * `function callback`: A function called when the shortcut is pressed;
       "this" will point to the JQConsole object.
 
-  Example:
+    Example:
 
         // Ctrl+R: resets the console.
         jqconsole.RegisterShortCut(82, function() {
@@ -69,7 +69,7 @@ or output:
       is completed. Otherwise, input continues and the cursor moves to the next 
       line.
 
-  Example:
+    Example:
 
         jqconsole.Input(true, function(input) {
           alert(input);
@@ -77,7 +77,7 @@ or output:
           return /\\$/.test('asdasd \\');
         });
 
-* `jqconsole.Write`: Writes the given text to the console in a <span>, with an 
+* `jqconsole.Write`: Writes the given text to the console in a `<span>`, with an 
   optional class. This is used to for output and writing prompt labels. It takes
   two arguments:
 
@@ -85,21 +85,23 @@ or output:
 
     * `string cls`: The class to give the span containing the text. Optional.
 
-  Examples:
+    Examples:
 
         jqconsole.Write('>>>', 'prompt')
         jqconsole.Write(output, 'output')
         jqconsole.Write(err.message, 'error')
 
 * `jqconsole.SetPromptText` Sets the text currently in the input prompt. Takes
-  only one parameter, the text to put in the prompt.
+  only one parameter:
 
-  Examples:
+    * `string text`: The text to put in the prompt.
+
+    Examples:
 
         jqconsole.SetPromptText('>>>')
         jqconsole.SetPromptText('user@host$ ')
 
 ##Contributors
 
-[Max Shawabkeh](http://max99x.com/)  
+[Max Shawabkeh](http://max99x.com/)
 [Amjad Masad](http://twitter.com/amasad)
