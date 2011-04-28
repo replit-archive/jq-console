@@ -13,17 +13,16 @@ We have tested the plugin on the following browsers, however it may support othe
 <li> Opera </li>
 </ul>
 
-##How to use:
+##Getting started:
 ###Instantiate the plugin:
-<pre>var jqconsole = $(div).jqconsole(WelcomeString);</pre><br />
+<pre>var jqconsole = $(div).jqconsole(WelcomeString);</pre>
 &nbsp;&nbsp;div: is your div element or selector.<br />
 &nbsp;&nbsp;WelcomeString: Being the string to be shown when the terminal is first rendered.<br />
-WelcomeString: Being the string to be shown when the terminal is first rendered.<br />
 ###How does it work
 ####Configuration:
 There isn't much initial configuration needed, because the user must supply options and callbacks with each state change.<br />
-<pre>jqconsole.RegisterShortCut</pre> Register callbacks for specific keyboard shortcuts, all shortcuts currently is a combination of cntrl key + any_key_code.<br />
-It takes two arguments, keyCode and callback.
+`jqconsole.RegisterShortCut` Register callbacks for specific keyboard shortcuts, all shortcuts currently is a combination of cntrl key + any_key_code.<br />
+It takes two arguments, keyCode and callback.<br />
 Example:<br />
 <pre>// cntrl+r, resets console
 jqconsole.RegisterShortCut(82, function (jqcnsle) {
@@ -42,18 +41,18 @@ Example:<br />
 <pre>
 jqconsole.Input(true, function (input) {
 	alert(input);
-}, function (input) {return false;});</pre><br /><br />
+}, function (input) {return false;});</pre><br />
 
 `jqconsole.Write` Is used to write a static text to the terminal, usually used for output and writing the prompt label.<br />
 It takes two arguments, text and class, the class being the DOM element class.<br />
 Examples: <br />
-<pre>jqconsole.Write(">>>", "prompt")</pre><br />
-<pre>jqconsole.write(output, "output")</pre><br />
-<pre>jqconsole.write(err.message, "error")</pre><br /><br />
+<pre>jqconsole.Write(">>>", "prompt")</pre>
+<pre>jqconsole.write(output, "output")</pre>
+<pre>jqconsole.write(err.message, "error")</pre><br />
 
 `jqconsole.SetPromptText` Sets the terminal current input text.<br />
 Example: <br />
-<pre>jqconsole.SetPromptText("ls")</pre><br /><br />
+<pre>jqconsole.SetPromptText("ls")</pre><br />
 <pre>jqconsole.Reset()</pre> Resets the terminal to its initial state.<br />
 
 ##Contributers
