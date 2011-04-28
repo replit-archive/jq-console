@@ -1,4 +1,3 @@
-
 #jq-console
 
 A simple jQuery terminal plugin written in CoffeeScript.
@@ -49,7 +48,7 @@ create custom shortcuts:
           this.Reset();
         });
 
-###Usage
+##Usage
 
 Unlike most terminal plugins, jq-console gives you complete low-level control
 over the execution; you have to call the appropriate methods to start input
