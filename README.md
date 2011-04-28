@@ -27,8 +27,8 @@ Example:<br />
 <pre>// cntrl+r, resets console
 jqconsole.RegisterShortCut(82, function (jqcnsle) {
 	jqcnsle.Reset();
-});</pre><br /><br />
-####Usage
+});</pre><br />
+####Usage:
 Unlike most plugins, jq-console gives you complete control over the plugin,<br />
 meaning method calls must be made inorder to start input/output:<br /><br />
 `jqconsole.Input` takes three arguments: <br/>
@@ -43,6 +43,7 @@ jqconsole.Input(true, function (input) {
 	alert(input);
 }, function (input) {return false;});</pre><br />
 
+
 `jqconsole.Write` Is used to write a static text to the terminal, usually used for output and writing the prompt label.<br />
 It takes two arguments, text and class, the class being the DOM element class.<br />
 Examples: <br />
@@ -52,7 +53,7 @@ Examples: <br />
 
 `jqconsole.SetPromptText` Sets the terminal current input text.<br />
 Example: <br />
-<pre>jqconsole.SetPromptText("ls")</pre><br />
+<pre>jqconsole.SetPromptText("ls")</pre>
 <pre>jqconsole.Reset()</pre> Resets the terminal to its initial state.<br />
 
 ##Contributers
