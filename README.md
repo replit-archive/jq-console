@@ -98,8 +98,8 @@ or output:
 
     Examples:
 
-        jqconsole.SetPromptText('>>>')
-        jqconsole.SetPromptText('user@host$ ')
+        jqconsole.SetPromptText('ls')
+        jqconsole.SetPromptText('print [i ** 2 for i in range(10)]')
 
 ##Contributors
 
