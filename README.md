@@ -78,7 +78,7 @@ or output:
         });
 
 * `jqconsole.Write`: Writes the given text to the console in a `<span>`, with an 
-  optional class. This is used to for output and writing prompt labels. It takes
+  optional class. This is used for output and writing prompt labels. It takes
   two arguments:
 
     * `string text`: The text to write.
