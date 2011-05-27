@@ -104,4 +104,4 @@ or output:
 ##Contributors
 
 [Max Shawabkeh](http://max99x.com/)  
-[Amjad Masad](http://twitter.com/amasad)
+[Amjad Masad](http://twitter.com/amjad_masad)
