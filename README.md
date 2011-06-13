@@ -82,7 +82,7 @@ or output:
   when the current operation and all previously enqueued operations finish.
   Takes one argument:
 
-    * `function input_callback: A function called with the user's input when
+    * `function input_callback`: A function called with the user's input when
       the user presses Enter and the input operation is complete.
 
     Example:
@@ -134,8 +134,8 @@ or output:
         }, 2000);
 
 * `jqconsole.Write`: Writes the given text to the console in a `<span>`, with an 
-  optional class. This is used for output and writing prompt labels. Takes two
-  arguments:
+  optional class. If a prompt is currently being shown, the text is inserted
+  before it. Takes two arguments:
 
     * `string text`: The text to write.
 
