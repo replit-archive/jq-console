@@ -227,7 +227,6 @@ The console responds to the followind keys and key combinations by default:
 * `Ctrl+Delete`: Delete the following word.
 * `Backspace`: Delete the preceding character.
 * `Ctrl+Backspace`: Delete the preceding word.
-
 * `Ctrl+Left`: Move one word to the left.
 * `Ctrl+Right`: Move one word to the right.
 * `Home`: Move to the beginning of the current line.
@@ -236,13 +235,10 @@ The console responds to the followind keys and key combinations by default:
 * `Ctrl+End`: Move to the end of the last line.
 * `Shift+Up`, `Ctrl+Up`: Move cursor to the line above the current one.
 * `Shift+Down`, `Ctrl+Down`: Move cursor to the line below the current one.
-
 * `Tab`: Indent.
 * `Shift+Tab`: Unindent.
-
 * `Up`: Previous history item.
 * `Down`: Next history item.
-
 * `Enter`: Finish input/prompt operation. See Input() and Prompt() for details.
 * `Shift+Enter`: New line.
 
