@@ -464,12 +464,12 @@ class JQConsole
   #   @arg shift: Whether the shift key is held.
   _HandleEnter: (shift) ->
     if shift
-      @_InsertNewLine()
+      @_InsertNewLine true
     else
       text = @GetPromptText()
       if @multiline_callback and @multiline_callback text
         @_MoveToEnd true
-        @_InsertNewLine()
+        @_InsertNewLine true
       else
         # Done with input.
         cls_suffix = if @state == STATE_INPUT then 'input' else 'prompt'
@@ -624,18 +624,23 @@ class JQConsole
       line_text = line_text[1..]
 
   # Inserts a new line at the cursor position.
-  _InsertNewLine: ->
+  #   @arg indent: If specified and true, the inserted line is indented to the
+  #     same column as the last line.
+  _InsertNewLine: (indent = false) ->
     old_prompt = @_SelectPromptLabel not @$prompt_before.is ':empty'
     $old_line = $('<span/>').appendTo @$prompt_before
     $old_line.append $('<span/>').text old_prompt
     $old_line.append $('<span/>').text @$prompt_left.text()
 
     @$prompt_label.text @_SelectPromptLabel true
-    @$prompt_left.text ''
+    if indent and match = @$prompt_left.text().match /^\s+/
+      @$prompt_left.text match[0]
+    else
+      @$prompt_left.text ''
     @_ScrollToEnd()
 
   # Appends the given text to the prompt.
-  #   text: The text to append. Can contain multiple lines.
+  #   @arg text: The text to append. Can contain multiple lines.
   _AppendPromptText: (text) ->
     lines = text.split '\n'
     @$prompt_left.text @$prompt_left.text() + lines[0]
