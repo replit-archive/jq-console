@@ -73,7 +73,11 @@
             try {
               Function(command);
             } catch (e) {
-              return true;
+              if (/[\[\{\(]$/.test(command)) {
+                return 1;
+              } else {
+                return 0;
+              }
             }
             return false;
           });
