@@ -235,9 +235,11 @@ class JQConsole
   #     user presses Enter and the prompt operation is complete.
   #   @arg multiline_callback: If specified, this function is called when the
   #     user presses Enter to check whether the input should continue to the
-  #     next line. If this function returns a falsy value, the input operation
-  #     is completed. Otherwise, input continues and the cursor moves to the
-  #     next line.
+  #     next line. The function must return one of the following values:
+  #       false: the input operation is completed.
+  #       0: the input continues to the next line with the current indent.
+  #       N (int): the input continues to the next line, and the current indent
+  #         is adjusted by N, e.g. -2 to unindent two levels.
   Prompt: (history_enabled, result_callback, multiline_callback) ->
     if @state != STATE_OUTPUT
       @input_queue.push =>
@@ -477,9 +479,13 @@ class JQConsole
       @_InsertNewLine true
     else
       text = @GetPromptText()
-      if @multiline_callback and @multiline_callback text
+      indent = if @multiline_callback then @multiline_callback text else false
+      if indent isnt false
         @_MoveToEnd true
         @_InsertNewLine true
+        indent = @multiline_callback text
+        for _ in [0...Math.abs indent]
+          if indent > 0 then @_Indent() else @_Unindent()
       else
         # Done with input.
         cls_suffix = if @state == STATE_INPUT then 'input' else 'prompt'

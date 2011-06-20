@@ -106,9 +106,14 @@ or output:
 
     * `function multiline_callback`: If specified, this function is called when
       the user presses Enter to check whether the input should continue to the
-      next line. If this function returns a falsy value, the input operation
-      is completed. Otherwise, input continues and the cursor moves to the next
-      line.
+      next line. The function must return one of the following values:
+
+        * `false`: the input operation is completed.
+
+        * `0`: the input continues to the next line with the current indent.
+
+        * `N` (int): the input continues to the next line, and the current
+          indent is adjusted by `N`, e.g. `-2` to unindent two levels.
 
     Example:
 
