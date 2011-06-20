@@ -632,6 +632,7 @@ class JQConsole
 
     @$prompt_label.text @_SelectPromptLabel true
     @$prompt_left.text ''
+    @_ScrollToEnd()
 
   # Appends the given text to the prompt.
   #   text: The text to append. Can contain multiple lines.
