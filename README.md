@@ -248,6 +248,7 @@ The console responds to the followind keys and key combinations by default:
 Several CSS classes are provided to help stylize the console:
 
 * `jqconsole`: The main console container.
+* `jqconsole, jqconsole-blurred`: The main console container, when not in focus.
 * `jqconsole-cursor`: The cursor.
 * `jqconsole-header`: The welcome message at the top of the console.
 * `jqconsole-input`: The prompt area during input. May have multiple lines.

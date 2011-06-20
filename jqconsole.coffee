@@ -348,6 +348,12 @@ class JQConsole
           return document.selection.createRange().text
       if getSelection() == '' then @Focus()
 
+    # Mark the console with a style when it loses focus.
+    @$input_source.focus =>
+      @$console.removeClass 'jqconsole-blurred'
+    @$input_source.blur =>
+      @$console.addClass 'jqconsole-blurred'
+
     # Intercept pasting.
     paste_event = if $.browser.opera then 'input' else 'paste'
     @$input_source.bind paste_event, =>
