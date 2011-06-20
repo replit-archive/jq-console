@@ -341,12 +341,16 @@ class JQConsole
   _SetupEvents: ->
     # Redirect focus to the hidden textbox unless we selected something.
     @$console.click =>
-      getSelection = ->
-        if window.getSelection
-          return window.getSelection().toString()
-        else if document.selection?.type == "Text"
-          return document.selection.createRange().text
-      if getSelection() == '' then @Focus()
+      checkFocus = =>
+        getSelection = ->
+          if window.getSelection
+            return window.getSelection().toString()
+          else if document.selection?.type == "Text"
+            return document.selection.createRange().text
+        if getSelection() == '' then @Focus()
+      # Delay check until the browser has handled the event and removed the
+      # selection if it was clicked.
+      setTimeout checkFocus, 0
 
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
