@@ -483,7 +483,6 @@ class JQConsole
       if indent isnt false
         @_MoveToEnd true
         @_InsertNewLine true
-        indent = @multiline_callback text
         for _ in [0...Math.abs indent]
           if indent > 0 then @_Indent() else @_Unindent()
       else
