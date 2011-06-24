@@ -83,7 +83,14 @@ class JQConsole
     @$input_source = $('<textarea/>')
     @$input_source.css position: 'absolute', left: '-9999px'
     @$input_source.appendTo container
-
+    
+    # Hash containing opening, closing charecters to match in an
+    # array respectivley. Key is the concatenation of both chars.
+    @matchings = 
+      openings: {}
+      closings: {}
+      ids: []
+    
     # Prepare console for interaction.
     @_InitPrompt()
     @_SetupEvents()
@@ -280,6 +287,22 @@ class JQConsole
   GetIndentWidth: ->
     return @indent_width
 
+  #
+  Match: (open, close, id)->  
+    if id?
+      match_config = 
+        opening_char: open
+        closing_char: close
+        id: id
+        
+      @matchings.ids.push(id)
+      @matchings.openings[open] = match_config
+      @matchings.closings[close] = match_config
+    else
+      delete @matching.openings[open]
+      delete @matching.openings[close]
+      @matchings.ids.splice @matcings.ids.indexOf(id), 1
+    
   ###------------------------ Private Methods -------------------------------###
 
   _CheckInputQueue: ->
@@ -415,7 +438,9 @@ class JQConsole
     if @state == STATE_OUTPUT then return true
 
     key = event.keyCode or event.which
-
+    # Check for matchings next time the callstack is empty
+    # TODO (@max99x): Refactor code to fit this method call
+    setTimeout $.proxy(@_CheckMatchings, this), 0
     # Handle shortcuts.
     if event.altKey or event.metaKey and not event.ctrlKey
       # Allow Alt and Meta shortcuts.
@@ -675,7 +700,45 @@ class JQConsole
       return if continuation then @prompt_label_continue else @prompt_label_main
     else
       return if continuation then '\n ' else ' '
-
+  
+  _CheckMatchings: ->
+    current_char = @$prompt_right.text()[0]
+    $('#' + id).contents().unwrap() for id in @matchings.ids
+    
+    wrap_needle = ($elem, index, config)->
+      text = $elem.text()
+      html = text[0...index]+ 
+             "<span id=\"#{config.id}\">#{text[index]}</span>"+
+             text[index + 1...]
+      $elem.html(html)
+    
+    check_and_process = (config, back) =>
+      [CHAR, PROMPT_DIR, PROMPT_RELATIVE, INDEX_FN] = if back
+        ['opening_char', '$prompt_left', '$prompt_before', 'lastIndexOf']
+      else
+        ['closing_char', '$prompt_right', '$prompt_after', 'indexOf']
+        
+      needle = config[CHAR]
+      # check current line first
+      console.log PROMPT_DIR
+      text = @[PROMPT_DIR].text()
+      index = text[INDEX_FN](needle)
+      if index > -1
+        wrap_needle @[PROMPT_DIR], index, config
+      else
+        @[PROMPT_RELATIVE].each (i, elem) ->
+          $elem = $(elem).children().last()
+          text = $elem.text()
+          index = text[INDEX_FN](needle)
+          if index > -1
+            wrap_needle $elem, index, config
+            return false
+            
+    if config = @matchings.closings[current_char]
+      check_and_process config, true
+    else if config = @matchings.openings[current_char]
+      check_and_process config
+    
   # Sets the prompt to the previous history item.
   _HistoryPrevious: ->
     if not @history_active then return
