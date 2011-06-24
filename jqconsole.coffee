@@ -86,7 +86,7 @@ class JQConsole
     
     # Hash containing all matching settings
     # openings/closings[char] = matching_config 
-    # where char is the opening/closing charecter.
+    # where char is the opening/closing character.
     # clss is an array of classes for fast unhighlighting
     # for matching_config see Match method
     @matchings = 
@@ -290,10 +290,10 @@ class JQConsole
   GetIndentWidth: ->
     return @indent_width
 
-  # Adds/deletes charecter matching settings for a single matching
-  #   @arg open: the openning charecter
-  #   @arg close: the closing charecter
-  #   @arg cls: the html class to add to the matched charecters
+  # Adds/deletes character matching settings for a single matching
+  #   @arg open: the openning character
+  #   @arg close: the closing character
+  #   @arg cls: the html class to add to the matched characters
   Match: (open, close, cls)->  
     if cls?
       match_config = 
@@ -707,90 +707,110 @@ class JQConsole
     else
       return if continuation then '\n ' else ' '
   
-  # Unrwaps all prevoisly matched charecters.
-  # Checks if the cursor's current charecter is one to be matched, then walks
-  # the following/preceeding charecters to look for the opposing charecter that
-  # would satisfy the match. If found both charecters would be wrapped with a 
-  # span and applied the html class that was found in the match_config.
-  _CheckMatchings: ->
-    current_char = @$prompt_right.text()[0]
-    # on every move unwrap all matched elements
-    # TODO(amasad): cache previous matched elements since this must be costly
-    $('.' + cls, @$console).contents().unwrap() for cls in @matchings.clss
-    found = false
-    
-    walk = (text, char, opposing_char, current_count, back)->
-      index = if back then text.length else 0
-      read_char = () ->
-        if back
-          [text..., ret] = text
-        else
-          [ret, text...] = text
-        if ret
-          index = index + if back then -1 else +1
-        ret
-
-      while ch = read_char()
-        if ch is char
-          current_count++
-        else if ch is opposing_char
-          current_count--
-        if current_count is 0 
-          return {index: index, current_count: current_count}
-      
-      return {index: -1, current_count: current_count}
-      
-    wrap = ($elem, index, config)->
-      text = $elem.html()
-      html = text[0...index]+ 
-             "<span class=\"#{config.cls}\">#{text[index]}</span>"+
-             text[index + 1...]
-      $elem.html(html)
-    
-    check_and_process = (config, back) =>
-      [CHAR, OPPOSING_CHAR, PROMPT_DIR, PROMPT_RELATIVE] = if back
-        ['closing_char','opening_char',  '$prompt_left', '$prompt_before']
+  # Wraps a single character in an element with a <span> having a class
+  #   @arg $elem: The JqDom element in question
+  #   @arg index: the index of the character to be wrapped
+  #   @arg cls: the html class to be given to the wrapping <span>
+  _Wrap: ($elem, index, cls)->
+    text = $elem.html()
+    html = text[0...index]+ 
+           "<span class=\"#{cls}\">#{text[index]}</span>"+
+           text[index + 1...]
+    $elem.html(html)
+  
+  # Walks a string of characters incrementing current_count each time a char is found
+  # and decrementing each time an opposing char is found.
+  #   @arg text: the text in question
+  #   @arg char: the char that would increment the counter
+  #   @arg opposing_char: the char that would decrement the counter
+  #   @arg back: specifies whether the walking should be done backwards.
+  _WalkCharacters: (text, char, opposing_char, current_count, back)->
+    index = if back then text.length else 0
+    read_char = () ->
+      if back
+        [text..., ret] = text
       else
-        ['opening_char','closing_char',  '$prompt_right', '$prompt_after']
+        [ret, text...] = text
+      if ret
+        index = index + if back then -1 else +1
+      ret
+
+    while ch = read_char()
+      if ch is char
+        current_count++
+      else if ch is opposing_char
+        current_count--
+      if current_count is 0 
+        return {index: index, current_count: current_count}
+
+    return {index: -1, current_count: current_count}
+  
+  _ProcessMatch: (config, back) =>
+      [char, opposing_char, $prompt_which, $prompt_relative] = if back
+        [
+          config['closing_char']
+          config['opening_char']  
+          @$prompt_left
+          @$prompt_before
+        ]
+      else
+        [
+          config['opening_char']
+          config['closing_char']
+          @$prompt_right
+          @$prompt_after
+        ]
       
       current_count = 1
-      char = config[CHAR]
-      opposing_char = config[OPPOSING_CHAR]
-      
+      found = false
       # check current line first
-      text = @[PROMPT_DIR].text()
-      # When on the same line discard checking the first charecter, going backwards
-      # is not an issue since the cursor's current charecter is found in $prompt_right
+      text = $prompt_which.text()
+      # When on the same line discard checking the first character, going backwards
+      # is not an issue since the cursor's current character is found in $prompt_right.
       if !back then text = text[1...]
-      {index, current_count} = walk text, char, opposing_char, current_count, back
+      {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
       if index > -1
-        wrap @[PROMPT_DIR], index, config
+        @_Wrap $prompt_which, index, config.cls
         found = true
       else
-        $collection = @[PROMPT_RELATIVE].children()
+        $collection = $prompt_relative.children()
         # When going backwards we have to the reverse our jQuery collection
         # for fair matchings
         $collection = if back then Array.prototype.reverse.call($collection) else $collection
         $collection.each (i, elem) ->
           $elem = $(elem).children().last()
           text = $elem.text()
-          {index, current_count} = walk text, char, opposing_char, current_count, back
+          {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
           if index > -1
             # When checking for matchings ona different line going forward we must decrement 
             # the index since the current char is not included
             if !back then index--
-            wrap $elem, index, config
+            @_Wrap $elem, index, config.cls
             found = true
             return false
             
+      return found
+  
+  # Unrwaps all prevoisly matched characters.
+  # Checks if the cursor's current character is one to be matched, then walks
+  # the following/preceeding characters to look for the opposing character that
+  # would satisfy the match. If found both characters would be wrapped with a 
+  # span and applied the html class that was found in the match_config.
+  _CheckMatchings: ->
+    current_char = @$prompt_right.text()[0]
+    # on every move unwrap all matched elements
+    # TODO(amasad): cache previous matched elements since this must be costly
+    $('.' + cls, @$console).contents().unwrap() for cls in @matchings.clss
+                
     if config = @matchings.closings[current_char]
-      check_and_process config, true
+      found = @_ProcessMatch config, true
     else if config = @matchings.openings[current_char]
-      check_and_process config
+      found = @_ProcessMatch config
     
     # Wrap current element when a matching was found
-    wrap @$prompt_right, 0, config if found
+    @_Wrap @$prompt_right, 0, config.cls if found
     
+  
   # Sets the prompt to the previous history item.
   _HistoryPrevious: ->
     if not @history_active then return
