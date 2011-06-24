@@ -118,14 +118,10 @@ class JQConsole
     @$prompt.appendTo @$console
     @Write @header, 'jqconsole-header'
     return undefined
-
-  # Registers a Ctrl+Key shortcut.
-  #   @arg key_code: The code of the key pressing which (when Ctrl is held) will
-  #     trigger this shortcut. If a string is provided, the character code of
-  #     the first character is taken.
-  #   @arg callback: A function called when the shortcut is pressed; "this" will
-  #     point to the JQConsole object.
-  RegisterShortcut: (key_code, callback) ->
+  
+  ###------------------------ Shortcut Methods -----------------------------###
+  
+  _CheckKeyCode: (key_code) ->
     if isNaN key_code
       key_code = key_code.charCodeAt 0
     else
@@ -133,17 +129,54 @@ class JQConsole
 
     if not (0 < key_code < 256) or isNaN key_code
       throw new Error 'Key code must be a number between 0 and 256 exclusive.'
+    
+    return key_code
+  
+  _LetterCaseHelper: (key_code, callback)->
+    callback key_code
+    if 65 <= key_code <= 90 then callback key_code + 32
+    if 97 <= key_code <= 122 then callback key_code - 32
+    
+  # Registers a Ctrl+Key shortcut.
+  #   @arg key_code: The code of the key pressing which (when Ctrl is held) will
+  #     trigger this shortcut. If a string is provided, the character code of
+  #     the first character is taken.
+  #   @arg callback: A function called when the shortcut is pressed; "this" will
+  #     point to the JQConsole object.
+  RegisterShortcut: (key_code, callback) ->
+    key_code = @_CheckKeyCode key_code
     if not callback instanceof Function
       throw new Error 'Callback must be a function, not ' + callback + '.'
 
     addShortcut = (key) =>
       if key not of @shortcuts then @shortcuts[key] = []
       @shortcuts[key].push callback
-    addShortcut key_code
-    if 65 <= key_code <= 90 then addShortcut key_code + 32
-    if 97 <= key_code <= 122 then addShortcut key_code - 32
+    
+    @_LetterCaseHelper key_code, addShortcut
     return undefined
-
+  
+  # Removes a Ctrl+Key shortcut from shortcut registry.
+  #   @arg key_code: The code of the key pressing which (when Ctrl is held) will
+  #     trigger this shortcut. If a string is provided, the character code of
+  #     the first character is taken.
+  #   @arg handler: The handler that was used when registering the shortcut,
+  #     if not supplied then all shortcut handlers corrosponding to the key
+  #     would be removed.
+  UnRegisterShortcut: (key_code, handler) ->
+    key_code = @_CheckKeyCode key_code
+    
+    removeShortcut = (key)=>
+      if key of @shortcuts
+        if handler
+          @shortcuts[key].splice @shortcuts[key].indexOf(handler), 1
+        else
+          delete @shortcuts[key]
+    
+    @_LetterCaseHelper key_code, removeShortcut
+    return undefined
+  
+  ###---------------------- END Shortcut Methods ---------------------------###
+  
   # Returns the 0-based number of the column on which the cursor currently is.
   GetColumn: ->
     @$prompt_cursor.text ''
