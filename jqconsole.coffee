@@ -567,73 +567,85 @@ class JQConsole
         @input_callback = null
         if callback then callback text
         @_CheckInputQueue()
-
+        
+  _VerticalMove: (up) ->
+    [
+      $prompt_which
+      $prompt_opposite
+      $prompt_relative
+      MoveToLimit
+      MoveDirection
+    ] = 
+    if up
+      [
+        @$prompt_left 
+        @$prompt_right
+        @$prompt_before
+        $.proxy(@_MoveToStart, this)
+        $.proxy(@_MoveLeft, this)
+      ]
+    else
+      [
+        @$prompt_right
+        @$prompt_left
+        @$prompt_after
+        $.proxy(@_MoveToEnd, this)
+        $.proxy(@_MoveRight, this)
+      ]
+            
+    if $prompt_relative.is ':empty' then return
+    pos = @$prompt_left.text().length
+    MoveToLimit()
+    MoveDirection()
+    $prompt_opposite.text if up then $prompt_which.text()[pos..] else $prompt_which.text()[0...pos]
+    $prompt_which.text if up then $prompt_which.text()[0...pos] else $prompt_which.text()[pos..]
+    
+    
   # Moves the cursor to the line above the current one, in the same column.
   _MoveUp: ->
-    if @$prompt_before.is ':empty' then return
-    pos = @$prompt_left.text().length
-    @_MoveToStart()
-    @_MoveLeft()
-    @$prompt_right.text @$prompt_left.text()[pos..]
-    @$prompt_left.text @$prompt_left.text()[0...pos]
+    @_VerticalMove true
 
   # Moves the cursor to the line below the current one, in the same column.
   _MoveDown: ->
-    if @$prompt_after.is ':empty' then return
-    pos = @$prompt_left.text().length
-    @_MoveToEnd()
-    @_MoveRight()
-    @$prompt_left.text @$prompt_right.text()[0...pos]
-    @$prompt_right.text @$prompt_right.text()[pos..]
-
+    @_VerticalMove()
+  
+  _HorizontalMove: (whole_word, back) ->
+    [$prompt_which, $prompt_opposite, $prompt_relative, $prompt_rel_opposite, which_end, where_append] = if back
+      [@$prompt_left, @$prompt_right, @$prompt_before, @$prompt_after, 'last', 'prependTo']
+    else
+      [@$prompt_right, @$prompt_left, @$prompt_after, @$prompt_before, 'first', 'appendTo']
+    
+    text = $prompt_which.text()
+    if text
+      if whole_word
+        word = text.match if back then /\w*\W*$/ else /^\w*\W*/
+        if not word then return
+        word = word[0]
+        $prompt_opposite.text if back then word + $prompt_opposite.text() else $prompt_opposite.text() + word
+        $prompt_which.text if back then text[...-word.length] else text[word.length...]
+      else
+        $prompt_opposite.text if back then text[-1...] + $prompt_opposite.text() else $prompt_opposite.text() + text[0]
+        $prompt_which.text if back then text[...-1] else text[1...]
+    else if not $prompt_relative.is ':empty'
+      $which_line = $('<span/>')[where_append] $prompt_rel_opposite
+      $which_line.append $('<span/>').text @$prompt_label.text()
+      $which_line.append $('<span/>').text $prompt_opposite.text()
+      
+      $opposite_line = $prompt_relative.children()[which_end]().detach()
+      @$prompt_label.text $opposite_line.children().first().text()
+      $prompt_which.text $opposite_line.children().last().text()
+      $prompt_opposite.text ''
+      
   # Moves the cursor to the left.
   #   @arg whole_word: Whether to move by a whole word rather than a character.
   _MoveLeft: (whole_word) ->
-    text = @$prompt_left.text()
-    if text
-      if whole_word
-        word = text.match /\w*\W*$/
-        if not word then return
-        word = word[0]
-        @$prompt_right.text word + @$prompt_right.text()
-        @$prompt_left.text text[...-word.length]
-      else
-        @$prompt_right.text text[-1...] + @$prompt_right.text()
-        @$prompt_left.text text[...-1]
-    else if not @$prompt_before.is ':empty'
-      $lower_line = $('<span/>').prependTo @$prompt_after
-      $lower_line.append $('<span/>').text @$prompt_label.text()
-      $lower_line.append $('<span/>').text @$prompt_right.text()
-
-      $upper_line = @$prompt_before.children().last().detach()
-      @$prompt_label.text $upper_line.children().first().text()
-      @$prompt_left.text $upper_line.children().last().text()
-      @$prompt_right.text ''
+    @_HorizontalMove whole_word, true
 
   # Moves the cursor to the right.
   #   @arg whole_word: Whether to move by a whole word rather than a character.
   _MoveRight: (whole_word) ->
-    text = @$prompt_right.text()
-    if text
-      if whole_word
-        word = text.match /^\w*\W*/
-        if not word then return
-        word = word[0]
-        @$prompt_left.text @$prompt_left.text() + word
-        @$prompt_right.text text[word.length...]
-      else
-        @$prompt_left.text @$prompt_left.text() + text[0]
-        @$prompt_right.text text[1...]
-    else if not @$prompt_after.is ':empty'
-      $upper_line = $('<span/>').appendTo @$prompt_before
-      $upper_line.append $('<span/>').text @$prompt_label.text()
-      $upper_line.append $('<span/>').text @$prompt_left.text()
-
-      $lower_line = @$prompt_after.children().first().detach()
-      @$prompt_label.text $lower_line.children().first().text()
-      @$prompt_left.text ''
-      @$prompt_right.text $lower_line.children().last().text()
-
+    @_HorizontalMove whole_word
+    
   # Moves the cursor to the start of the current prompt line.
   #   @arg all_lines: If true, moves to the beginning of the first prompt line,
   #     instead of the beginning of the current.
