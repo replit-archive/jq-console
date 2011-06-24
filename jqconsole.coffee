@@ -89,7 +89,7 @@ class JQConsole
     @matchings = 
       openings: {}
       closings: {}
-      ids: []
+      clss: []
     
     # Prepare console for interaction.
     @_InitPrompt()
@@ -288,20 +288,20 @@ class JQConsole
     return @indent_width
 
   #
-  Match: (open, close, id)->  
-    if id?
+  Match: (open, close, cls)->  
+    if cls?
       match_config = 
         opening_char: open
         closing_char: close
-        id: id
+        cls: cls
         
-      @matchings.ids.push(id)
+      @matchings.clss.push(cls)
       @matchings.openings[open] = match_config
       @matchings.closings[close] = match_config
     else
-      delete @matching.openings[open]
-      delete @matching.openings[close]
-      @matchings.ids.splice @matcings.ids.indexOf(id), 1
+      delete @matchings.openings[open]
+      delete @matchings.closings[close]
+      @matchings.clss.splice @matchings.clss.indexOf(cls), 1
     
   ###------------------------ Private Methods -------------------------------###
 
@@ -703,41 +703,83 @@ class JQConsole
   
   _CheckMatchings: ->
     current_char = @$prompt_right.text()[0]
-    $('#' + id).contents().unwrap() for id in @matchings.ids
+    # on every move unwrap all matched elements
+    # TODO(amasad): cache previous cached elements since this must be costly
+    $('.' + cls, @$console).contents().unwrap() for cls in @matchings.clss
+    found = false
     
-    wrap_needle = ($elem, index, config)->
-      text = $elem.text()
+    # Walks a string of charecters to find the best a
+    walk = (text, char, opposing_char, current_count, back)->
+      index = if back then text.length else 0
+      read_char = () ->
+        if back
+          [text..., ret] = text
+        else
+          [ret, text...] = text
+        if ret
+          index = index + if back then -1 else +1
+        ret
+
+      while ch = read_char()
+        if ch is char
+          current_count++
+        else if ch is opposing_char
+          current_count--
+        if current_count is 0 
+          return {index: index, current_count: current_count}
+      
+      return {index: -1, current_count: current_count}
+      
+    wrap = ($elem, index, config)->
+      text = $elem.html()
       html = text[0...index]+ 
-             "<span id=\"#{config.id}\">#{text[index]}</span>"+
+             "<span class=\"#{config.cls}\">#{text[index]}</span>"+
              text[index + 1...]
       $elem.html(html)
     
     check_and_process = (config, back) =>
-      [CHAR, PROMPT_DIR, PROMPT_RELATIVE, INDEX_FN] = if back
-        ['opening_char', '$prompt_left', '$prompt_before', 'lastIndexOf']
+      [CHAR, OPPOSING_CHAR, PROMPT_DIR, PROMPT_RELATIVE] = if back
+        ['closing_char','opening_char',  '$prompt_left', '$prompt_before']
       else
-        ['closing_char', '$prompt_right', '$prompt_after', 'indexOf']
-        
-      needle = config[CHAR]
+        ['opening_char','closing_char',  '$prompt_right', '$prompt_after']
+      
+      current_count = 1
+      char = config[CHAR]
+      opposing_char = config[OPPOSING_CHAR]
+      
       # check current line first
-      console.log PROMPT_DIR
       text = @[PROMPT_DIR].text()
-      index = text[INDEX_FN](needle)
+      # When on the same line discard checking the first charecter, going backwards
+      # is not an issue since the cursor's current charecter is found in $prompt_right
+      if !back then text = text[1...]
+      {index, current_count} = walk(text, char, opposing_char, current_count, back)
       if index > -1
-        wrap_needle @[PROMPT_DIR], index, config
+        wrap @[PROMPT_DIR], index, config
+        found = true
       else
-        @[PROMPT_RELATIVE].each (i, elem) ->
+        $collection = @[PROMPT_RELATIVE].children()
+        # When going backwards we have to the reverse our jQuery collection
+        # for fair matchings
+        $collection = if back then Array.prototype.reverse.call($collection) else $collection
+        $collection.each (i, elem) ->
           $elem = $(elem).children().last()
           text = $elem.text()
-          index = text[INDEX_FN](needle)
+          {index, current_count} = walk(text, char, opposing_char, current_count, back)
           if index > -1
-            wrap_needle $elem, index, config
+            # When checking for matchings ona different line going forward we must decrement 
+            # the index since the current char is not included
+            if !back then index--
+            wrap $elem, index, config
+            found = true
             return false
             
     if config = @matchings.closings[current_char]
       check_and_process config, true
     else if config = @matchings.openings[current_char]
       check_and_process config
+    
+    # Wrap current element when a matching was found
+    wrap(@$prompt_right, 0, config) if found
     
   # Sets the prompt to the previous history item.
   _HistoryPrevious: ->
