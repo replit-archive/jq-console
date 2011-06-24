@@ -290,12 +290,11 @@ class JQConsole
   GetIndentWidth: ->
     return @indent_width
 
-  # Adds/deletes character matching settings for a single matching
+  # Registers character matching settings for a single matching
   #   @arg open: the openning character
   #   @arg close: the closing character
   #   @arg cls: the html class to add to the matched characters
-  Match: (open, close, cls)->  
-    if cls?
+  RegisterMatching: (open, close, cls) ->  
       match_config = 
         opening_char: open
         closing_char: close
@@ -304,10 +303,15 @@ class JQConsole
       @matchings.clss.push(cls)
       @matchings.openings[open] = match_config
       @matchings.closings[close] = match_config
-    else
-      delete @matchings.openings[open]
-      delete @matchings.closings[close]
-      @matchings.clss.splice @matchings.clss.indexOf(cls), 1
+  
+  # Unregisters a character matching. cls is optional.
+  UnRegisterMatching: (open, close) ->
+    cls = @matchings.openings[open].cls
+    delete @matchings.openings[open]
+    delete @matchings.closings[close]
+    @matchings.clss.splice @matchings.clss.indexOf(cls), 1
+  
+  
     
   ###------------------------ Private Methods -------------------------------###
 
