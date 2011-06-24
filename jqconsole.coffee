@@ -84,8 +84,11 @@ class JQConsole
     @$input_source.css position: 'absolute', left: '-9999px'
     @$input_source.appendTo container
     
-    # Hash containing opening, closing charecters to match in an
-    # array respectivley. Key is the concatenation of both chars.
+    # Hash containing all matching settings
+    # openings/closings[char] = matching_config 
+    # where char is the opening/closing charecter.
+    # clss is an array of classes for fast unhighlighting
+    # for matching_config see Match method
     @matchings = 
       openings: {}
       closings: {}
@@ -287,7 +290,10 @@ class JQConsole
   GetIndentWidth: ->
     return @indent_width
 
-  #
+  # Adds/deletes charecter matching settings for a single matching
+  #   @arg open: the openning charecter
+  #   @arg close: the closing charecter
+  #   @arg cls: the html class to add to the matched charecters
   Match: (open, close, cls)->  
     if cls?
       match_config = 
@@ -701,14 +707,18 @@ class JQConsole
     else
       return if continuation then '\n ' else ' '
   
+  # Unrwaps all prevoisly matched charecters.
+  # Checks if the cursor's current charecter is one to be matched, then walks
+  # the following/preceeding charecters to look for the opposing charecter that
+  # would satisfy the match. If found both charecters would be wrapped with a 
+  # span and applied the html class that was found in the match_config.
   _CheckMatchings: ->
     current_char = @$prompt_right.text()[0]
     # on every move unwrap all matched elements
-    # TODO(amasad): cache previous cached elements since this must be costly
+    # TODO(amasad): cache previous matched elements since this must be costly
     $('.' + cls, @$console).contents().unwrap() for cls in @matchings.clss
     found = false
     
-    # Walks a string of charecters to find the best a
     walk = (text, char, opposing_char, current_count, back)->
       index = if back then text.length else 0
       read_char = () ->
@@ -752,7 +762,7 @@ class JQConsole
       # When on the same line discard checking the first charecter, going backwards
       # is not an issue since the cursor's current charecter is found in $prompt_right
       if !back then text = text[1...]
-      {index, current_count} = walk(text, char, opposing_char, current_count, back)
+      {index, current_count} = walk text, char, opposing_char, current_count, back
       if index > -1
         wrap @[PROMPT_DIR], index, config
         found = true
@@ -764,7 +774,7 @@ class JQConsole
         $collection.each (i, elem) ->
           $elem = $(elem).children().last()
           text = $elem.text()
-          {index, current_count} = walk(text, char, opposing_char, current_count, back)
+          {index, current_count} = walk text, char, opposing_char, current_count, back
           if index > -1
             # When checking for matchings ona different line going forward we must decrement 
             # the index since the current char is not included
@@ -779,7 +789,7 @@ class JQConsole
       check_and_process config
     
     # Wrap current element when a matching was found
-    wrap(@$prompt_right, 0, config) if found
+    wrap @$prompt_right, 0, config if found
     
   # Sets the prompt to the previous history item.
   _HistoryPrevious: ->
