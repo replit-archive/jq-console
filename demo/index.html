@@ -44,6 +44,15 @@
         color: #bb0;
         font-weight: normal;
       }
+      .brace {
+        color: #00FFFF;
+      }
+      .paran {
+        color: #FF00FF;
+      }
+      .bracket {
+        color: #FFFF00;
+      }
     </style>
     <script>
       $(function() {
@@ -58,7 +67,10 @@
           jqconsole.AbortPrompt();
           handler();
         });
-
+        
+        jqconsole.RegisterMatching('{', '}', 'brace');
+        jqconsole.RegisterMatching('(', ')', 'paran');
+        jqconsole.RegisterMatching('[', ']', 'bracket');
         // Handle a command.
         var handler = function(command) {
           if (command) {
