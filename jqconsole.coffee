@@ -567,38 +567,50 @@ class JQConsole
         @input_callback = null
         if callback then callback text
         @_CheckInputQueue()
-        
+  
+  _GetDirectionals: (back) ->
+    $prompt_which = if back then @$prompt_left else @$prompt_right
+    $prompt_opposite = if back then @$prompt_right else @$prompt_left
+    $prompt_relative = if back then @$prompt_before else @$prompt_after
+    $prompt_rel_opposite = if back then @$prompt_after else @$prompt_before
+    MoveToLimit = if back
+      $.proxy @_MoveToStart, @
+    else 
+      $.proxy @_MoveToEnd, @
+    MoveDirection = if back
+      $.proxy @_MoveLeft, @ 
+    else 
+      $.proxy @_MoveRight, @
+    which_end = if back then 'last' else 'first'
+    where_append = if back then 'prependTo' else 'appendTo'
+    {
+      $prompt_which
+      $prompt_opposite
+      $prompt_relative
+      $prompt_rel_opposite
+      MoveToLimit
+      MoveDirection
+      which_end
+      where_append
+    }
+    
+     
   _VerticalMove: (up) ->
-    [
+    {
       $prompt_which
       $prompt_opposite
       $prompt_relative
       MoveToLimit
       MoveDirection
-    ] = 
-    if up
-      [
-        @$prompt_left 
-        @$prompt_right
-        @$prompt_before
-        $.proxy(@_MoveToStart, this)
-        $.proxy(@_MoveLeft, this)
-      ]
-    else
-      [
-        @$prompt_right
-        @$prompt_left
-        @$prompt_after
-        $.proxy(@_MoveToEnd, this)
-        $.proxy(@_MoveRight, this)
-      ]
+    } = @_GetDirectionals(up)
             
     if $prompt_relative.is ':empty' then return
     pos = @$prompt_left.text().length
     MoveToLimit()
     MoveDirection()
-    $prompt_opposite.text if up then $prompt_which.text()[pos..] else $prompt_which.text()[0...pos]
-    $prompt_which.text if up then $prompt_which.text()[0...pos] else $prompt_which.text()[pos..]
+    text = $prompt_which.text()
+    $prompt_opposite.text if up then text[pos..] else text[...pos]
+    $prompt_which.text if up then text[...pos] else text[pos..]
     
     
   # Moves the cursor to the line above the current one, in the same column.
@@ -610,21 +622,29 @@ class JQConsole
     @_VerticalMove()
   
   _HorizontalMove: (whole_word, back) ->
-    [$prompt_which, $prompt_opposite, $prompt_relative, $prompt_rel_opposite, which_end, where_append] = if back
-      [@$prompt_left, @$prompt_right, @$prompt_before, @$prompt_after, 'last', 'prependTo']
-    else
-      [@$prompt_right, @$prompt_left, @$prompt_after, @$prompt_before, 'first', 'appendTo']
+    {
+      $prompt_which
+      $prompt_opposite
+      $prompt_relative
+      $prompt_rel_opposite
+      which_end
+      where_append
+    } = @_GetDirectionals(back)
+    regexp = if back then /\w*\W*$/ else /^\w*\W*/
     
     text = $prompt_which.text()
     if text
       if whole_word
-        word = text.match if back then /\w*\W*$/ else /^\w*\W*/
+        word = text.match regexp
         if not word then return
         word = word[0]
-        $prompt_opposite.text if back then word + $prompt_opposite.text() else $prompt_opposite.text() + word
-        $prompt_which.text if back then text[...-word.length] else text[word.length...]
+        tmp = $prompt_opposite.text()
+        $prompt_opposite.text if back then word + tmp else tmp + word
+        len = word.length
+        $prompt_which.text if back then text[...-len] else text[len..]
       else
-        $prompt_opposite.text if back then text[-1...] + $prompt_opposite.text() else $prompt_opposite.text() + text[0]
+        tmp = $prompt_opposite.text()
+        $prompt_opposite.text if back then text[-1...] + tmp else tmp + text[0]
         $prompt_which.text if back then text[...-1] else text[1...]
     else if not $prompt_relative.is ':empty'
       $which_line = $('<span/>')[where_append] $prompt_rel_opposite
@@ -645,30 +665,35 @@ class JQConsole
   #   @arg whole_word: Whether to move by a whole word rather than a character.
   _MoveRight: (whole_word) ->
     @_HorizontalMove whole_word
+  
+  _MoveTo: (all_lines, back) ->
+    {
+      $prompt_which
+      $prompt_opposite
+      $prompt_relative
+      MoveToLimit
+      MoveDirection
+    } = @_GetDirectionals(back)
     
+    if all_lines
+      # Warning! FF hangs on is(':empty')
+      until $prompt_relative.is(':empty') and $prompt_which.text() == ''
+        MoveToLimit false
+        MoveDirection false
+    else
+      $prompt_opposite.text @$prompt_left.text() + @$prompt_right.text()
+      $prompt_which.text ''
+      
   # Moves the cursor to the start of the current prompt line.
   #   @arg all_lines: If true, moves to the beginning of the first prompt line,
   #     instead of the beginning of the current.
   _MoveToStart: (all_lines) ->
-    if all_lines
-      # WARNING: @$prompt_left.is(':empty') hangs on Firefox 3.x.
-      until @$prompt_before.is(':empty') and @$prompt_left.text() == ''
-        @_MoveToStart false
-        @_MoveLeft false
-    else
-      @$prompt_right.text @$prompt_left.text() + @$prompt_right.text()
-      @$prompt_left.text ''
+    @_MoveTo all_lines, true
 
   # Moves the cursor to the end of the current prompt line.
   _MoveToEnd: (all_lines) ->
-    if all_lines
-      # WARNING: @$prompt_right.is(':empty') hangs on Firefox 3.x.
-      until @$prompt_after.is(':empty') and @$prompt_right.text() == ''
-        @_MoveToEnd false
-        @_MoveRight false
-    else
-      @$prompt_left.text @$prompt_left.text() + @$prompt_right.text()
-      @$prompt_right.text ''
+    @_MoveTo all_lines, false
+
 
   # Deletes the character or word following the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
@@ -795,20 +820,17 @@ class JQConsole
     return {index: -1, current_count: current_count}
   
   _ProcessMatch: (config, back) =>
-      [char, opposing_char, $prompt_which, $prompt_relative] = if back
+      [char, opposing_char] = if back
         [
           config['closing_char']
-          config['opening_char']  
-          @$prompt_left
-          @$prompt_before
+          config['opening_char']
         ]
       else
         [
           config['opening_char']
           config['closing_char']
-          @$prompt_right
-          @$prompt_after
         ]
+      {$prompt_which, $prompt_relative} = @_GetDirectionals(back)
       
       current_count = 1
       found = false
