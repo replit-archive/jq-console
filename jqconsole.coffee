@@ -676,7 +676,7 @@ class JQConsole
     } = @_GetDirectionals(back)
     
     if all_lines
-      # Warning! FF hangs on is(':empty')
+      # Warning! FF 3.6 hangs on is(':empty')
       until $prompt_relative.is(':empty') and $prompt_which.text() == ''
         MoveToLimit false
         MoveDirection false
@@ -800,6 +800,7 @@ class JQConsole
   #   @arg back: specifies whether the walking should be done backwards.
   _WalkCharacters: (text, char, opposing_char, current_count, back)->
     index = if back then text.length else 0
+    text = text.split ''
     read_char = () ->
       if back
         [text..., ret] = text
@@ -848,7 +849,7 @@ class JQConsole
         # When going backwards we have to the reverse our jQuery collection
         # for fair matchings
         $collection = if back then Array.prototype.reverse.call($collection) else $collection
-        $collection.each (i, elem) ->
+        $collection.each (i, elem) =>
           $elem = $(elem).children().last()
           text = $elem.text()
           {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
