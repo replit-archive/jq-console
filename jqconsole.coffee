@@ -113,6 +113,10 @@ class JQConsole
     @history_index = 0
     @history_current = ''
     @shortcuts = {}
+    @matchings = 
+      openings: {}
+      closings: {}
+      clss: []
     @$prompt.detach()
     @$console.html ''
     @$prompt.appendTo @$console
