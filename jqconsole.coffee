@@ -796,7 +796,6 @@ class JQConsole
   #   @arg index: the index of the character to be wrapped
   #   @arg cls: the html class to be given to the wrapping <span>
   _Wrap: ($elem, index, cls) ->
-    console.log $elem.clone()
     offset = 0
     text = $.map $elem.contents(), (elem, i) =>
       if elem.nodeType != 3
@@ -862,9 +861,7 @@ class JQConsole
       # is not an issue since the cursor's current character is found in $prompt_right.
       if !back then text = text[1...]
       if before_char and back then text = text[...-1]
-      console.log '5a4a', text
       {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
-      console.log index, current_count
       if index > -1
         @_Wrap $prompt_which, index, config.cls
         found = true
