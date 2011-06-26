@@ -796,12 +796,17 @@ class JQConsole
   #   @arg index: the index of the character to be wrapped
   #   @arg cls: the html class to be given to the wrapping <span>
   _Wrap: ($elem, index, cls) ->
+    console.log $elem.clone()
+    offset = 0
     text = $.map $elem.contents(), (elem, i) =>
       if elem.nodeType != 3
-        return @_outerHTML $(elem)
+        html = @_outerHTML $(elem)
+        offset += html.length - 1
+        return html
       return elem.textContent
     
     text = text.join('')
+    index += offset if index != 0
     html = text[0...index]+ 
            "<span class=\"#{cls}\">#{text[index]}</span>"+
            text[index + 1...]
@@ -836,7 +841,7 @@ class JQConsole
 
     return {index: -1, current_count: current_count}
   
-  _ProcessMatch: (config, back) =>
+  _ProcessMatch: (config, back, before_char) =>
       [char, opposing_char] = if back
         [
           config['closing_char']
@@ -856,7 +861,10 @@ class JQConsole
       # When on the same line discard checking the first character, going backwards
       # is not an issue since the cursor's current character is found in $prompt_right.
       if !back then text = text[1...]
+      if before_char and back then text = text[...-1]
+      console.log '5a4a', text
       {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
+      console.log index, current_count
       if index > -1
         @_Wrap $prompt_which, index, config.cls
         found = true
@@ -884,19 +892,26 @@ class JQConsole
   # the following/preceeding characters to look for the opposing character that
   # would satisfy the match. If found both characters would be wrapped with a 
   # span and applied the html class that was found in the match_config.
-  _CheckMatchings: ->
-    current_char = @$prompt_right.text()[0]
+  _CheckMatchings: (before_char) ->
+    current_char = if before_char then @$prompt_left.text()[@$prompt_left.text().length - 1...] else @$prompt_right.text()[0]
     # on every move unwrap all matched elements
     # TODO(amasad): cache previous matched elements since this must be costly
     $('.' + cls, @$console).contents().unwrap() for cls in @matchings.clss
                 
     if config = @matchings.closings[current_char]
-      found = @_ProcessMatch config, true
+      found = @_ProcessMatch config, true, before_char
     else if config = @matchings.openings[current_char]
-      found = @_ProcessMatch config
+      found = @_ProcessMatch config, false, before_char
+    else if not before_char
+      @_CheckMatchings true
+      
+      
     
+    if before_char
+      @_Wrap @$prompt_left, @$prompt_left.text().length - 1, config.cls if found
+    else
     # Wrap current element when a matching was found
-    @_Wrap @$prompt_right, 0, config.cls if found
+      @_Wrap @$prompt_right, 0, config.cls if found
     
   
   # Sets the prompt to the previous history item.
