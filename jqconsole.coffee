@@ -785,16 +785,28 @@ class JQConsole
     else
       return if continuation then '\n ' else ' '
   
+  _outerHTML: ($elem) ->
+    if document.body.outerHTML 
+      return $elem.get(0).outerHTML
+    else
+      return $('<div/>').append($elem.eq(0).clone()).html()
+    
   # Wraps a single character in an element with a <span> having a class
   #   @arg $elem: The JqDom element in question
   #   @arg index: the index of the character to be wrapped
   #   @arg cls: the html class to be given to the wrapping <span>
-  _Wrap: ($elem, index, cls)->
-    text = $elem.html()
+  _Wrap: ($elem, index, cls) ->
+    text = $.map $elem.contents(), (elem, i) =>
+      if elem.nodeType != 3
+        return @_outerHTML $(elem)
+      return elem.textContent
+    
+    text = text.join('')
     html = text[0...index]+ 
            "<span class=\"#{cls}\">#{text[index]}</span>"+
            text[index + 1...]
-    $elem.html(html)
+
+    $elem.html html
   
   # Walks a string of characters incrementing current_count each time a char is found
   # and decrementing each time an opposing char is found.
@@ -802,7 +814,7 @@ class JQConsole
   #   @arg char: the char that would increment the counter
   #   @arg opposing_char: the char that would decrement the counter
   #   @arg back: specifies whether the walking should be done backwards.
-  _WalkCharacters: (text, char, opposing_char, current_count, back)->
+  _WalkCharacters: (text, char, opposing_char, current_count, back) ->
     index = if back then text.length else 0
     text = text.split ''
     read_char = () ->
