@@ -902,8 +902,6 @@ class JQConsole
     else if not before_char
       @_CheckMatchings true
       
-      
-    
     if before_char
       @_Wrap @$prompt_left, @$prompt_left.text().length - 1, config.cls if found
     else
