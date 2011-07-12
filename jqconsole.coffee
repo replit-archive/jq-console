@@ -565,7 +565,7 @@ class JQConsole
         if @history_active
           if not @history.length or @history[@history.length - 1] != text
             @history.push text
-            @history_index = @history.length
+          @history_index = @history.length
         @state = STATE_OUTPUT
         callback = @input_callback
         @input_callback = null
