@@ -125,6 +125,8 @@ class JQConsole
   
   ###------------------------ Shortcut Methods -----------------------------###
   
+  # Checks the type/value of key codes passed in for registering/unregistering
+  #   shortcuts and handles accordingly.
   _CheckKeyCode: (key_code) ->
     if isNaN key_code
       key_code = key_code.charCodeAt 0
@@ -136,6 +138,8 @@ class JQConsole
     
     return key_code
   
+  # A helper function responsible for calling the register/unregister callback
+  #   twice passing in both the upper and lower case letters.
   _LetterCaseHelper: (key_code, callback)->
     callback key_code
     if 65 <= key_code <= 90 then callback key_code + 32
@@ -572,6 +576,8 @@ class JQConsole
         if callback then callback text
         @_CheckInputQueue()
   
+  # Returns the appropriate variables for usage in methods that depends on the
+  #   direction of the interaction with the console.
   _GetDirectionals: (back) ->
     $prompt_which = if back then @$prompt_left else @$prompt_right
     $prompt_opposite = if back then @$prompt_right else @$prompt_left
@@ -587,7 +593,7 @@ class JQConsole
       $.proxy @_MoveRight, @
     which_end = if back then 'last' else 'first'
     where_append = if back then 'prependTo' else 'appendTo'
-    {
+    return {
       $prompt_which
       $prompt_opposite
       $prompt_relative
@@ -598,7 +604,8 @@ class JQConsole
       where_append
     }
     
-     
+  # Moves the cursor vertically in the current prompt,
+  #   in the same column. (Used by _MoveUp, _MoveDown)
   _VerticalMove: (up) ->
     {
       $prompt_which
@@ -625,6 +632,8 @@ class JQConsole
   _MoveDown: ->
     @_VerticalMove()
   
+  # Moves the cursor horizontally in the current prompt.
+  #   Used by _MoveLeft, _MoveRight
   _HorizontalMove: (whole_word, back) ->
     {
       $prompt_which
@@ -670,6 +679,7 @@ class JQConsole
   _MoveRight: (whole_word) ->
     @_HorizontalMove whole_word
   
+  # Moves the cursor either to the start or end of the current prompt line(s).
   _MoveTo: (all_lines, back) ->
     {
       $prompt_which
@@ -785,6 +795,7 @@ class JQConsole
     else
       return if continuation then '\n ' else ' '
   
+  # Cross-browser outerHTML
   _outerHTML: ($elem) ->
     if document.body.outerHTML 
       return $elem.get(0).outerHTML
