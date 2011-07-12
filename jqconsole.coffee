@@ -218,7 +218,7 @@ class JQConsole
     else
       getPromptLines = (node) ->
         buffer = []
-        node.children().each -> buffer.push $(':last-child', @).text()
+        node.children().each -> buffer.push $(@).children().last().text()
         return buffer.join '\n'
 
       before = getPromptLines @$prompt_before
