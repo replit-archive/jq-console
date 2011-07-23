@@ -223,8 +223,8 @@ or output:
         jqconsole.SetIndentWidth(4);
         console.assert(jqconsole.GetIndentWidth() == 4);
 
-* `jqconsole.RegisterMatching`: Registers an opening closing characters to 
-  match and highlight. Takes one parameters:
+* `jqconsole.RegisterMatching`: Registers an opening and closing characters to 
+  match and highlight (wraps each opening and closing character with a span with the specified class) Takes one parameters:
     
     * `char open`: The opening character of a "block".
     * `char close`: The closing character of a "block".
