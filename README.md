@@ -223,6 +223,27 @@ or output:
         jqconsole.SetIndentWidth(4);
         console.assert(jqconsole.GetIndentWidth() == 4);
 
+* `jqconsole.RegisterMatching`: Registers an opening closing characters to 
+  match and highlight. Takes one parameters:
+    
+    * `char open`: The opening character of a "block".
+    * `char close`: The closing character of a "block".
+    * `string class`: The css class that is applied to the matched characters.
+
+    Example:
+
+        jqconsole.RegisterMatching('{', '}', 'brackets');
+
+* `jqconsole.UnRegisterMatching`: Deletes a certain matching settings set by
+  `jqconsole.RegisterMatching`. Takes two paramaters:
+
+    * `char open`: The opening character of a "block".
+    * `char close`: The closing character of a "block".
+
+    Example:
+
+        jqconsole.UnRegisterMatching('{', '}');
+
 
 ##Default Key Config
 
