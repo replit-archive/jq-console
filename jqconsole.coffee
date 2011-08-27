@@ -248,8 +248,8 @@ class JQConsole
   # Writes the given text to the console in a <span>, with an optional class.
   #   @arg text: The text to write.
   #   @arg cls: The class to give the span containing the text. Optional.
-  Write: (text, cls) ->
-    span = $('<span>').text text
+  Write: (text, cls, escape=true) ->
+    span = $('<span/>')[if escape then 'text' else 'html'] text
     if cls? then span.addClass cls
     span.insertBefore @$prompt
     @_ScrollToEnd()
@@ -807,20 +807,10 @@ class JQConsole
   #   @arg index: the index of the character to be wrapped
   #   @arg cls: the html class to be given to the wrapping <span>
   _Wrap: ($elem, index, cls) ->
-    offset = 0
-    text = $.map $elem.contents(), (elem, i) =>
-      if elem.nodeType != 3
-        html = @_outerHTML $(elem)
-        offset += html.length - 1
-        return html
-      return elem.textContent
-    
-    text = text.join('')
-    index += offset if index != 0
+    text = $elem.html()
     html = text[0...index]+ 
            "<span class=\"#{cls}\">#{text[index]}</span>"+
            text[index + 1...]
-
     $elem.html html
   
   # Walks a string of characters incrementing current_count each time a char is found
@@ -867,7 +857,7 @@ class JQConsole
       current_count = 1
       found = false
       # check current line first
-      text = $prompt_which.text()
+      text = $prompt_which.html()
       # When on the same line discard checking the first character, going backwards
       # is not an issue since the cursor's current character is found in $prompt_right.
       if !back then text = text[1...]
@@ -883,7 +873,7 @@ class JQConsole
         $collection = if back then Array.prototype.reverse.call($collection) else $collection
         $collection.each (i, elem) =>
           $elem = $(elem).children().last()
-          text = $elem.text()
+          text = $elem.html()
           {index, current_count} = @_WalkCharacters text, char, opposing_char, current_count, back
           if index > -1
             # When checking for matchings ona different line going forward we must decrement 
@@ -914,7 +904,7 @@ class JQConsole
       @_CheckMatchings true
       
     if before_char
-      @_Wrap @$prompt_left, @$prompt_left.text().length - 1, config.cls if found
+      @_Wrap @$prompt_left, @$prompt_left.html().length - 1, config.cls if found
     else
     # Wrap current element when a matching was found
       @_Wrap @$prompt_right, 0, config.cls if found
