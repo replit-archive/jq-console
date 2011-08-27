@@ -146,6 +146,9 @@ or output:
 
     * `string cls`: The class to give the span containing the text. Optional.
 
+    * `bool escape`: Whether the text to write should be html escaped.
+      Optional, defaults to true.
+
     Examples:
 
         jqconsole.Write(output, 'my-output-class')
