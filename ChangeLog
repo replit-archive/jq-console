@@ -1,0 +1,5 @@
+2011.08.28, Version 2.4.2
+
+* Fix for issue #13 .
+* Add optional paramater "escape" to the Write method, see README for more
+info.
