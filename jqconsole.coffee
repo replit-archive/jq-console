@@ -555,26 +555,32 @@ class JQConsole
       @_InsertNewLine true
     else
       text = @GetPromptText()
-      indent = if @multiline_callback then @multiline_callback text else false
-      if indent isnt false
-        @_MoveToEnd true
-        @_InsertNewLine true
-        for _ in [0...Math.abs indent]
-          if indent > 0 then @_Indent() else @_Unindent()
+      cont = (indent) =>
+        if indent isnt false
+          @_MoveToEnd true
+          @_InsertNewLine true
+          for _ in [0...Math.abs indent]
+            if indent > 0 then @_Indent() else @_Unindent()
+        else
+          # Done with input.
+          cls_suffix = if @state == STATE_INPUT then 'input' else 'prompt'
+          @Write @GetPromptText(true) + '\n', 'jqconsole-old-' + cls_suffix
+          @ClearPromptText true
+          if @history_active
+            if not @history.length or @history[@history.length - 1] != text
+              @history.push text
+            @history_index = @history.length
+          @state = STATE_OUTPUT
+          callback = @input_callback
+          @input_callback = null
+          if callback then callback text
+          @_CheckInputQueue()
+      
+      if @multiline_callback
+        @multiline_callback text, cont
       else
-        # Done with input.
-        cls_suffix = if @state == STATE_INPUT then 'input' else 'prompt'
-        @Write @GetPromptText(true) + '\n', 'jqconsole-old-' + cls_suffix
-        @ClearPromptText true
-        if @history_active
-          if not @history.length or @history[@history.length - 1] != text
-            @history.push text
-          @history_index = @history.length
-        @state = STATE_OUTPUT
-        callback = @input_callback
-        @input_callback = null
-        if callback then callback text
-        @_CheckInputQueue()
+        cont false
+          
   
   # Returns the appropriate variables for usage in methods that depends on the
   #   direction of the interaction with the console.
