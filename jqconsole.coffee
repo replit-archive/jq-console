@@ -77,6 +77,8 @@ class JQConsole
 
     # The main console area. Everything else happens inside this.
     @$console = $('<pre class="jqconsole"/>').appendTo container
+    # Whether the console currently has focus.
+    @$console_focused = true
 
     # A hidden textbox which captures the user input when the console is in
     # input mode. Needed to be able to intercept paste events.
@@ -430,9 +432,16 @@ class JQConsole
 
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
+      @$console_focused = true
       @$console.removeClass 'jqconsole-blurred'
+      removeClass = =>
+        if @$console_focused then @$console.removeClass 'jqconsole-blurred'
+      setTimeout removeClass, 100
     @$input_source.blur =>
-      @$console.addClass 'jqconsole-blurred'
+      @$console_focused = false
+      addClass = =>
+        if not @$console_focused then @$console.addClass 'jqconsole-blurred'
+      setTimeout addClass, 100
 
     # Intercept pasting.
     paste_event = if $.browser.opera then 'input' else 'paste'
