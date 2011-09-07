@@ -17,6 +17,8 @@ KEY_UP = 38
 KEY_DOWN = 40
 KEY_HOME = 36
 KEY_END = 35
+KEY_PAGE_UP = 33
+KEY_PAGE_DOWN = 34
 
 # Default prompt text for main and continuation prompts.
 DEFAULT_PROMPT_LABEL = '>>> '
@@ -514,6 +516,8 @@ class JQConsole
         when KEY_TAB then @_Unindent()
         when KEY_UP then  @_MoveUp()
         when KEY_DOWN then @_MoveDown()
+        when KEY_PAGE_UP then @_ScrollUp()
+        when KEY_PAGE_DOWN then @_ScrollDown()
         # Allow other Shift shortcuts to pass through to the browser.
         else return true
       return false
@@ -530,6 +534,8 @@ class JQConsole
         when KEY_DOWN then @_HistoryNext()
         when KEY_HOME then @_MoveToStart false
         when KEY_END then @_MoveToEnd false
+        when KEY_PAGE_UP then @_ScrollUp()
+        when KEY_PAGE_DOWN then @_ScrollDown()
         # Let any other key continue its way to keypress.
         else return true
       return false
@@ -790,6 +796,16 @@ class JQConsole
     for line in lines[1..]
       @_InsertNewLine()
       @$prompt_left.text line
+
+  # Scrolls the console area up one page (with animation).
+  _ScrollUp: ->
+    target = @$console[0].scrollTop - @$console.height()
+    @$console.animate {scrollTop: target}, 'fast'
+
+  # Scrolls the console area down one page (with animation).
+  _ScrollDown: ->
+    target = @$console[0].scrollTop + @$console.height()
+    @$console.animate {scrollTop: target}, 'fast'
 
   # Scrolls the console area to its bottom.
   _ScrollToEnd: ->

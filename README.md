@@ -270,6 +270,8 @@ The console responds to the followind keys and key combinations by default:
 * `Down`: Next history item.
 * `Enter`: Finish input/prompt operation. See Input() and Prompt() for details.
 * `Shift+Enter`: New line.
+* `Page Up`: Scroll console one page up.
+* `Page Down`: Scroll console one page down.
 
 
 ##CSS Classes
