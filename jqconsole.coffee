@@ -432,6 +432,8 @@ class JQConsole
   # Binds all the required input and focus events.
   _SetupEvents: ->
     # Redirect focus to the hidden textbox unless we selected something.
+    # Mouse position is saved on mousedown and checked against on keyup
+    # if its different then we are selecting.
     mouse_pos = 
       X: null
       Y: null
