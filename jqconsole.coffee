@@ -85,7 +85,19 @@ class JQConsole
     # A hidden textbox which captures the user input when the console is in
     # input mode. Needed to be able to intercept paste events.
     @$input_source = $('<textarea/>')
-    @$input_source.css position: 'absolute', left: '-9999px'
+    @$input_source.css 
+      position: 'absolute'
+      'z-index': -1
+      width: 10
+      height: 30
+      opacity: 0
+      background: 'transparent'
+      appearance: 'none'
+      '-moz-appearance': 'none'
+      border: 'none'
+      resize: 'none'
+      outline: 'none'
+      overflow: 'hidden'
     @$input_source.appendTo container
     
     # Hash containing all matching settings
@@ -420,18 +432,19 @@ class JQConsole
   # Binds all the required input and focus events.
   _SetupEvents: ->
     # Redirect focus to the hidden textbox unless we selected something.
-    @$console.click =>
-      checkFocus = =>
-        getSelection = ->
-          if window.getSelection
-            return window.getSelection().toString()
-          else if document.selection?.type == "Text"
-            return document.selection.createRange().text
-        if getSelection() == '' then @Focus()
-      # Delay check until the browser has handled the event and removed the
-      # selection if it was clicked.
-      setTimeout checkFocus, 0
+    mouse_pos = 
+      X: null
+      Y: null
 
+    @$console.mousedown (e) =>
+      mouse_pos.X = e.pageX
+      mouse_pos.Y = e.pageY
+      
+    @$console.mouseup (e)=>
+      if mouse_pos.X is e.pageX and mouse_pos.Y is e.pageY
+        e.preventDefault()
+        @Focus()
+        
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
       @$console_focused = true
@@ -809,7 +822,17 @@ class JQConsole
 
   # Scrolls the console area to its bottom.
   _ScrollToEnd: ->
+    line_height = @$prompt_cursor.height()
+    screen_top = $(window).scrollTop()
+    pos = @$prompt_cursor.position()
     @$console.scrollTop @$console[0].scrollHeight
+    
+    # Move the input element to the cursor position.
+    @$input_source.css
+      left: pos.left
+      top: pos.top
+    if screen_top < @$prompt_cursor.position().top - (2 * line_height) or screen_top > @$prompt_cursor.position().top
+      $(window).scrollTop @$prompt_cursor.position().top - (2 * line_height)
 
   # Selects the prompt label appropriate to the current mode.
   #   @arg continuation: If true, returns the continuation prompt rather than
