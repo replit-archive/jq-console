@@ -459,8 +459,13 @@ class JQConsole
       removeClass = =>
         if @$console_focused then @$console.removeClass 'jqconsole-blurred'
       setTimeout removeClass, 100
+      hideTextInput = =>
+        if @isIos and @$console_focused then @$input_source.hide()
+      setTimeout hideTextInput, 500
+      
     @$input_source.blur =>
       @$console_focused = false
+      if @isIos then @$input_source.show()
       addClass = =>
         if not @$console_focused then @$console.addClass 'jqconsole-blurred'
       setTimeout addClass, 100
@@ -844,32 +849,33 @@ class JQConsole
     doc_height = document.documentElement.clientHeight
     pos = @$prompt_cursor.offset()
     rel_pos = @$prompt_cursor.position()
-    
+
     # Scroll console to the bottom.
     @$console.scrollTop @$console[0].scrollHeight
-    
     # Move the input element to the cursor position.
     @$input_container.css
-      left: rel_pos.left
-      top: rel_pos.top
+      left: rel_pos.left 
+      top: rel_pos.top 
     
     optimal_pos = pos.top - (2 * line_height)
-    # There is no way to detect the current viewport height or width in mobiles
-    # Good thing that there is a default behavior for typing:
-    # Orientation : horizontal
-    #   Viewport is 230 pixel wide
-    #   As there is some different 
+    # AFAK there is no way to detect the current viewport height or width in 
+    # mobiles, good thing that there is a default behavior for typing:
+    # in iOS (So far tested on iPhone):
+    #   viewport becomes 320 wide in landscape and 220 in portrait orientation.
+    # in Android:
+    #   320 and 530 - 570???
     if @isMobile and orientation?
-      console.log screen_top, pos.top
       if screen_top  < pos.top or screen_top > pos.top
         @$window.scrollTop optimal_pos
 
       if @isIos
          viewport_width = if orientation == 0 then 220 else 330
+         if screen_left + viewport_width < pos.left or pos.left < screen_left
+           @$window.scrollLeft pos.left
+      ###
        else if @isAndroid
-         viewport_width = if orientation == 0 then 320 else 570
-      if screen_left + viewport_width < pos.left or pos.left < screen_left
-        @$window.scrollLeft pos.left
+         viewport_width = if orientation == 0 then 320 else 570###
+
     else  
       # If the window is scrolled beyond the cursor, scroll to the cursor's
       # position and give two line to the top. 
