@@ -91,7 +91,7 @@ class JQConsole
     
     # On screen somehow invisible textbox for input.
     # Copied from codemirror2, this works for both mobile and desktop browsers.
-    @$input_container = $('<div/>').appendTo container
+    @$input_container = $('<div/>').appendTo @$console
     @$input_container.css
       position: 'relative'
       width: 1
@@ -137,8 +137,10 @@ class JQConsole
       closings: {}
       clss: []
     @$prompt.detach()
+    @$input_container.detach()
     @$console.html ''
     @$prompt.appendTo @$console
+    @$input_container.appendTo @$console
     @Write @header, 'jqconsole-header'
     return undefined
   
@@ -856,7 +858,10 @@ class JQConsole
       if screen_top  < pos.top or screen_top > pos.top
         @$window.scrollTop optimal_pos
 
-      viewport_width = if orientation == 0 then 220 else 320
+      if @isIos
+         viewport_width = if orientation == 0 then 220 else 330
+       else if @isAndroid
+         viewport_width = if orientation == 0 then 320 else 570
       if screen_left + viewport_width < pos.left or pos.left < screen_left
         @$window.scrollLeft pos.left
     else  
