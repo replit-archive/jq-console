@@ -858,24 +858,12 @@ class JQConsole
       top: rel_pos.top 
     
     optimal_pos = pos.top - (2 * line_height)
-    # AFAK there is no way to detect the current viewport height or width in 
-    # mobiles, good thing that there is a default behavior for typing:
-    # in iOS (So far tested on iPhone):
-    #   viewport becomes 320 wide in landscape and 220 in portrait orientation.
-    # in Android:
-    #   320 and 530 - 570???
+    # Follow the cursor vertically on mobile and desktop.
     if @isMobile and orientation?
-      if screen_top  < pos.top or screen_top > pos.top
+      # Since the keyboard takes up most of the screen, we don't care about how
+      # far the the cursor position from the screen top is. We just follow it.
+      if screen_top < pos.top or screen_top > pos.top
         @$window.scrollTop optimal_pos
-
-      if @isIos
-         viewport_width = if orientation == 0 then 220 else 330
-         if screen_left + viewport_width < pos.left or pos.left < screen_left
-           @$window.scrollLeft pos.left
-      ###
-       else if @isAndroid
-         viewport_width = if orientation == 0 then 320 else 570###
-
     else  
       # If the window is scrolled beyond the cursor, scroll to the cursor's
       # position and give two line to the top. 
