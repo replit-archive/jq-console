@@ -37,6 +37,13 @@ class JQConsole
   #   @arg prompt_continue: The label to show before continuation lines of the
   #     command prompt. Optional. Defaults to DEFAULT_PROMPT_CONINUE_LABEL.
   constructor: (container, header, prompt_label, prompt_continue_label) ->
+    # Mobile devices supported sniff.
+    @isMobile = !!navigator.userAgent.match /iPhone|iPad|iPod|Android/i
+    @isIos = !!navigator.userAgent.match /iPhone|iPad|iPod/i
+    @isAndroid = !!navigator.userAgent.match /Android/i
+    
+    @$window = $(window)
+    
     # The header written when the console is reset.
     @header = header or ''
 
@@ -81,24 +88,20 @@ class JQConsole
     @$console = $('<pre class="jqconsole"/>').appendTo container
     # Whether the console currently has focus.
     @$console_focused = true
-
-    # A hidden textbox which captures the user input when the console is in
-    # input mode. Needed to be able to intercept paste events.
-    @$input_source = $('<textarea/>')
-    @$input_source.css 
-      position: 'absolute'
-      'z-index': -1
-      width: 10
-      height: 30
-      opacity: 0
-      background: 'transparent'
-      appearance: 'none'
-      '-moz-appearance': 'none'
-      border: 'none'
-      resize: 'none'
-      outline: 'none'
+    
+    # On screen somehow invisible textbox for input.
+    # Copied from codemirror2, this works for both mobile and desktop browsers.
+    @$input_container = $('<div/>').appendTo container
+    @$input_container.css
+      position: 'relative'
+      width: 1
+      height: 0
       overflow: 'hidden'
-    @$input_source.appendTo container
+    @$input_source = $('<textarea/>')
+    @$input_source.attr('wrap', 'off').css
+      position: 'absolute'
+      width: 2
+    @$input_source.appendTo @$input_container
     
     # Hash containing all matching settings
     # openings/closings[char] = matching_config 
@@ -426,8 +429,8 @@ class JQConsole
     @$prompt_cursor.css
       color: 'transparent'
       display: 'inline'
-      position: 'absolute'
       zIndex: 0
+    @$prompt_cursor.css('position', 'absolute') if not @isMobile
 
   # Binds all the required input and focus events.
   _SetupEvents: ->
@@ -758,6 +761,7 @@ class JQConsole
   # Deletes the character or word preceding the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
   _Backspace: (whole_word) ->
+    setTimeout $.proxy(@_ScrollToEnd, @), 0
     text = @$prompt_left.text()
     if text
       if whole_word
@@ -822,20 +826,43 @@ class JQConsole
     target = @$console[0].scrollTop + @$console.height()
     @$console.animate {scrollTop: target}, 'fast'
 
-  # Scrolls the console area to its bottom.
+  # Scrolls the console area to its bottom;
+  # Scrolls the window to the cursor vertical position.
+  # On mobile scrolls the window to the cursor's horizontal position.
   _ScrollToEnd: ->
     line_height = @$prompt_cursor.height()
-    screen_top = $(window).scrollTop()
+    screen_top = @$window.scrollTop()
+    screen_left = @$window.scrollLeft()
+    doc_height = document.documentElement.clientHeight
     pos = @$prompt_cursor.position()
+    
+    # Scroll console to the bottom.
     @$console.scrollTop @$console[0].scrollHeight
     
     # Move the input element to the cursor position.
-    @$input_source.css
+    @$input_container.css
       left: pos.left
       top: pos.top
-    if screen_top < @$prompt_cursor.position().top - (2 * line_height) or screen_top > @$prompt_cursor.position().top
-      $(window).scrollTop @$prompt_cursor.position().top - (2 * line_height)
+    
+    optimal_pos = pos.top - (2 * line_height)
+    # There is no way to detect the current viewport height or width in mobiles
+    # Good thing that there is a default behavior for typing:
+    # Orientation : horizontal
+    #   Viewport is 230 pixel wide
+    #   As there is some different 
+    if @isMobile and orientation?
+      if screen_top  < optimal_pos or screen_top > optimal_pos
+        @$window.scrollTop optimal_pos
 
+      viewport_width = if orientation == 0 then 220 else 320
+      if screen_left + viewport_width < pos.left or pos.left < screen_left
+        @$window.scrollLeft pos.left
+    else  
+      # If the window is scrolled beyond the cursor, scroll to the cursor's
+      # position and give two line to the top. 
+      if screen_top + doc_height < pos.top or screen_top > optimal_pos
+        @$window.scrollTop optimal_pos
+      
   # Selects the prompt label appropriate to the current mode.
   #   @arg continuation: If true, returns the continuation prompt rather than
   #     the main one.
