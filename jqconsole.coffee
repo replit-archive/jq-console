@@ -840,15 +840,16 @@ class JQConsole
     screen_top = @$window.scrollTop()
     screen_left = @$window.scrollLeft()
     doc_height = document.documentElement.clientHeight
-    pos = @$prompt_cursor.position()
+    pos = @$prompt_cursor.offset()
+    rel_pos = @$prompt_cursor.position()
     
     # Scroll console to the bottom.
     @$console.scrollTop @$console[0].scrollHeight
     
     # Move the input element to the cursor position.
     @$input_container.css
-      left: pos.left
-      top: pos.top
+      left: rel_pos.left
+      top: rel_pos.top
     
     optimal_pos = pos.top - (2 * line_height)
     # There is no way to detect the current viewport height or width in mobiles
@@ -857,7 +858,8 @@ class JQConsole
     #   Viewport is 230 pixel wide
     #   As there is some different 
     if @isMobile and orientation?
-      if screen_top  < optimal_pos or screen_top > optimal_pos
+      console.log screen_top, pos.top
+      if screen_top  < pos.top or screen_top > pos.top
         @$window.scrollTop optimal_pos
 
       viewport_width = if orientation == 0 then 220 else 320
