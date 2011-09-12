@@ -210,7 +210,7 @@ class JQConsole
   GetColumn: ->
     @$prompt_cursor.text ''
     lines = @$console.text().split '\n'
-    @$prompt_cursor.text ' '
+    @$prompt_cursor.text '\xA0'
     return lines[lines.length - 1].length
 
   # Returns the 0-based number of the line on which the cursor currently is.
@@ -238,7 +238,7 @@ class JQConsole
     if full
       @$prompt_cursor.text ''
       text = @$prompt.text()
-      @$prompt_cursor.text ' '
+      @$prompt_cursor.text '\xA0'
       return text
     else
       getPromptLines = (node) ->
@@ -436,7 +436,7 @@ class JQConsole
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
     # the first character of @$prompt_right to get the appropriate width.
-    @$prompt_cursor = $('<span class="jqconsole-cursor"> </span>')
+    @$prompt_cursor = $('<span class="jqconsole-cursor">&nbsp;</span>')
     @$prompt_cursor.insertBefore @$prompt_right
     @$prompt_cursor.css
       color: 'transparent'
