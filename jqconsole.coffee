@@ -284,7 +284,17 @@ class JQConsole
   #   @arg input_callback: A function called with the user's input when the
   #     user presses Enter and the input operation is complete.
   Input: (input_callback) ->
-    if @state != STATE_OUTPUT
+    if @state == STATE_PROMPT
+      # Input operation has a higher priority, Abort and defer current prompt
+      # by putting it on top of the queue.
+      current_input_callback = this.input_callback
+      current_multiline_callback = this.multiline_callback
+      current_history_active = this.history_active
+      @AbortPrompt()
+      @input_queue.unshift => @Prompt current_history_active,
+                                      current_input_callback,
+                                      current_multiline_callback
+    else if @state != STATE_OUTPUT
       @input_queue.push => @Input input_callback
       return
     @history_active = false
