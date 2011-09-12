@@ -497,7 +497,6 @@ class JQConsole
     
     if @isMobile
       @$console.bind 'touchend', =>
-        alert 'unbinin'
         @$console[0].ontouchmove = null
       @$console.bind 'touchstart', (e)=>
         first_change =
@@ -513,10 +512,8 @@ class JQConsole
             check = if diffX > diffY then distanceX > first_change.distanceX else distanceY > first_change.distanceY
             if check
               @_HistoryPrevious()
-              alert 'h prev'
             else
               @_HistoryNext()
-              alert 'h next'
             @$console[0].ontouchmove = null
           else
             first_change.distanceX = distanceX
