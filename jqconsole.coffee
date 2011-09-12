@@ -865,12 +865,12 @@ class JQConsole
   # Scrolls the console area up one page (with animation).
   _ScrollUp: ->
     target = @$console[0].scrollTop - @$console.height()
-    @$console.animate {scrollTop: target}, 'fast'
+    @$console.stop().animate {scrollTop: target}, 'fast'
 
   # Scrolls the console area down one page (with animation).
   _ScrollDown: ->
     target = @$console[0].scrollTop + @$console.height()
-    @$console.animate {scrollTop: target}, 'fast'
+    @$console.stop().animate {scrollTop: target}, 'fast'
 
   # Scrolls the console area to its bottom;
   # Scrolls the window to the cursor vertical position.
