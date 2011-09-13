@@ -49,8 +49,8 @@ class JQConsole
 
     # The prompt label used by Prompt().
     @prompt_label_main = prompt_label or DEFAULT_PROMPT_LABEL
-    @prompt_label_continue = '\n' + (prompt_continue_label or
-                                     DEFAULT_PROMPT_CONINUE_LABEL)
+    @prompt_label_continue = ' \n' + (prompt_continue_label or
+                                      DEFAULT_PROMPT_CONINUE_LABEL)
 
     # How many spaces are inserted when a tab character is pressed.
     @indent_width = DEFAULT_INDENT_WIDTH
