@@ -210,7 +210,7 @@ class JQConsole
   GetColumn: ->
     @$prompt_cursor.text ''
     lines = @$console.text().split '\n'
-    @$prompt_cursor.text '\xA0'
+    @$prompt_cursor.html '&nbsp;'
     return lines[lines.length - 1].length
 
   # Returns the 0-based number of the line on which the cursor currently is.
@@ -238,7 +238,7 @@ class JQConsole
     if full
       @$prompt_cursor.text ''
       text = @$prompt.text()
-      @$prompt_cursor.text '\xA0'
+      @$prompt_cursor.html '&nbsp;'
       return text
     else
       getPromptLines = (node) ->
