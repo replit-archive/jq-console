@@ -252,6 +252,7 @@ or output:
 
         jqconsole.UnRegisterMatching('{', '}');
 
+* `jqocnsole.Dump`: Returns the text content of the console.
 
 ##Default Key Config
 
