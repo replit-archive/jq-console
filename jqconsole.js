@@ -503,10 +503,10 @@
             this._HistoryNext();
             break;
           case KEY_HOME:
-            this._MoveToStart(false);
+            this.MoveToStart(false);
             break;
           case KEY_END:
-            this._MoveToEnd(false);
+            this.MoveToEnd(false);
             break;
           case KEY_PAGE_UP:
             this._ScrollUp();
@@ -542,10 +542,10 @@
           this._MoveDown();
           break;
         case KEY_END:
-          this._MoveToEnd(true);
+          this.MoveToEnd(true);
           break;
         case KEY_HOME:
-          this._MoveToStart(true);
+          this.MoveToStart(true);
           break;
         default:
           if (key in this.shortcuts) {
@@ -570,7 +570,7 @@
         continuation = __bind(function(indent) {
           var callback, cls_suffix, _, _ref, _results;
           if (indent !== false) {
-            this._MoveToEnd(true);
+            this.MoveToEnd(true);
             this._InsertNewLine(true);
             _results = [];
             for (_ = 0, _ref = Math.abs(indent); 0 <= _ref ? _ < _ref : _ > _ref; 0 <= _ref ? _++ : _--) {
@@ -613,7 +613,7 @@
       $prompt_opposite = back ? this.$prompt_right : this.$prompt_left;
       $prompt_relative = back ? this.$prompt_before : this.$prompt_after;
       $prompt_rel_opposite = back ? this.$prompt_after : this.$prompt_before;
-      MoveToLimit = back ? $.proxy(this._MoveToStart, this) : $.proxy(this._MoveToEnd, this);
+      MoveToLimit = back ? $.proxy(this.MoveToStart, this) : $.proxy(this.MoveToEnd, this);
       MoveDirection = back ? $.proxy(this._MoveLeft, this) : $.proxy(this._MoveRight, this);
       which_end = back ? 'last' : 'first';
       where_append = back ? 'prependTo' : 'appendTo';
@@ -699,11 +699,11 @@
         return $prompt_which.text('');
       }
     };
-    JQConsole.prototype._MoveToStart = function(all_lines) {
-      return this._MoveTo(all_lines, true);
+    JQConsole.prototype.MoveToStart = function(all_lines) {
+      this._MoveTo(all_lines, true);
     };
-    JQConsole.prototype._MoveToEnd = function(all_lines) {
-      return this._MoveTo(all_lines, false);
+    JQConsole.prototype.MoveToEnd = function(all_lines) {
+      this._MoveTo(all_lines, false);
     };
     JQConsole.prototype._Delete = function(whole_word) {
       var $lower_line, text, word;
@@ -1003,6 +1003,15 @@
         }
         return _results;
       })()).join(' ');
+    };
+    JQConsole.prototype.GetState = function() {
+      if (this.state === STATE_INPUT) {
+        return 'input';
+      } else if (this.state === STATE_OUTPUT) {
+        return 'output';
+      } else {
+        return 'prompt';
+      }
     };
     return JQConsole;
   })();
