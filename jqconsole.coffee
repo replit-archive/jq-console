@@ -591,8 +591,8 @@ class JQConsole
         when KEY_RIGHT then @_MoveRight false
         when KEY_UP then @_HistoryPrevious()
         when KEY_DOWN then @_HistoryNext()
-        when KEY_HOME then @_MoveToStart false
-        when KEY_END then @_MoveToEnd false
+        when KEY_HOME then @MoveToStart false
+        when KEY_END then @MoveToEnd false
         when KEY_PAGE_UP then @_ScrollUp()
         when KEY_PAGE_DOWN then @_ScrollDown()
         # Let any other key continue its way to keypress.
@@ -609,8 +609,8 @@ class JQConsole
       when KEY_RIGHT then @_MoveRight true
       when KEY_UP then  @_MoveUp()
       when KEY_DOWN then @_MoveDown()
-      when KEY_END then @_MoveToEnd true
-      when KEY_HOME then @_MoveToStart true
+      when KEY_END then @MoveToEnd true
+      when KEY_HOME then @MoveToStart true
       else
         if key of @shortcuts
           # Execute custom shortcuts.
@@ -631,7 +631,7 @@ class JQConsole
       text = @GetPromptText()
       continuation = (indent) =>
         if indent isnt false
-          @_MoveToEnd true
+          @MoveToEnd true
           @_InsertNewLine true
           for _ in [0...Math.abs indent]
             if indent > 0 then @_Indent() else @_Unindent()
@@ -667,9 +667,9 @@ class JQConsole
     $prompt_relative = if back then @$prompt_before else @$prompt_after
     $prompt_rel_opposite = if back then @$prompt_after else @$prompt_before
     MoveToLimit = if back
-      $.proxy @_MoveToStart, @
+      $.proxy @MoveToStart, @
     else 
-      $.proxy @_MoveToEnd, @
+      $.proxy @MoveToEnd, @
     MoveDirection = if back
       $.proxy @_MoveLeft, @ 
     else 
@@ -784,13 +784,14 @@ class JQConsole
   # Moves the cursor to the start of the current prompt line.
   #   @arg all_lines: If true, moves to the beginning of the first prompt line,
   #     instead of the beginning of the current.
-  _MoveToStart: (all_lines) ->
+  MoveToStart: (all_lines) ->
     @_MoveTo all_lines, true
+    return undefined
 
   # Moves the cursor to the end of the current prompt line.
-  _MoveToEnd: (all_lines) ->
+  MoveToEnd: (all_lines) ->
     @_MoveTo all_lines, false
-
+    return undefined
 
   # Deletes the character or word following the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
