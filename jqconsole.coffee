@@ -1060,6 +1060,14 @@ class JQConsole
         else
           $(elem).text()
     ).join ' '
-        
+  
+  GetState: ->
+    return if @state is STATE_INPUT
+      'input'
+     else if @state is STATE_OUTPUT
+      'output'
+    else
+      'prompt'
+      
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
