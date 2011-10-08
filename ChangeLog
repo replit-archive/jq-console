@@ -3,3 +3,12 @@
 * Fix for issue #13 .
 * Add optional paramater "escape" to the Write method, see README for more
 info.
+
+20011.10.28, Version 2.5
+
+* Added mobile support.
+* Follow the cursor's position when the window is scrolled away.
+* Add async_multiline option in prompt, see README for more info.
+* Add Dump method that would dump the console's text content.
+* Add GetState method that gets the current state of the console.
+* Publicize MoveToStart and MoveToEnd methods.
