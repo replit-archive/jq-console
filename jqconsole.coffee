@@ -1049,5 +1049,16 @@ class JQConsole
     else
       @SetPromptText @history[++@history_index]
 
+  Dump: ->
+    $elems = @$console.find('.jqconsole-header').nextUntil('.jqconsole-prompt')
+
+    return (
+      for elem in $elems
+        if $(elem).is '.jqconsole-old-prompt'
+          $(elem).text().replace /^\s+/, '>>> '
+        else
+          $(elem).text()
+    ).join ' '
+        
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
