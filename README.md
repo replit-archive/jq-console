@@ -114,7 +114,12 @@ or output:
 
         * `N` (int): the input continues to the next line, and the current
           indent is adjusted by `N`, e.g. `-2` to unindent two levels.
-
+    
+    * `bool async_multiline`: Whether the multiline callback function should
+      be treated as an asynchronous operation and be passed a continuation
+      function that should be called with one of the return values mentioned
+      above: `false`/`0`/`N`.
+      
     Example:
 
         jqconsole.Prompt(true, function(input) {
