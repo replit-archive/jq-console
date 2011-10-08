@@ -322,7 +322,7 @@ class JQConsole
   #       0: the input continues to the next line with the current indent.
   #       N (int): the input continues to the next line, and the current indent
   #         is adjusted by N, e.g. -2 to unindent two levels.
-  Prompt: (history_enabled, result_callback, multiline_callback) ->
+  Prompt: (history_enabled, result_callback, multiline_callback, async_multiline) ->
     if @state != STATE_OUTPUT
       @input_queue.push =>
         @Prompt history_enabled, result_callback, multiline_callback
@@ -330,6 +330,7 @@ class JQConsole
     @history_active = history_enabled
     @input_callback = result_callback
     @multiline_callback = multiline_callback
+    @async_multiline = async_multiline
     @state = STATE_PROMPT
     @$prompt.attr 'class', 'jqconsole-prompt'
     @$prompt_label.text @_SelectPromptLabel false
@@ -628,7 +629,7 @@ class JQConsole
       @_InsertNewLine true
     else
       text = @GetPromptText()
-      cont = (indent) =>
+      continuation = (indent) =>
         if indent isnt false
           @_MoveToEnd true
           @_InsertNewLine true
@@ -650,9 +651,12 @@ class JQConsole
           @_CheckInputQueue()
       
       if @multiline_callback
-        @multiline_callback text, cont
+        if @async_multiline
+          @multiline_callback text, continuation
+        else
+          continuation @multiline_callback text
       else
-        cont false
+        continuation false
           
   
   # Returns the appropriate variables for usage in methods that depends on the
