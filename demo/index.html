@@ -68,6 +68,18 @@
           handler();
         });
         
+        // Move to line start Ctrl+A.
+        jqconsole.RegisterShortcut('A', function() {
+          jqconsole.MoveToStart();
+          handler();
+        });
+        
+        // Move to line end Ctrl+A.
+        jqconsole.RegisterShortcut('E', function() {
+          jqconsole.MoveToEnd();
+          handler();
+        });
+        
         jqconsole.RegisterMatching('{', '}', 'brace');
         jqconsole.RegisterMatching('(', ')', 'paran');
         jqconsole.RegisterMatching('[', ']', 'bracket');
