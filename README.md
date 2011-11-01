@@ -291,7 +291,13 @@ or output:
           jqconsole.MoveToEnd();
           handler();
         });
-  
+
+* `jqconsole.Disable`: Disables input and focus on the console.
+
+* `jqconsole.Enable`: Enables input and focus on the console.
+
+* `jqconsole.IsDisabled`: Returns true if the console is disabled.
+
 ##Default Key Config  
   
 The console responds to the followind keys and key combinations by default:  
