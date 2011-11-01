@@ -1,3 +1,6 @@
+# Copyrights 2011, the repl.it project.
+# Licensed under the MIT license
+
 # Shorthand for jQuery.
 $ = jQuery
 
