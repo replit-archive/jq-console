@@ -83,7 +83,7 @@ class JQConsole
 
     # A table of custom shortcuts, mapping character codes to callbacks.
     @shortcuts = {}
-
+    
     # The main console area. Everything else happens inside this.
     @$console = $('<pre class="jqconsole"/>').appendTo container
     # Whether the console currently has focus.
@@ -352,7 +352,7 @@ class JQConsole
 
   # Sets focus on the console's hidden input box so input can be read.
   Focus: ->
-    @$input_source.focus()
+    @$input_source.focus() if not @IsDisabled()
     return undefined
 
   # Sets the number of spaces inserted when indenting.
@@ -384,8 +384,52 @@ class JQConsole
     delete @matchings.closings[close]
     @matchings.clss.splice @matchings.clss.indexOf(cls), 1
   
+  # Dumps the content of the console before the current prompt.
+  Dump: ->
+    $elems = @$console.find('.jqconsole-header').nextUntil('.jqconsole-prompt')
+
+    return (
+      for elem in $elems
+        if $(elem).is '.jqconsole-old-prompt'
+          $(elem).text().replace /^\s+/, '>>> '
+        else
+          $(elem).text()
+    ).join ' '
+
+  # Gets the current prompt state.
+  GetState: ->
+    return if @state is STATE_INPUT
+      'input'
+     else if @state is STATE_OUTPUT
+      'output'
+    else
+      'prompt'
   
+  # Disables focus and input on the console.
+  Disable: ->
+    @$input_source.attr 'disabled', on
+    @$input_source.blur();
     
+  # Enables focus and input on the console.
+  Enable: ->
+    @$input_source.attr 'disabled', off
+
+  # Returns true if the console is disabled.
+  IsDisabled: ->
+    return Boolean @$input_source.attr 'disabled'
+
+  # Moves the cursor to the start of the current prompt line.
+  #   @arg all_lines: If true, moves to the beginning of the first prompt line,
+  #     instead of the beginning of the current.
+  MoveToStart: (all_lines) ->
+    @_MoveTo all_lines, true
+    return undefined
+
+  # Moves the cursor to the end of the current prompt line.
+  MoveToEnd: (all_lines) ->
+    @_MoveTo all_lines, false
+    return undefined
+
   ###------------------------ Private Methods -------------------------------###
 
   _CheckInputQueue: ->
@@ -459,6 +503,7 @@ class JQConsole
       mouse_pos.Y = e.pageY
       
     @$console.mouseup (e)=>
+      # TODO(amasad): Tolerate X pixels movement. 
       if mouse_pos.X is e.pageX and mouse_pos.Y is e.pageY
         e.preventDefault()
         @Focus()
@@ -780,18 +825,6 @@ class JQConsole
     else
       $prompt_opposite.text @$prompt_left.text() + @$prompt_right.text()
       $prompt_which.text ''
-      
-  # Moves the cursor to the start of the current prompt line.
-  #   @arg all_lines: If true, moves to the beginning of the first prompt line,
-  #     instead of the beginning of the current.
-  MoveToStart: (all_lines) ->
-    @_MoveTo all_lines, true
-    return undefined
-
-  # Moves the cursor to the end of the current prompt line.
-  MoveToEnd: (all_lines) ->
-    @_MoveTo all_lines, false
-    return undefined
 
   # Deletes the character or word following the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
@@ -1049,25 +1082,6 @@ class JQConsole
       @SetPromptText @history_new
     else
       @SetPromptText @history[++@history_index]
-
-  Dump: ->
-    $elems = @$console.find('.jqconsole-header').nextUntil('.jqconsole-prompt')
-
-    return (
-      for elem in $elems
-        if $(elem).is '.jqconsole-old-prompt'
-          $(elem).text().replace /^\s+/, '>>> '
-        else
-          $(elem).text()
-    ).join ' '
-  
-  GetState: ->
-    return if @state is STATE_INPUT
-      'input'
-     else if @state is STATE_OUTPUT
-      'output'
-    else
-      'prompt'
-      
+    
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
