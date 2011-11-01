@@ -12,3 +12,9 @@ info.
 * Add Dump method that would dump the console's text content.
 * Add GetState method that gets the current state of the console.
 * Publicize MoveToStart and MoveToEnd methods.
+
+2011.11.1, Version 2.5.1
+
+* Added Disable/Enable funcitonality and methods.
+* Added IsDisabled method.
+
