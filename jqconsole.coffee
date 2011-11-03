@@ -106,6 +106,12 @@ class JQConsole
       width: 2
     @$input_source.appendTo @$input_container
     
+    @$composition = $('<div/>')
+    @$composition.css
+      background: 'red'
+      display: 'inline'
+      position: 'relative'
+      
     # Hash containing all matching settings
     # openings/closings[char] = matching_config 
     # where char is the opening/closing character.
@@ -120,7 +126,7 @@ class JQConsole
     @_InitPrompt()
     @_SetupEvents()
     @Write @header, 'jqconsole-header'
-
+    
     # Save this instance to be accessed if lost.
     $(container).data 'jqconsole', this
 
@@ -543,6 +549,12 @@ class JQConsole
     @$input_source.keypress (e) => @_HandleChar e
     key_event = if $.browser.mozilla then 'keypress' else 'keydown'
     @$input_source[key_event] (e) => @_HandleKey e
+    @$input_source.keydown (e) => @_CheckComposition e
+    ###
+    @$input_source.bind 'compositionstart', (e) => @_StartComposition()
+    comp_update_event = if $.browser.mozilla? then 'text' else 'keyup'
+    @$input_source.bind comp_update_event, (e) => @_UpdateComposition(e)
+    @$input_source.bind 'compositionend', (e) => @_EndComposition()###
     
     if @isMobile
       @$console.bind 'touchend', =>
@@ -605,8 +617,9 @@ class JQConsole
   _HandleKey: (event) ->
     # We let the browser take over during output mode.
     if @state == STATE_OUTPUT then return true
-
+    
     key = event.keyCode or event.which
+
     # Check for matchings next time the callstack is empty
     # TODO (@max99x): Refactor code to fit this method call
     setTimeout $.proxy(@_CheckMatchings, this), 0
@@ -1085,6 +1098,38 @@ class JQConsole
       @SetPromptText @history_new
     else
       @SetPromptText @history[++@history_index]
+  
+  _CheckComposition: (e) ->
+    key = e.keyCode or e.which
+    if key == 229
+      if @in_composition then @_UpdateComposition() else @_StartComposition()
+      
+  _StartComposition: ->
+    @$input_source.bind 'keypress', @_EndComposition 
+    @in_composition = true
+    @_ShowComposition()
+    setTimeout @_UpdateComposition, 0
+      
+  _EndComposition: =>
+    @$input_source.unbind 'keypress', @_EndComposition 
+    @in_composition = false
+    @_UpdateComposition()
+    @_HideComposition()
+    @$input_source.val ''
+    
+  
+  _UpdateComposition: (e) =>
+    setTimeout (=> @$composition.text @$input_source.val()), 0
+    
+  _ShowComposition: ->
+    @$composition.css 'width', @$prompt_cursor.width()
+    @$composition.css 'height', @$prompt_cursor.height()
+    @$composition.empty()
+    @$composition.appendTo @$prompt_left
+    
+  _HideComposition: ->
+    @$composition.detach()
+
     
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
