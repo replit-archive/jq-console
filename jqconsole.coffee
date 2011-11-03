@@ -608,7 +608,8 @@ class JQConsole
          return true
 
     # Skip everything when a modifier key other than shift is held.
-    if event.metaKey or event.ctrlKey or event.altKey then return false
+    # Allow alt key to pass through for unicode & multibyte characters.
+    if event.metaKey or event.ctrlKey then return false
 
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
@@ -1101,37 +1102,43 @@ class JQConsole
     else
       @SetPromptText @history[++@history_index]
   
+  # Check if this could be the start of a composition or an update to it.
   _CheckComposition: (e) =>
     key = e.keyCode or e.which
     if key == 229
       if @in_composition then @_UpdateComposition() else @_StartComposition()
-      
+  
+  # Starts a multibyte character composition.
   _StartComposition: =>
     @$input_source.bind 'keypress', @_EndComposition 
     @in_composition = true
     @_ShowComposition()
     setTimeout @_UpdateComposition, 0
-      
+  
+  # Ends a multibyte character composition.
   _EndComposition: =>
     @$input_source.unbind 'keypress', @_EndComposition 
     @in_composition = false
     @_UpdateComposition()
     @_HideComposition()
     @$input_source.val ''
-    
   
+  # Updates a multibyte character composition.
   _UpdateComposition: (e) =>
     setTimeout (=> @$composition.text @$input_source.val()), 0
-    
+  
+  # Shows a multibyte character composition.
   _ShowComposition: =>
     @$composition.css 'width', @$prompt_cursor.width()
     @$composition.css 'height', @$prompt_cursor.height()
     @$composition.empty()
     @$composition.appendTo @$prompt_left
-    
+  
+  # Hides a multibyte character composition.
   _HideComposition: =>
+    # We just detach the element because by now the text value of this element
+    # is already extracted and has been put on the left of the prompt.
     @$composition.detach()
-
-    
+  
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
