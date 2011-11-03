@@ -546,9 +546,9 @@ class JQConsole
       setTimeout handlePaste, 0
 
     # Actual key-by-key handling.
-    @$input_source.keypress (e) => @_HandleChar e
+    @$input_source.keypress @_HandleChar
     key_event = if $.browser.mozilla then 'keypress' else 'keydown'
-    @$input_source[key_event] (e) => @_HandleKey e
+    @$input_source[key_event] @_HandleKey
     @$input_source.keydown @_CheckComposition
     
     # Firefox don't fire any key event for composition characters, so we listen
@@ -583,7 +583,7 @@ class JQConsole
             first_change.distanceY = distanceY
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
-  _HandleChar: (event) ->
+  _HandleChar: (event) =>
     # We let the browser take over during output mode.
     if @state == STATE_OUTPUT then return true
 
@@ -616,7 +616,7 @@ class JQConsole
 
   # Handles a key up event and dispatches specific handlers.
   #   @arg event: The jQuery keyboard Event object to handle.
-  _HandleKey: (event) ->
+  _HandleKey: (event) =>
     # We let the browser take over during output mode.
     if @state == STATE_OUTPUT then return true
     
