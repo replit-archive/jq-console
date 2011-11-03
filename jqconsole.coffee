@@ -107,8 +107,8 @@ class JQConsole
     @$input_source.appendTo @$input_container
     
     @$composition = $('<div/>')
+    @$composition.addClass 'jqconsole-composition'
     @$composition.css
-      background: 'red'
       display: 'inline'
       position: 'relative'
       
@@ -539,6 +539,8 @@ class JQConsole
     paste_event = if $.browser.opera then 'input' else 'paste'
     @$input_source.bind paste_event, =>
       handlePaste = =>
+        # Opera fires input on composition end.
+        return if @in_composition
         @_AppendPromptText @$input_source.val()
         @$input_source.val ''
         @Focus()
@@ -547,7 +549,14 @@ class JQConsole
 
     # Actual key-by-key handling.
     @$input_source.keypress @_HandleChar
-    key_event = if $.browser.mozilla then 'keypress' else 'keydown'
+    
+    # FF & opera fires keydown events only once (even when holding) and 
+    # also delegates control keys to keypress that *is* fired more than 
+    # once on holding down the key.
+    key_event = if $.browser.mozilla or $.browser.opera
+      'keypress'
+    else
+      'keydown'
     @$input_source[key_event] @_HandleKey
     @$input_source.keydown @_CheckComposition
     
@@ -558,6 +567,16 @@ class JQConsole
       @$input_source.bind 'compositionend', @_EndCommposition
       @$input_source.bind 'text', @_UpdateComposition
     
+    # There is no way to detect compositionstart in opera so we poll for it.
+    if $.browser.opera?
+      cb = =>
+        return if @in_composition
+        # if there was characters that actually escaped to the input source
+        # then its most probably a multibyte char.
+        if @$input_source.val().length
+          @_StartComposition()
+      setInterval cb, 200
+      
     if @isMobile
       @$console.bind 'touchend', =>
         @$console[0].ontouchmove = null
@@ -581,6 +600,7 @@ class JQConsole
           else
             first_change.distanceX = distanceX
             first_change.distanceY = distanceY
+            
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
   _HandleChar: (event) =>
@@ -603,14 +623,12 @@ class JQConsole
          return true
     # Pass control characters which are captured on Opera.
     if $.browser.opera
-       if (event.keyCode or event.which or
-           event.metaKey or event.ctrlKey or event.altKey)
+       if event.metaKey or event.ctrlKey or event.altKey
          return true
-
     # Skip everything when a modifier key other than shift is held.
     # Allow alt key to pass through for unicode & multibyte characters.
     if event.metaKey or event.ctrlKey then return false
-
+    
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
     return false
@@ -1105,12 +1123,14 @@ class JQConsole
   # Check if this could be the start of a composition or an update to it.
   _CheckComposition: (e) =>
     key = e.keyCode or e.which
+    if $.browser.opera? and @in_composition
+      @_UpdateComposition()
     if key == 229
       if @in_composition then @_UpdateComposition() else @_StartComposition()
   
   # Starts a multibyte character composition.
   _StartComposition: =>
-    @$input_source.bind 'keypress', @_EndComposition 
+    @$input_source.bind 'keypress', @_EndComposition
     @in_composition = true
     @_ShowComposition()
     setTimeout @_UpdateComposition, 0
@@ -1119,17 +1139,18 @@ class JQConsole
   _EndComposition: =>
     @$input_source.unbind 'keypress', @_EndComposition 
     @in_composition = false
-    @_UpdateComposition()
     @_HideComposition()
     @$input_source.val ''
   
   # Updates a multibyte character composition.
   _UpdateComposition: (e) =>
-    setTimeout (=> @$composition.text @$input_source.val()), 0
+    cb =  =>
+      return if not @in_composition
+      @$composition.text @$input_source.val()
+    setTimeout cb, 0
   
   # Shows a multibyte character composition.
   _ShowComposition: =>
-    @$composition.css 'width', @$prompt_cursor.width()
     @$composition.css 'height', @$prompt_cursor.height()
     @$composition.empty()
     @$composition.appendTo @$prompt_left
