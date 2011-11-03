@@ -549,12 +549,14 @@ class JQConsole
     @$input_source.keypress (e) => @_HandleChar e
     key_event = if $.browser.mozilla then 'keypress' else 'keydown'
     @$input_source[key_event] (e) => @_HandleKey e
-    @$input_source.keydown (e) => @_CheckComposition e
-    ###
-    @$input_source.bind 'compositionstart', (e) => @_StartComposition()
-    comp_update_event = if $.browser.mozilla? then 'text' else 'keyup'
-    @$input_source.bind comp_update_event, (e) => @_UpdateComposition(e)
-    @$input_source.bind 'compositionend', (e) => @_EndComposition()###
+    @$input_source.keydown @_CheckComposition
+    
+    # Firefox don't fire any key event for composition characters, so we listen
+    # for the unstandard composition-events.
+    if $.browser.mozilla?
+      @$input_source.bind 'compositionstart', @_StartComposition
+      @$input_source.bind 'compositionend', @_EndCommposition
+      @$input_source.bind 'text', @_UpdateComposition
     
     if @isMobile
       @$console.bind 'touchend', =>
@@ -1099,12 +1101,12 @@ class JQConsole
     else
       @SetPromptText @history[++@history_index]
   
-  _CheckComposition: (e) ->
+  _CheckComposition: (e) =>
     key = e.keyCode or e.which
     if key == 229
       if @in_composition then @_UpdateComposition() else @_StartComposition()
       
-  _StartComposition: ->
+  _StartComposition: =>
     @$input_source.bind 'keypress', @_EndComposition 
     @in_composition = true
     @_ShowComposition()
@@ -1121,13 +1123,13 @@ class JQConsole
   _UpdateComposition: (e) =>
     setTimeout (=> @$composition.text @$input_source.val()), 0
     
-  _ShowComposition: ->
+  _ShowComposition: =>
     @$composition.css 'width', @$prompt_cursor.width()
     @$composition.css 'height', @$prompt_cursor.height()
     @$composition.empty()
     @$composition.appendTo @$prompt_left
     
-  _HideComposition: ->
+  _HideComposition: =>
     @$composition.detach()
 
     
