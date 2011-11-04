@@ -534,7 +534,7 @@ class JQConsole
       addClass = =>
         if not @$console_focused then @$console.addClass 'jqconsole-blurred'
       setTimeout addClass, 100
-
+    
     # Intercept pasting.
     paste_event = if $.browser.opera then 'input' else 'paste'
     @$input_source.bind paste_event, =>
@@ -605,7 +605,9 @@ class JQConsole
   #   @arg event: The jQuery keyboard Event object to handle.
   _HandleChar: (event) =>
     # We let the browser take over during output mode.
-    if @state == STATE_OUTPUT then return true
+    # Let ctrl + meta key combos pass through.
+    if @state == STATE_OUTPUT or event.metaKey or event.ctrlKey
+      return true
 
     # IE & Chrome capture non-control characters and Enter.
     # Mozilla and Opera capture everything.
@@ -616,14 +618,14 @@ class JQConsole
     # Skip Enter on IE and Chrome and Tab on Opera. These are handled in
     # _HandleKey().
     if char_code == 13 or char_code == 9 then return false
-
-    # Pass control characters which are captured on Mozilla.
+    
+    # Pass control characters which are captured on Mozilla/Safari.
     if $.browser.mozilla
-       if event.keyCode or event.metaKey or event.ctrlKey or event.altKey
+       if event.keyCode or event.altKey
          return true
     # Pass control characters which are captured on Opera.
     if $.browser.opera
-       if event.metaKey or event.ctrlKey or event.altKey
+       if event.altKey
          return true
     # Skip everything when a modifier key other than shift is held.
     # Allow alt key to pass through for unicode & multibyte characters.
