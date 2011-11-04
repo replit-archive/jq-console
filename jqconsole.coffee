@@ -1,5 +1,7 @@
-# Copyrights 2011, the repl.it project.
-# Licensed under the MIT license
+###
+Copyrights 2011, the repl.it project.
+Licensed under the MIT license
+###
 
 # Shorthand for jQuery.
 $ = jQuery
@@ -23,6 +25,22 @@ KEY_END = 35
 KEY_PAGE_UP = 33
 KEY_PAGE_DOWN = 34
 
+# CSS classes
+CLASS_PREFIX = 'jqconsole-'
+CLASS_CURSOR = "#{CLASS_PREFIX}cursor"
+CLASS_HEADER = "#{CLASS_PREFIX}header"
+CLASS_PROMPT = "#{CLASS_PREFIX}prompt"
+CLASS_OLD_PROMPT = "#{CLASS_PREFIX}old-prompt"
+CLASS_INPUT = "#{CLASS_PREFIX}input"
+CLASS_BLURRED = "#{CLASS_PREFIX}blurred"
+
+# Frequently used string literals
+E_KEYPRESS = 'keypress'
+EMPTY_SPAN = '<span/>'
+EMPTY_DIV = '<div/>'
+EMPTY_SELECTOR = ':empty'
+NEWLINE = '\n'
+
 # Default prompt text for main and continuation prompts.
 DEFAULT_PROMPT_LABEL = '>>> '
 DEFAULT_PROMPT_CONINUE_LABEL = '... '
@@ -30,6 +48,9 @@ DEFAULT_PROMPT_CONINUE_LABEL = '... '
 # The default number of spaces inserted when indenting.
 DEFAULT_INDENT_WIDTH = 2
 
+# Helper functions
+spanHtml = (klass, content) -> "<span class=\"#{klass}\">#{content or ''}</span>"
+  
 class JQConsole
   # Creates a console.
   #   @arg container: The DOM element into which the console is inserted.
@@ -94,7 +115,7 @@ class JQConsole
     
     # On screen somehow invisible textbox for input.
     # Copied from codemirror2, this works for both mobile and desktop browsers.
-    @$input_container = $('<div/>').appendTo @$console
+    @$input_container = $(EMPTY_DIV).appendTo @$console
     @$input_container.css
       position: 'relative'
       width: 1
@@ -106,8 +127,8 @@ class JQConsole
       width: 2
     @$input_source.appendTo @$input_container
     
-    @$composition = $('<div/>')
-    @$composition.addClass 'jqconsole-composition'
+    @$composition = $(EMPTY_DIV)
+    @$composition.addClass "#{CLASS_PREFIX}composition"
     @$composition.css
       display: 'inline'
       position: 'relative'
@@ -125,7 +146,7 @@ class JQConsole
     # Prepare console for interaction.
     @_InitPrompt()
     @_SetupEvents()
-    @Write @header, 'jqconsole-header'
+    @Write @header, CLASS_HEADER
     
     # Save this instance to be accessed if lost.
     $(container).data 'jqconsole', this
@@ -150,7 +171,7 @@ class JQConsole
     @$console.html ''
     @$prompt.appendTo @$console
     @$input_container.appendTo @$console
-    @Write @header, 'jqconsole-header'
+    @Write @header, CLASS_HEADER
     return undefined
   
   ###------------------------ Shortcut Methods -----------------------------###
@@ -218,13 +239,13 @@ class JQConsole
   # Returns the 0-based number of the column on which the cursor currently is.
   GetColumn: ->
     @$prompt_cursor.text ''
-    lines = @$console.text().split '\n'
+    lines = @$console.text().split NEWLINE
     @$prompt_cursor.html '&nbsp;'
     return lines[lines.length - 1].length
 
   # Returns the 0-based number of the line on which the cursor currently is.
   GetLine: ->
-    return @$console.text().split('\n').length - 1
+    return @$console.text().split(NEWLINE).length - 1
 
   # Clears the contents of the prompt.
   #   @arg clear_label: If true, also clears the main prompt label (e.g. ">>>").
@@ -253,15 +274,15 @@ class JQConsole
       getPromptLines = (node) ->
         buffer = []
         node.children().each -> buffer.push $(@).children().last().text()
-        return buffer.join '\n'
+        return buffer.join NEWLINE
 
       before = getPromptLines @$prompt_before
-      if before then before += '\n'
+      if before then before += NEWLINE
 
       current = @$prompt_left.text() + @$prompt_right.text()
 
       after = getPromptLines @$prompt_after
-      if after then after = '\n' + after
+      if after then after = NEWLINE + after
 
       return before + current + after
 
@@ -279,7 +300,7 @@ class JQConsole
   #   @arg text: The text to write.
   #   @arg cls: The class to give the span containing the text. Optional.
   Write: (text, cls, escape=true) ->
-    span = $('<span/>')[if escape then 'text' else 'html'] text
+    span = $(EMPTY_SPAN)[if escape then 'text' else 'html'] text
     if cls? then span.addClass cls
     span.insertBefore @$prompt
     @_ScrollToEnd()
@@ -310,7 +331,7 @@ class JQConsole
     @input_callback = input_callback
     @multiline_callback = null
     @state = STATE_INPUT
-    @$prompt.attr 'class', 'jqconsole-input'
+    @$prompt.attr 'class', CLASS_INPUT
     @$prompt_label.text @_SelectPromptLabel false
     @Focus()
     @_ScrollToEnd()
@@ -341,7 +362,7 @@ class JQConsole
     @multiline_callback = multiline_callback
     @async_multiline = async_multiline
     @state = STATE_PROMPT
-    @$prompt.attr 'class', 'jqconsole-prompt'
+    @$prompt.attr 'class', CLASS_PROMPT
     @$prompt_label.text @_SelectPromptLabel false
     @Focus()
     @_ScrollToEnd()
@@ -352,7 +373,7 @@ class JQConsole
   AbortPrompt: ->
     if @state != STATE_PROMPT
       throw new Error 'Cannot abort prompt when not in prompt state.'
-    @Write @GetPromptText(true) + '\n', 'jqconsole-old-prompt'
+    @Write @GetPromptText(true) + NEWLINE, CLASS_OLD_PROMPT
     @ClearPromptText true
     @state = STATE_OUTPUT
     @input_callback = @multiline_callback = null
@@ -395,11 +416,11 @@ class JQConsole
   
   # Dumps the content of the console before the current prompt.
   Dump: ->
-    $elems = @$console.find('.jqconsole-header').nextUntil('.jqconsole-prompt')
+    $elems = @$console.find(".#{CLASS_HEADER}").nextUntil(".#{CLASS_PROMPT}")
 
     return (
       for elem in $elems
-        if $(elem).is '.jqconsole-old-prompt'
+        if $(elem).is ".#{CLASS_OLD_PROMPT}"
           $(elem).text().replace /^\s+/, '>>> '
         else
           $(elem).text()
@@ -471,18 +492,18 @@ class JQConsole
   #       prompt_content
   _InitPrompt: ->
     # The main prompt container.
-    @$prompt = $('<span class="jqconsole-input"/>').appendTo @$console
+    @$prompt = $(spanHtml(CLASS_INPUT)).appendTo @$console
     # The main divisions of the prompt - the lines before the current line, the
     # current line, and the lines after it.
-    @$prompt_before = $('<span/>').appendTo @$prompt
-    @$prompt_current = $('<span/>').appendTo @$prompt
-    @$prompt_after = $('<span/>').appendTo @$prompt
+    @$prompt_before = $(EMPTY_SPAN).appendTo @$prompt
+    @$prompt_current = $(EMPTY_SPAN).appendTo @$prompt
+    @$prompt_after = $(EMPTY_SPAN).appendTo @$prompt
 
     # The subdivisions of the current prompt line - the static prompt label
     # (e.g. ">>> "), and the editable text to the left and right of the cursor.
-    @$prompt_label = $('<span/>').appendTo @$prompt_current
-    @$prompt_left = $('<span/>').appendTo @$prompt_current
-    @$prompt_right = $('<span/>').appendTo @$prompt_current
+    @$prompt_label = $(EMPTY_SPAN).appendTo @$prompt_current
+    @$prompt_left = $(EMPTY_SPAN).appendTo @$prompt_current
+    @$prompt_right = $(EMPTY_SPAN).appendTo @$prompt_current
 
     # Needed for the CSS z-index on the cursor to work.
     @$prompt_right.css position: 'relative'
@@ -490,7 +511,7 @@ class JQConsole
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
     # the first character of @$prompt_right to get the appropriate width.
-    @$prompt_cursor = $('<span class="jqconsole-cursor">&nbsp;</span>')
+    @$prompt_cursor = $(spanHtml(CLASS_CURSOR, '&nbsp;'))
     @$prompt_cursor.insertBefore @$prompt_right
     @$prompt_cursor.css
       color: 'transparent'
@@ -520,9 +541,9 @@ class JQConsole
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
       @$console_focused = true
-      @$console.removeClass 'jqconsole-blurred'
+      @$console.removeClass CLASS_BLURRED
       removeClass = =>
-        if @$console_focused then @$console.removeClass 'jqconsole-blurred'
+        if @$console_focused then @$console.removeClass CLASS_BLURRED
       setTimeout removeClass, 100
       hideTextInput = =>
         if @isIos and @$console_focused then @$input_source.hide()
@@ -532,7 +553,7 @@ class JQConsole
       @$console_focused = false
       if @isIos then @$input_source.show()
       addClass = =>
-        if not @$console_focused then @$console.addClass 'jqconsole-blurred'
+        if not @$console_focused then @$console.addClass CLASS_BLURRED
       setTimeout addClass, 100
     
     # Intercept pasting.
@@ -554,7 +575,7 @@ class JQConsole
     # also delegates control keys to keypress that *is* fired more than 
     # once on holding down the key.
     key_event = if $.browser.mozilla or $.browser.opera
-      'keypress'
+      E_KEYPRESS
     else
       'keydown'
     @$input_source[key_event] @_HandleKey
@@ -722,7 +743,7 @@ class JQConsole
         else
           # Done with input.
           cls_suffix = if @state == STATE_INPUT then 'input' else 'prompt'
-          @Write @GetPromptText(true) + '\n', 'jqconsole-old-' + cls_suffix
+          @Write @GetPromptText(true) + NEWLINE, "#{CLASS_PREFIX}old-" + cls_suffix
           @ClearPromptText true
           if @history_active
             if not @history.length or @history[@history.length - 1] != text
@@ -782,7 +803,7 @@ class JQConsole
       MoveDirection
     } = @_GetDirectionals(up)
             
-    if $prompt_relative.is ':empty' then return
+    if $prompt_relative.is EMPTY_SELECTOR then return
     pos = @$prompt_left.text().length
     MoveToLimit()
     MoveDirection()
@@ -826,10 +847,10 @@ class JQConsole
         tmp = $prompt_opposite.text()
         $prompt_opposite.text if back then text[-1...] + tmp else tmp + text[0]
         $prompt_which.text if back then text[...-1] else text[1...]
-    else if not $prompt_relative.is ':empty'
-      $which_line = $('<span/>')[where_append] $prompt_rel_opposite
-      $which_line.append $('<span/>').text @$prompt_label.text()
-      $which_line.append $('<span/>').text $prompt_opposite.text()
+    else if not $prompt_relative.is EMPTY_SELECTOR
+      $which_line = $(EMPTY_SPAN)[where_append] $prompt_rel_opposite
+      $which_line.append $(EMPTY_SPAN).text @$prompt_label.text()
+      $which_line.append $(EMPTY_SPAN).text $prompt_opposite.text()
       
       $opposite_line = $prompt_relative.children()[which_end]().detach()
       @$prompt_label.text $opposite_line.children().first().text()
@@ -857,8 +878,8 @@ class JQConsole
     } = @_GetDirectionals(back)
     
     if all_lines
-      # Warning! FF 3.6 hangs on is(':empty')
-      until $prompt_relative.is(':empty') and $prompt_which.text() == ''
+      # Warning! FF 3.6 hangs on is(EMPTY_SELECTOR)
+      until $prompt_relative.is(EMPTY_SELECTOR) and $prompt_which.text() == ''
         MoveToLimit false
         MoveDirection false
     else
@@ -877,7 +898,7 @@ class JQConsole
         @$prompt_right.text text[word.length...]
       else
         @$prompt_right.text text[1...]
-    else if not @$prompt_after.is ':empty'
+    else if not @$prompt_after.is EMPTY_SELECTOR
       $lower_line = @$prompt_after.children().first().detach()
       @$prompt_right.text $lower_line.children().last().text()
 
@@ -894,7 +915,7 @@ class JQConsole
         @$prompt_left.text text[...-word.length]
       else
         @$prompt_left.text text[...-1]
-    else if not @$prompt_before.is ':empty'
+    else if not @$prompt_before.is EMPTY_SELECTOR
       $upper_line = @$prompt_before.children().last().detach()
       @$prompt_label.text $upper_line.children().first().text()
       @$prompt_left.text $upper_line.children().last().text()
@@ -918,10 +939,10 @@ class JQConsole
   #   @arg indent: If specified and true, the inserted line is indented to the
   #     same column as the last line.
   _InsertNewLine: (indent = false) ->
-    old_prompt = @_SelectPromptLabel not @$prompt_before.is ':empty'
-    $old_line = $('<span/>').appendTo @$prompt_before
-    $old_line.append $('<span/>').text old_prompt
-    $old_line.append $('<span/>').text @$prompt_left.text()
+    old_prompt = @_SelectPromptLabel not @$prompt_before.is EMPTY_SELECTOR
+    $old_line = $(EMPTY_SPAN).appendTo @$prompt_before
+    $old_line.append $(EMPTY_SPAN).text old_prompt
+    $old_line.append $(EMPTY_SPAN).text @$prompt_left.text()
 
     @$prompt_label.text @_SelectPromptLabel true
     if indent and match = @$prompt_left.text().match /^\s+/
@@ -933,7 +954,7 @@ class JQConsole
   # Appends the given text to the prompt.
   #   @arg text: The text to append. Can contain multiple lines.
   _AppendPromptText: (text) ->
-    lines = text.split '\n'
+    lines = text.split NEWLINE
     @$prompt_left.text @$prompt_left.text() + lines[0]
     for line in lines[1..]
       @_InsertNewLine()
@@ -994,7 +1015,7 @@ class JQConsole
     if document.body.outerHTML 
       return $elem.get(0).outerHTML
     else
-      return $('<div/>').append($elem.eq(0).clone()).html()
+      return $(EMPTY_DIV).append($elem.eq(0).clone()).html()
     
   # Wraps a single character in an element with a <span> having a class
   #   @arg $elem: The JqDom element in question
@@ -1002,8 +1023,8 @@ class JQConsole
   #   @arg cls: the html class to be given to the wrapping <span>
   _Wrap: ($elem, index, cls) ->
     text = $elem.html()
-    html = text[0...index]+ 
-           "<span class=\"#{cls}\">#{text[index]}</span>"+
+    html = text[0...index]+
+           spanHtml(cls, text[index])+
            text[index + 1...]
     $elem.html html
   
@@ -1132,14 +1153,14 @@ class JQConsole
   
   # Starts a multibyte character composition.
   _StartComposition: =>
-    @$input_source.bind 'keypress', @_EndComposition
+    @$input_source.bind E_KEYPRESS, @_EndComposition
     @in_composition = true
     @_ShowComposition()
     setTimeout @_UpdateComposition, 0
   
   # Ends a multibyte character composition.
   _EndComposition: =>
-    @$input_source.unbind 'keypress', @_EndComposition 
+    @$input_source.unbind E_KEYPRESS, @_EndComposition 
     @in_composition = false
     @_HideComposition()
     @$input_source.val ''
