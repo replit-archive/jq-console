@@ -1,7 +1,7 @@
 2011.08.28, Version 2.4.2
 
 * Fix for issue #13 .
-* Add optional paramater "escape" to the Write method, see README for more
+* Add optional parameter "escape" to the Write method, see README for more
 info.
 
 20011.10.9, Version 2.5
@@ -15,9 +15,13 @@ info.
 
 2011.11.1, Version 2.5.1
 
-* Added Disable/Enable funcitonality and methods.
+* Added Disable/Enable functionality and methods.
 * Added IsDisabled method.
 
 2011.11.3, Version 2.5.2
 
 * Added multibyte character input support, issue #19.
+
+2011.11.4, Version 2.6
+* Fix safari paste. Issue #15.
+* Created constants and minifier friendliness. Issue #14.
