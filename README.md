@@ -97,7 +97,8 @@ The plugin has been tested on the following browsers:
     $(div).jqconsole(welcomeString, promptLabel, continueLabel);
 ```
 
-* `div` is the div element or selector.
+* `div` is the div element or selector. Note that this element must be
+  explicity sized and positioned `absolute` or `relative`.
 * `welcomeString` is the string to be shown when the terminal is first rendered.  
 * `promptLabel` is the label to be shown before the input when using Prompt().  
 * `continueLabel` is the label to be shown before the continued lines of the  

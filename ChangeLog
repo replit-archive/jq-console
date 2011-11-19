@@ -23,5 +23,12 @@ info.
 * Added multibyte character input support, issue #19.
 
 2011.11.4, Version 2.6
+
 * Fix safari paste. Issue #15.
 * Created constants and minifier friendliness. Issue #14.
+
+2011.11.19, Version 2.6.1
+
+* Fix issues #20, #21
+* Implement feature #22
+* Add built-in css for ease of use.
