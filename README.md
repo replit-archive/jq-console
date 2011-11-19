@@ -24,7 +24,7 @@ The plugin has been tested on the following browsers:
   
 ##Getting Started  
   
-###Echo example.  
+###Echo example
 
 ```css
     /* The console container element */
@@ -72,6 +72,7 @@ The plugin has been tested on the following browsers:
 
 ```html
     <div id="console"></div>
+    <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
     <script src="jqconsole.js" type="text/javascript" charset="utf-8"></script>
     <script>
       $(function () {
@@ -89,12 +90,6 @@ The plugin has been tested on the following browsers:
       });
     </script>
 ```
-
-```javascript
-    var jqconsole = $('#console').jqconsole(welcomeString, promptLabel, continueLabel);  
-```
-
- 
   
 ###Instantiating  
 
@@ -102,7 +97,7 @@ The plugin has been tested on the following browsers:
     $(div).jqconsole(welcomeString, promptLabel, continueLabel);
 ```
 
-* `div` is the ID of t 
+* `div` is the div element or selector.
 * `welcomeString` is the string to be shown when the terminal is first rendered.  
 * `promptLabel` is the label to be shown before the input when using Prompt().  
 * `continueLabel` is the label to be shown before the continued lines of the  
