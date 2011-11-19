@@ -110,7 +110,14 @@ class JQConsole
     
     # The main console area. Everything else happens inside this.
     @$console = $('<pre class="jqconsole"/>').appendTo @container
-    @$console.css 'position', 'absolute'
+    @$console.css 
+      position: 'absolute'
+      top: 0
+      bottom: 0
+      right: 0
+      left: 0
+      margin: 0
+      overflow: 'auto'
 
     # Whether the console currently has focus.
     @$console_focused = true
