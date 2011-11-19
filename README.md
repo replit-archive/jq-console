@@ -24,16 +24,90 @@ The plugin has been tested on the following browsers:
   
 ##Getting Started  
   
+###Echo example.  
+
+```css
+    /* The console container element */
+    #console {
+      position: absolute;
+      width: 400px;
+      height: 500px;
+      background-color:black;
+    }
+    /* The inner console element. */
+    .jqconsole {
+        padding: 10px;
+    }
+    /* The cursor. */
+    .jqconsole-cursor {
+        background-color: gray;
+    }
+    /* The cursor color when the console looses focus. */
+    .jqconsole-blurred .jqconsole-cursor {
+        background-color: #666;
+    }
+    /* The current prompt text color */
+    .jqconsole-prompt {
+        color: #0d0;
+    }
+    /* The command history */
+    .jqconsole-old-prompt {
+        color: #0b0;
+        font-weight: normal;
+    }
+    /* The text color when in input mode. */
+    .jqconsole-input {
+        color: #dd0;
+    }
+    /* Previously entered input. */
+    .jqconsole-old-input {
+        color: #bb0;
+        font-weight: normal;
+    }
+    /* The text color of the output. */
+    .jqconsole-output {
+        color: white;
+    }
+```
+
+```html
+    <div id="console"></div>
+    <script src="jqconsole.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+      $(function () {
+        var jqconsole = $('#console').jqconsole('Hi\n', '>>>');
+        var startPrompt = function () {
+          // Start the prompt with history enabled.
+          jqconsole.Prompt(true, function (input) {
+            // Output input with the class jqconsole-output.
+            jqconsole.Write(input + '\n', 'jqconsole-output');
+            // Restart the prompt.
+            startPrompt();
+          });
+        };
+        startPrompt();
+      });
+    </script>
+```
+
+```javascript
+    var jqconsole = $('#console').jqconsole(welcomeString, promptLabel, continueLabel);  
+```
+
+ 
+  
 ###Instantiating  
-  
-    var jqconsole = $(div).jqconsole(welcomeString, promptLabel, continueLabel);  
-  
-* `div` is the div element or selector.  
+
+```javascript
+    $(div).jqconsole(welcomeString, promptLabel, continueLabel);
+```
+
+* `div` is the ID of t 
 * `welcomeString` is the string to be shown when the terminal is first rendered.  
 * `promptLabel` is the label to be shown before the input when using Prompt().  
 * `continueLabel` is the label to be shown before the continued lines of the  
-  input when using Prompt().  
-  
+  input when using Prompt().
+
 ###Configuration  
   
 There isn't much initial configuration needed, because the user must supply  
