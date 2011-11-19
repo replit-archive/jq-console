@@ -298,6 +298,12 @@ or output:
 
 * `jqconsole.IsDisabled`: Returns true if the console is disabled.
 
+* `jqconsole.ResetHistory`: Resets the console history.
+
+* `jqconsoe.ResetMatchings`: Resets the character matching configuration.
+
+* `jqconsole.ResetShortcuts`: Resets the shortcut configuration.
+
 ##Default Key Config  
   
 The console responds to the followind keys and key combinations by default:  
@@ -336,6 +342,9 @@ Several CSS classes are provided to help stylize the console:
 * `jqconsole-old-input`: Previously-entered inputs.  
 * `jqconsole-prompt`: The prompt area during prompting. May have multiple lines.  
 * `jqconsole-old-prompt`: Previously-entered prompts.  
+* `jqconsole-composition`: The div encapsulating the composition of multi-byte  
+    characters.
+
   
 Of course, custom classes may be specified when using `jqconsole.Write()` for  
 further customization.  
