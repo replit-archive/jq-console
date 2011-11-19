@@ -60,7 +60,7 @@ class JQConsole
   #     Defaults to DEFAULT_PROMPT_LABEL.
   #   @arg prompt_continue: The label to show before continuation lines of the
   #     command prompt. Optional. Defaults to DEFAULT_PROMPT_CONINUE_LABEL.
-  constructor: (container, header, prompt_label, prompt_continue_label) ->
+  constructor: (@container, header, prompt_label, prompt_continue_label) ->
     # Mobile devices supported sniff.
     @isMobile = !!navigator.userAgent.match /iPhone|iPad|iPod|Android/i
     @isIos = !!navigator.userAgent.match /iPhone|iPad|iPod/i
@@ -109,13 +109,15 @@ class JQConsole
     @shortcuts = {}
     
     # The main console area. Everything else happens inside this.
-    @$console = $('<pre class="jqconsole"/>').appendTo container
+    @$console = $('<pre class="jqconsole"/>').appendTo @container
+    @$console.css 'position', 'absolute'
+
     # Whether the console currently has focus.
     @$console_focused = true
     
     # On screen somehow invisible textbox for input.
     # Copied from codemirror2, this works for both mobile and desktop browsers.
-    @$input_container = $(EMPTY_DIV).appendTo @$console
+    @$input_container = $(EMPTY_DIV).appendTo @container
     @$input_container.css
       position: 'relative'
       width: 1
@@ -149,7 +151,24 @@ class JQConsole
     @Write @header, CLASS_HEADER
     
     # Save this instance to be accessed if lost.
-    $(container).data 'jqconsole', this
+    $(@container).data 'jqconsole', this
+
+  # Resets the history into intitial state.
+  ResetHistory: ->
+    @history = []
+    @history_index = 0
+    @history_current = ''
+
+  # Resets the shortcut configuration.
+  ResetShortcuts: ->
+    @shortcuts = {}
+
+  # Resets the matching configuration.
+  ResetMatchings: ->
+    @matchings = 
+      openings: {}
+      closings: {}
+      clss: []
 
   # Resets the console to its initial state.
   Reset: ->
@@ -158,19 +177,14 @@ class JQConsole
     @input_queue = []
     @input_callback = null
     @multiline_callback = null
-    @history = []
-    @history_index = 0
-    @history_current = ''
-    @shortcuts = {}
-    @matchings = 
-      openings: {}
-      closings: {}
-      clss: []
+    @ResetHistory()
+    @ResetShortcuts()
+    @ResetMatchings()
     @$prompt.detach()
     @$input_container.detach()
     @$console.html ''
     @$prompt.appendTo @$console
-    @$input_container.appendTo @$console
+    @$input_container.appendTo @container
     @Write @header, CLASS_HEADER
     return undefined
   
@@ -521,22 +535,20 @@ class JQConsole
 
   # Binds all the required input and focus events.
   _SetupEvents: ->
-    # Redirect focus to the hidden textbox unless we selected something.
-    # Mouse position is saved on mousedown and checked against on keyup
-    # if its different then we are selecting.
-    mouse_pos = 
-      X: null
-      Y: null
-
-    @$console.mousedown (e) =>
-      mouse_pos.X = e.pageX
-      mouse_pos.Y = e.pageY
-      
-    @$console.mouseup (e)=>
-      # TODO(amasad): Tolerate X pixels movement. 
-      if mouse_pos.X is e.pageX and mouse_pos.Y is e.pageY
+    
+    # Click to focus.
+    if @isMobile
+      @$console.click (e) =>
         e.preventDefault()
         @Focus()
+    else
+      @$console.mouseup (e) =>
+        fn = =>
+          if not window.getSelection().toString()
+            e.preventDefault()
+            @Focus()
+        # Force selection update.
+        setTimeout fn, 0
         
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
@@ -570,7 +582,7 @@ class JQConsole
 
     # Actual key-by-key handling.
     @$input_source.keypress @_HandleChar
-    
+
     # FF & opera fires keydown events only once (even when holding) and 
     # also delegates control keys to keypress that *is* fired more than 
     # once on holding down the key.
@@ -980,7 +992,6 @@ class JQConsole
     doc_height = document.documentElement.clientHeight
     pos = @$prompt_cursor.offset()
     rel_pos = @$prompt_cursor.position()
-
     # Scroll console to the bottom.
     @$console.scrollTop @$console[0].scrollHeight
     # Move the input element to the cursor position.
