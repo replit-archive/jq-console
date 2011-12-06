@@ -655,9 +655,9 @@ class JQConsole
     # This is the most reliable cross-browser; charCode/keyCode break on Opera.
     char_code = event.which
 
-    # Skip Enter on IE and Chrome and Tab on Opera. These are handled in
-    # _HandleKey().
-    if char_code == 13 or char_code == 9 then return false
+    # Skip Enter on IE and Chrome and Tab & backspace on Opera. 
+    # These are handled in _HandleKey().
+    if char_code in [8, 9, 13] then return false
     
     # Pass control characters which are captured on Mozilla/Safari.
     if $.browser.mozilla
@@ -670,7 +670,7 @@ class JQConsole
     # Skip everything when a modifier key other than shift is held.
     # Allow alt key to pass through for unicode & multibyte characters.
     if event.metaKey or event.ctrlKey then return false
-    
+
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
     return false
