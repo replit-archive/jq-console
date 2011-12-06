@@ -32,3 +32,6 @@ info.
 * Fix issues #20, #21
 * Implement feature #22
 * Add built-in css for ease of use.
+
+2011.12.6, Version 2.6.2
+* Fix issue #23.
