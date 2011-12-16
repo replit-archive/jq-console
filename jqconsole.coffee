@@ -338,13 +338,15 @@ class JQConsole
     if @state == STATE_PROMPT
       # Input operation has a higher priority, Abort and defer current prompt
       # by putting it on top of the queue.
-      current_input_callback = this.input_callback
-      current_multiline_callback = this.multiline_callback
-      current_history_active = this.history_active
+      current_input_callback = @input_callback
+      current_multiline_callback = @multiline_callback
+      current_history_active = @history_active
+      current_async_multiline = @async_multiline
       @AbortPrompt()
       @input_queue.unshift => @Prompt current_history_active,
                                       current_input_callback,
-                                      current_multiline_callback
+                                      current_multiline_callback,
+                                      current_async_multiline
     else if @state != STATE_OUTPUT
       @input_queue.push => @Input input_callback
       return
@@ -376,7 +378,7 @@ class JQConsole
   Prompt: (history_enabled, result_callback, multiline_callback, async_multiline) ->
     if @state != STATE_OUTPUT
       @input_queue.push =>
-        @Prompt history_enabled, result_callback, multiline_callback
+        @Prompt history_enabled, result_callback, multiline_callback, async_multiline
       return
     @history_active = history_enabled
     @input_callback = result_callback
