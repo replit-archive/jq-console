@@ -735,10 +735,11 @@ class JQConsole
   #   @arg event: The jQuery keyboard Event object to handle.
   _HandleChar: (event) =>
     # We let the browser take over during output mode.
-    # Let ctrl + meta key combos pass through.
+    # Skip everything when a modifier key other than shift is held.
+    # Allow alt key to pass through for unicode & multibyte characters.
     if @state == STATE_OUTPUT or event.metaKey or event.ctrlKey
       return true
-
+    
     # IE & Chrome capture non-control characters and Enter.
     # Mozilla and Opera capture everything.
 
@@ -755,12 +756,10 @@ class JQConsole
          return true
     # Pass control characters which are captured on Opera.
     if $.browser.opera
+       console.log event.altKey, 'fal'
        if event.altKey
          return true
-    # Skip everything when a modifier key other than shift is held.
-    # Allow alt key to pass through for unicode & multibyte characters.
-    if event.metaKey or event.ctrlKey then return false
-
+    
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
     return false
@@ -772,15 +771,15 @@ class JQConsole
     if @state == STATE_OUTPUT then return true
     
     key = event.keyCode or event.which
-
-    # Check for matchings next time the callstack is empty
-    # TODO (@max99x): Refactor code to fit this method call
+    
+    # Check for char matching next time the callstack unwinds.
     setTimeout $.proxy(@_CheckMatchings, this), 0
-    # Handle shortcuts.
-    if event.altKey or event.metaKey and not event.ctrlKey
-      # Allow Alt and Meta shortcuts.
+    
+    # Don't care about alt-modifier.
+    if event.altKey
       return true
-    else if event.ctrlKey
+    # Handle shortcuts.
+    else if event.ctrlKey or event.metaKey
       return @_HandleCtrlShortcut key
     else if event.shiftKey
       # Shift-modifier shortcut.
