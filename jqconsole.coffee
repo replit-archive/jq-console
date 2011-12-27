@@ -49,21 +49,27 @@ DEFAULT_PROMPT_CONINUE_LABEL = '... '
 DEFAULT_INDENT_WIDTH = 2
 
 CLASS_ANSI = "#{CLASS_PREFIX}ansi-" 
+ESCAPE_CHAR = '\033'
+ESCAPE_SYNTAX = /\[(\d+)m/
+
 class Ansi
   constructor: ->
     @klasses = [];
   
-  append: (klass) =>
-    console.log klass
+  _append: (klass) =>
+    klass = "#{CLASS_ANSI}#{klass}"
     if @klasses.indexOf(klass) is -1
-      @klasses.push "#{CLASS_ANSI}#{klass}"
+      @klasses.push klass
   
-  remove: (klass) =>
-    for i, cls in @klasses
-      if cls.indexOf(klass) is CLASS_ANSI.length
-        @klasses.splice i, 1
+  _remove: (klasses...) =>
+    for klass in klasses
+      if klass in ['fonts', 'color', 'background-color']
+        @klasses = (cls for cls in @klasses when cls.indexOf(klass) isnt CLASS_ANSI.length)
+      else
+        klass = "#{CLASS_ANSI}#{klass}"
+        @klasses = (cls for cls in @klasses when cls isnt klass)
   
-  color: (offset) =>
+  _color: (offset) =>
     switch offset
       when 0 then 'black'
       when 1 then 'red'
@@ -74,50 +80,56 @@ class Ansi
       when 6 then 'cyan'
       when 7 then 'white'
   
-  style: (code) => 
+  _style: (code) => 
     code = parseInt code
     switch code
       when 0  then @klasses = []
-      when 1  then @append 'bold'
-      when 2  then @append 'lighter'
-      when 3  then @append 'italic'
-      when 4  then @append 'underline'
-      when 5  then @append 'blink'
-      when 6  then @append 'blink-rapid'
-      when 8  then @append 'hidden'
-      when 9  then @append 'line-through'
-      when 10 then @remove 'fonts'
+      when 1  then @_append 'bold'
+      when 2  then @_append 'lighter'
+      when 3  then @_append 'italic'
+      when 4  then @_append 'underline'
+      when 5  then @_append 'blink'
+      when 6  then @_append 'blink-rapid'
+      when 8  then @_append 'hidden'
+      when 9  then @_append 'line-through'
+      when 10 then @_remove 'fonts'
       when 11,12,13,14,15,16,17,18,19
-        @append "fonts-#{code}"
-      when 20 then @append 'fraktur'
-      when 21 then @remove 'bold', 'lighter'
-      when 22 then @remove 'bold', 'lighter'
-      when 23 then @remove 'italic', 'fraktur'
-      when 24 then @remove 'underline'
-      when 25 then @remove 'blink', 'blink-rapid'
-      when 28 then @remove 'hidden'
-      when 29 then @remove 'line-through'
+        @_append "fonts-#{code - 10}"
+      when 20 then @_append 'fraktur'
+      when 21 then @_remove 'bold', 'lighter'
+      when 22 then @_remove 'bold', 'lighter'
+      when 23 then @_remove 'italic', 'fraktur'
+      when 24 then @_remove 'underline'
+      when 25 then @_remove 'blink', 'blink-rapid'
+      when 28 then @_remove 'hidden'
+      when 29 then @_remove 'line-through'
       when 30,31,32,33,34,35,36,37
-        @append 'color-' + @color code - 30
-      when 39 then @remove 'color'
+        @_append 'color-' + @_color code - 30
+      when 39 then @_remove 'color'
       when 40,41,42,43,44,45,46,47
-        @append 'background-color-' + @color code - 40
-      when 49 then @remove 'background-color'
-      when 51 then @append 'framed'
-      when 53 then @append 'overline'
-      when 54 then @remove 'framed'
-      when 55 then @remove 'overline'
+        @_append 'background-color-' + @_color code - 40
+      when 49 then @_remove 'background-color'
+      when 51 then @_append 'framed'
+      when 53 then @_append 'overline'
+      when 54 then @_remove 'framed'
+      when 55 then @_remove 'overline'
+  
+  getClasses: => @klasses.join ' '
+  
+  _openSpan: (text) => "<span class=\"#{@getClasses()}\">#{text}"
+  _closeSpan: (text) => "#{text}</span>"
   
   stylize: (text) =>
-    text = "<span class=\"#{@klasses.join(' ')}\">#{text}"
-    # may cause ie shit.
+    text = @_openSpan text
+    
     i = 0
-    while (i = text.indexOf('\033',i)) and i isnt -1
-      if d = text[i...].match /\[(\d+)m/
-        @style d[1]
-        text = text[0...i] + "</span><span class=\"#{@klasses.join(' ')}\">" + text[i + 1 + d[0].length...]
+    while (i = text.indexOf(ESCAPE_CHAR ,i)) and i isnt -1
+      if d = text[i...].match ESCAPE_SYNTAX
+        @_style d[1]
+        text = @_closeSpan(text[0...i]) + @_openSpan text[i + 1 + d[0].length...]
       else i++
-    text = "#{text}</span>"
+    
+    return @_closeSpan text 
         
 # Helper functions
 spanHtml = (klass, content) -> "<span class=\"#{klass}\">#{content or ''}</span>"
@@ -461,7 +473,7 @@ class JQConsole
     @multiline_callback = multiline_callback
     @async_multiline = async_multiline
     @state = STATE_PROMPT
-    @$prompt.attr 'class', CLASS_PROMPT
+    @$prompt.attr 'class', CLASS_PROMPT + ' ' + @ansi.getClasses()
     @$prompt_label.text @_SelectPromptLabel false
     @Focus()
     @_ScrollToEnd()
