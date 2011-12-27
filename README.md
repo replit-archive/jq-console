@@ -399,7 +399,164 @@ The console responds to the followind keys and key combinations by default:
 * `Page Up`: Scroll console one page up.  
 * `Page Down`: Scroll console one page down.  
   
-  
+##ANSI escape code SGR support
+
+jq-console implements a large subset of the ANSI escape code graphics.  
+Using the `.Write` method you could add style to the console using  
+the following syntax: 
+
+`ASCII 27 (decimal) or 0x1b (hex)`  `[`  `Graphics code``m`
+
+Example:
+
+  jqconsole.Write('\033[31mRed Text');
+
+You'll need to include the `ansi.css` file for default effects or create your  
+own using the css classes from the table below.
+
+<table>
+  <tr>
+    <th>Code</th>
+    <th>Effect</th>
+    <th>Class</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>Reset / Normal</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Bold</td>
+    <td>jqconsole-ansi-bold</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Faint</td>
+    <td>jqconsole-ansi-lighter</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Italic</td>
+    <td>jqconsole-ansi-italic</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Underline</td>
+    <td>jqconsole-ansi-underline</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Blink: 1s delay</td>
+    <td>jqconsole-ansi-blink</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Blink: 0.5s delay</td>
+    <td>jqconsole-ansi-blink-rapid</td>
+  </tr>
+  <tr>
+    <td>8</td>
+    <td>Hidden</td>
+    <td>jqconsole-ansi-hidden</td>
+  </tr>
+  <tr>
+    <td>9</td>
+    <td>Crossed-out</td>
+    <td>jqconsole-ansi-line-through</td>
+  </tr>
+  <tr>
+    <td>10</td>
+    <td>Remove all fonts</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>11-19</td>
+    <td>Add custom font</td>
+    <td>jqconsole-ansi-fonts-n where n is code-10</td>
+  </tr>
+  <tr>
+    <td>20</td>
+    <td>Add Fraktur font (not implemented in ansi.css)</td>
+    <td>jqconsole-ansi-fraktur</td>
+  </tr>
+  <tr>
+    <td>21</td>
+    <td>Remove Bold and Faint effects</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>22</td>
+    <td>Same as 21</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>23</td>
+    <td>Remove italic and fraktur effects</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>24</td>
+    <td>Add underline text decoration.</td>
+    <td>jqconsole-ansi-underline</td>
+  </tr>
+  <tr>
+    <td>25</td>
+    <td>Rmove blinking effect(s).</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>28</td>
+    <td>Reveal text</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>29</td>
+    <td>Remove cross-out text effect</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>30-37</td>
+    <td>Set foreground color to color from the color table below</td>
+    <td>jqconsole-ansi-color-{COLOR} where {COLOR} is the color name</td>
+  </tr>
+  <tr>
+    <td>39</td>
+    <td>Restore default foreground color</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>40-47</td>
+    <td>Set background color to color from the color table below</td>
+    <td>jqconsole-ansi-background-color-{COLOR} where {COLOR} is the color name</td>
+  </tr>
+  <tr>
+    <td>49</td>
+    <td>Restore default background color</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>51</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>53</td>
+    <td>Adds overline effect to text</td>
+    <td>jqconsole-ansi-overline</td>
+  </tr>
+  <tr>
+    <td>54</td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>55</td>
+    <td>Remove overline effect</td>
+    <td></td>
+  </tr>
+</table>
+
 ##CSS Classes  
   
 Several CSS classes are provided to help stylize the console:  
