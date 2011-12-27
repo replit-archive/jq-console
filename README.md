@@ -409,7 +409,7 @@ the following syntax:
 
 Example:
 
-  jqconsole.Write('\033[31mRed Text');
+    jqconsole.Write('\033[31mRed Text');
 
 Note that the third parameter `escape` must be true which defaults to it.
 
