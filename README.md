@@ -506,7 +506,7 @@ own using the css classes from the table below.
   </tr>
   <tr>
     <td>25</td>
-    <td>Rmove blinking effect(s).</td>
+    <td>Remove blinking effect(s).</td>
     <td></td>
   </tr>
   <tr>
