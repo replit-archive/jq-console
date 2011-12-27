@@ -38,3 +38,7 @@ info.
 
 2011.12.16 Version 2.6.3
 * Fix issue #24.
+
+2011.12.28 Version 2.7
+* Implement ANSI graphics, Issue #12
+* Fix issue #25
