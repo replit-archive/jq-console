@@ -405,14 +405,18 @@ jq-console implements a large subset of the ANSI escape code graphics.
 Using the `.Write` method you could add style to the console using  
 the following syntax: 
 
-`ASCII 27 (decimal) or 0x1b (hex)`  `[`  `Graphics code``m`
+`ASCII 27 (decimal) or 0x1b (hex)`  `[`  `SGR code` `m`
 
 Example:
 
   jqconsole.Write('\033[31mRed Text');
 
+Note that the third parameter `escape` must be true which defaults to it.
+
 You'll need to include the `ansi.css` file for default effects or create your  
 own using the css classes from the table below.
+
+###<a href="http://en.wikipedia.org/wiki/ANSI_escape_code#graphics">SGR</a>
 
 <table>
   <tr>
@@ -428,42 +432,42 @@ own using the css classes from the table below.
   <tr>
     <td>1</td>
     <td>Bold</td>
-    <td>jqconsole-ansi-bold</td>
+    <td>`jqconsole-ansi-bold`</td>
   </tr>
   <tr>
     <td>2</td>
     <td>Faint</td>
-    <td>jqconsole-ansi-lighter</td>
+    <td>`jqconsole-ansi-lighter`</td>
   </tr>
   <tr>
     <td>3</td>
     <td>Italic</td>
-    <td>jqconsole-ansi-italic</td>
+    <td>`jqconsole-ansi-italic`</td>
   </tr>
   <tr>
     <td>4</td>
-    <td>Underline</td>
-    <td>jqconsole-ansi-underline</td>
+    <td>Line below text</td>
+    <td>`jqconsole-ansi-underline`</td>
   </tr>
   <tr>
     <td>5</td>
     <td>Blink: 1s delay</td>
-    <td>jqconsole-ansi-blink</td>
+    <td>`jqconsole-ansi-blink`</td>
   </tr>
   <tr>
     <td>6</td>
     <td>Blink: 0.5s delay</td>
-    <td>jqconsole-ansi-blink-rapid</td>
+    <td>`jqconsole-ansi-blink-rapid`</td>
   </tr>
   <tr>
     <td>8</td>
-    <td>Hidden</td>
-    <td>jqconsole-ansi-hidden</td>
+    <td>Hide text</td>
+    <td>`jqconsole-ansi-hidden`</td>
   </tr>
   <tr>
     <td>9</td>
-    <td>Crossed-out</td>
-    <td>jqconsole-ansi-line-through</td>
+    <td>Line through text</td>
+    <td>`jqconsole-ansi-line-through`</td>
   </tr>
   <tr>
     <td>10</td>
@@ -473,12 +477,12 @@ own using the css classes from the table below.
   <tr>
     <td>11-19</td>
     <td>Add custom font</td>
-    <td>jqconsole-ansi-fonts-n where n is code-10</td>
+    <td>`jqconsole-ansi-fonts-{N}` where N is code - 10</td>
   </tr>
   <tr>
     <td>20</td>
     <td>Add Fraktur font (not implemented in ansi.css)</td>
-    <td>jqconsole-ansi-fraktur</td>
+    <td>`jqconsole-ansi-fraktur`</td>
   </tr>
   <tr>
     <td>21</td>
@@ -497,8 +501,8 @@ own using the css classes from the table below.
   </tr>
   <tr>
     <td>24</td>
-    <td>Add underline text decoration.</td>
-    <td>jqconsole-ansi-underline</td>
+    <td>Remove underline effect</td>
+    <td></td>
   </tr>
   <tr>
     <td>25</td>
@@ -512,7 +516,7 @@ own using the css classes from the table below.
   </tr>
   <tr>
     <td>29</td>
-    <td>Remove cross-out text effect</td>
+    <td>Remove line-through effect</td>
     <td></td>
   </tr>
   <tr>
@@ -528,7 +532,7 @@ own using the css classes from the table below.
   <tr>
     <td>40-47</td>
     <td>Set background color to color from the color table below</td>
-    <td>jqconsole-ansi-background-color-{COLOR} where {COLOR} is the color name</td>
+    <td>`jqconsole-ansi-background-color-{COLOR}` where {COLOR} is the color name</td>
   </tr>
   <tr>
     <td>49</td>
@@ -537,23 +541,64 @@ own using the css classes from the table below.
   </tr>
   <tr>
     <td>51</td>
-    <td></td>
-    <td></td>
+    <td>Adds a frame around the text</td>
+    <td>`jqconsole-ansi-framed`</td>
   </tr>
   <tr>
     <td>53</td>
-    <td>Adds overline effect to text</td>
+    <td>Line above text</td>
     <td>jqconsole-ansi-overline</td>
   </tr>
   <tr>
     <td>54</td>
-    <td></td>
+    <td>Remove frame effect</td>
     <td></td>
   </tr>
   <tr>
     <td>55</td>
-    <td>Remove overline effect</td>
+    <td>Remove over-line effect</td>
     <td></td>
+  </tr>
+</table>
+
+###<a href="http://en.wikipedia.org/wiki/ANSI_escape_code#Colors">Colors</a>
+
+<table>
+  <tr>
+    <th>Code offset</th>
+    <th>Color</th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>Black</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>Red</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>Green</td>
+  </tr>
+  <tr>
+    <td>3</td>
+    <td>Yellow</td>
+  </tr>
+  <tr>
+    <td>4</td>
+    <td>Blue</td>
+  </tr>
+  <tr>
+    <td>5</td>
+    <td>Magenta</td>
+  </tr>
+  <tr>
+    <td>6</td>
+    <td>Cyan</td>
+  </tr>
+  <tr>
+    <td>7</td>
+    <td>White</td>
   </tr>
 </table>
 
