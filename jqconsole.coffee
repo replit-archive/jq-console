@@ -48,6 +48,77 @@ DEFAULT_PROMPT_CONINUE_LABEL = '... '
 # The default number of spaces inserted when indenting.
 DEFAULT_INDENT_WIDTH = 2
 
+CLASS_ANSI = "#{CLASS_PREFIX}ansi-" 
+class Ansi
+  constructor: ->
+    @klasses = [];
+  
+  append: (klass) =>
+    console.log klass
+    if @klasses.indexOf(klass) is -1
+      @klasses.push "#{CLASS_ANSI}#{klass}"
+  
+  remove: (klass) =>
+    for i, cls in @klasses
+      if cls.indexOf(klass) is CLASS_ANSI.length
+        @klasses.splice i, 1
+  
+  color: (offset) =>
+    switch offset
+      when 0 then 'black'
+      when 1 then 'red'
+      when 2 then 'green'
+      when 3 then 'yellow'
+      when 4 then 'blue'
+      when 5 then 'magenta'
+      when 6 then 'cyan'
+      when 7 then 'white'
+  
+  style: (code) => 
+    code = parseInt code
+    switch code
+      when 0  then @klasses = []
+      when 1  then @append 'bold'
+      when 2  then @append 'lighter'
+      when 3  then @append 'italic'
+      when 4  then @append 'underline'
+      when 5  then @append 'blink'
+      when 6  then @append 'blink-rapid'
+      when 8  then @append 'hidden'
+      when 9  then @append 'line-through'
+      when 10 then @remove 'fonts'
+      when 11,12,13,14,15,16,17,18,19
+        @append "fonts-#{code}"
+      when 20 then @append 'fraktur'
+      when 21 then @remove 'bold', 'lighter'
+      when 22 then @remove 'bold', 'lighter'
+      when 23 then @remove 'italic', 'fraktur'
+      when 24 then @remove 'underline'
+      when 25 then @remove 'blink', 'blink-rapid'
+      when 28 then @remove 'hidden'
+      when 29 then @remove 'line-through'
+      when 30,31,32,33,34,35,36,37
+        @append 'color-' + @color code - 30
+      when 39 then @remove 'color'
+      when 40,41,42,43,44,45,46,47
+        @append 'background-color-' + @color code - 40
+      when 49 then @remove 'background-color'
+      when 51 then @append 'framed'
+      when 53 then @append 'overline'
+      when 54 then @remove 'framed'
+      when 55 then @remove 'overline'
+  
+  stylize: (text) =>
+    text = "<span class=\"#{@klasses.join(' ')}\">#{text}"
+    # may cause ie shit.
+    i = 0
+    while (i = text.indexOf('\033',i)) and i isnt -1
+      if d = text[i...].match /\[(\d+)m/
+        @style d[1]
+        text = text[0...i] + "</span><span class=\"#{@klasses.join(' ')}\">" + text[i + 1 + d[0].length...]
+      else i++
+    text = "#{text}</span>"
+        
 # Helper functions
 spanHtml = (klass, content) -> "<span class=\"#{klass}\">#{content or ''}</span>"
   
@@ -151,6 +222,8 @@ class JQConsole
       openings: {}
       closings: {}
       clss: []
+    
+    @ansi = new Ansi()
     
     # Prepare console for interaction.
     @_InitPrompt()
@@ -321,7 +394,10 @@ class JQConsole
   #   @arg text: The text to write.
   #   @arg cls: The class to give the span containing the text. Optional.
   Write: (text, cls, escape=true) ->
-    span = $(EMPTY_SPAN)[if escape then 'text' else 'html'] text
+    if escape
+      text = @ansi.stylize $(EMPTY_SPAN).text(text).html()
+      
+    span = $(EMPTY_SPAN).html text
     if cls? then span.addClass cls
     span.insertBefore @$prompt
     @_ScrollToEnd()
