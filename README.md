@@ -90,6 +90,8 @@ The plugin has been tested on the following browsers:
       });
     </script>
 ```
+<iframe src="demo/echo.html" style="width:400px;height:500px">
+</iframe>
   
 ###Instantiating  
 
@@ -104,40 +106,57 @@ The plugin has been tested on the following browsers:
 * `continueLabel` is the label to be shown before the continued lines of the  
   input when using Prompt().
 
-###Configuration  
+##Configuration  
   
 There isn't much initial configuration needed, because the user must supply  
 options and callbacks with each state change. There are a few config methods  
 provided to create custom shortcuts and change indentation width:  
   
-* `jqconsole.RegisterShortcut`: Registers a callback for a keyboard shortcut.  
-  Takes two arguments:  
-  
-    * `(int|string) keyCode`: The code of the key pressing which (when Ctrl is  
-      held) will trigger this shortcut. If a string is provided, the ASCII code  
-      of the first character is taken.  
-  
-    * `function callback`: A function called when the shortcut is pressed;  
-      "this" will point to the JQConsole object.  
-  
-    Example:  
-  
+###jqconsole.RegisterShortcut
+Registers a callback for a keyboard shortcut.
+Takes two arguments:  
+
+  * __(int|string)__ *keyCode*: The code of the key pressing which (when Ctrl is  
+    held) will trigger this shortcut. If a string is provided, the ASCII code  
+    of the first character is taken.  
+
+  * __function__ *callback*: A function called when the shortcut is pressed;  
+    "this" will point to the JQConsole object.  
+
+
+  Example:  
+
         // Ctrl+R: resets the console.  
         jqconsole.RegisterShortCut('R', function() {  
           this.Reset();  
         });  
+
+###jqconsole.SetIndentWidth
+Sets the number of spaces inserted when indenting and removed when unindenting.  
+Takes one argument:  
   
-* `jqconsole.SetIndentWidth`: Sets the number of spaces inserted when indenting  
-  and removed when unindenting. Takes one argument:  
-  
-    * `int width`: The code of the key pressing which (when Ctrl is held) will  
-      trigger this shortcut.  
-  
-    Example:  
-  
+  * __int__ *width*: The code of the key pressing which (when Ctrl is held) will  
+    trigger this shortcut.  
+
+
+  Example:  
+
         // Sets the indent width to 4 spaces.  
         jqconsole.SetIndentWidth(4);  
-  
+
+###jqconsole.RegisterMatching 
+Registers an opening and closing characters to match and wraps each of the  
+opening and closing characters with a span with the specified class.  
+Takes one parameters:  
+
+  * __char__ *open*: The opening character of a "block".  
+  * __char__ *close*: The closing character of a "block".  
+  * __string__ *class*: The css class that is applied to the matched characters.  
+
+
+  Example:  
+
+        jqconsole.RegisterMatching('{', '}', 'brackets');
   
 ##Usage  
   
@@ -145,51 +164,55 @@ Unlike most terminal plugins, jq-console gives you complete low-level control
 over the execution; you have to call the appropriate methods to start input  
 or output:  
   
-* `jqconsole.Input`: Asks user for input. If another input or prompt operation  
-  is currently underway, the new input operation is enqueued and will be called  
-  when the current operation and all previously enqueued operations finish.  
-  Takes one argument:  
-  
-    * `function input_callback`: A function called with the user's input when  
-      the user presses Enter and the input operation is complete.  
-  
-    Example:  
-  
+###jqconsole.Input: 
+Asks user for input. If another input or prompt operation is currently underway,  
+the new input operation is enqueued and will be called when the current  
+operation and all previously enqueued operations finish. Takes one argument:  
+
+  * __function__ *input_callback*: A function called with the user's input when  
+    the user presses Enter and the input operation is complete.  
+
+
+  Example:  
+
         // Echo the input.  
         jqconsole.Input(function(input) {  
           jqconsole.Write(input);  
         });  
-  
-* `jqconsole.Prompt`: Asks user for input. If another input or prompt operation  
-  is currently underway, the new prompt operation is enqueued and will be called  
-  when the current operation and all previously enqueued operations finish.  
-  Takes three arguments:  
-  
-    * `bool history_enabled`: Whether this input should use history. If true,  
-      the user can select the input from history, and their input will also be  
-      added as a new history item.  
-  
-    * `function result_callback`: A function called with the user's input when  
-      the user presses Enter and the prompt operation is complete.  
-  
-    * `function multiline_callback`: If specified, this function is called when  
-      the user presses Enter to check whether the input should continue to the  
-      next line. The function must return one of the following values:  
-  
-        * `false`: the input operation is completed.  
-  
-        * `0`: the input continues to the next line with the current indent.  
-  
-        * `N` (int): the input continues to the next line, and the current  
-          indent is adjusted by `N`, e.g. `-2` to unindent two levels.  
-      
-    * `bool async_multiline`: Whether the multiline callback function should  
-      be treated as an asynchronous operation and be passed a continuation  
-      function that should be called with one of the return values mentioned  
-      above: `false`/`0`/`N`.  
-        
-    Example:  
-  
+
+
+###jqconsole.Prompt
+Asks user for input. If another input or prompt operation is currently underway  
+the new prompt operation is enqueued and will be called when the current  
+peration and all previously enqueued operations finish. Takes three arguments:  
+
+  * __bool__ *history_enabled*: Whether this input should use history. If true,  
+    the user can select the input from history, and their input will also be  
+    added as a new history item.  
+
+  * __function__ *result_callback*: A function called with the user's input when  
+    the user presses Enter and the prompt operation is complete.  
+
+  * __function__ *multiline_callback*: If specified, this function is called when  
+    the user presses Enter to check whether the input should continue to the  
+    next line. The function must return one of the following values:  
+
+      * `false`: the input operation is completed.  
+
+      * `0`: the input continues to the next line with the current indent.  
+
+      * `N` (int): the input continues to the next line, and the current  
+        indent is adjusted by `N`, e.g. `-2` to unindent two levels.  
+
+    
+  * __bool__ *async_multiline*: Whether the multiline callback function should  
+    be treated as an asynchronous operation and be passed a continuation  
+    function that should be called with one of the return values mentioned  
+    above: `false`/`0`/`N`.  
+
+
+  Example:  
+
         jqconsole.Prompt(true, function(input) {  
           // Alert the user with the command.  
           alert(input);  
@@ -198,11 +221,12 @@ or output:
           return /\\$/.test(input);  
         });  
   
-* `jqconsole.AbortPrompt`: Aborts the current prompt operation and returns to  
-  output mode or the next queued input/prompt operation. Takes no arguments.  
-  
-    Example:  
-  
+###jqconsole.AbortPrompt 
+Aborts the current prompt operation and returns to output mode or the next  
+queued input/prompt operation. Takes no arguments.  
+
+  Example:  
+
         jqconsole.Prompt(true, function(input) {  
           alert(input);  
         });  
@@ -210,136 +234,148 @@ or output:
         setTimeout(function() {  
           jqconsole.AbortPrompt();  
         }, 2000);  
-  
-* `jqconsole.Write`: Writes the given text to the console in a `<span>`, with an   
-  optional class. If a prompt is currently being shown, the text is inserted  
-  before it. Takes two arguments:  
-  
-    * `string text`: The text to write.  
-  
-    * `string cls`: The class to give the span containing the text. Optional.  
-  
-    * `bool escape`: Whether the text to write should be html escaped.  
-      Optional, defaults to true.  
-  
-    Examples:  
-  
+
+###jqconsole.Write
+Writes the given text to the console in a `<span>`, with an   
+optional class. If a prompt is currently being shown, the text is inserted  
+before it. Takes two arguments:  
+
+  * __string__ *text*: The text to write.  
+
+  * __string__ *cls*: The class to give the span containing the text. Optional.  
+
+  * __bool__ *escape*: Whether the text to write should be html escaped.  
+    Optional, defaults to true.  
+
+
+  Examples:  
+
         jqconsole.Write(output, 'my-output-class')  
         jqconsole.Write(err.message, 'my-error-class')  
-  
-* `jqconsole.SetPromptText`: Sets the text currently in the input prompt. Takes  
-  one parameter:  
-  
-    * `string text`: The text to put in the prompt.  
-  
-    Examples:  
-  
+
+
+###jqconsole.SetPromptText
+Sets the text currently in the input prompt. Takes one parameter:  
+
+  * __string__ *text*: The text to put in the prompt.  
+
+  Examples:  
+
         jqconsole.SetPromptText('ls')  
         jqconsole.SetPromptText('print [i ** 2 for i in range(10)]')  
-  
-* `jqconsole.ClearPromptText`: Clears all the text currently in the input  
-  prompt. Takes one parameter:  
-  
-    * `bool clear_label`: If specified and true, also clears the main prompt  
-      label (e.g. ">>>").  
-  
-    Example:  
-  
+
+
+###jqconsole.ClearPromptText 
+Clears all the text currently in the input prompt. Takes one parameter:  
+
+  * __bool__ *clear_label*: If specified and true, also clears the main prompt  
+    label (e.g. ">>>").  
+
+
+  Example:  
+
         jqconsole.ClearPromptText()  
   
-* `jqconsole.GetPromptText`: Returns the contents of the prompt. Takes one  
-  parameter:  
+
+###jqconsole.GetPromptText 
+Returns the contents of the prompt. Takes one parameter:  
   
-    * `bool full`: If specified and true, also includes the prompt labels  
-      (e.g. ">>>").  
-  
-    Examples:  
-  
+  * __bool__ *full*: If specified and true, also includes the prompt labels  
+    (e.g. ">>>").  
+
+
+  Examples:  
+
         var currentCommand = jqconsole.GetPromptText()  
         var logEntry = jqconsole.GetPromptText(true)  
   
-* `jqconsole.Reset`: Resets the console to its initial state, cancelling all  
-  current and pending operations. Takes no parameters.  
+
+###jqconsole.Reset
+Resets the console to its initial state, cancelling all current and pending  
+operations. Takes no parameters.  
   
-    Example:  
+  Example:  
   
         jqconsole.Reset()  
+
+
+###jqconsole.GetColumn
+Returns the 0-based number of the column on which the cursor currently is.  
+Takes no parameters.  
   
-* `jqconsole.GetColumn`: Returns the 0-based number of the column on which the  
-  cursor currently is. Takes no parameters.  
+  Example:  
   
-    Example:  
+        // Show the current line and column in a status area.  
+        $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())  
+
+
+###jqconsole.GetLine
+Returns the 0-based number of the line on which the cursor currently is.  
+Takes no parameters.  
+  
+  Example:  
   
         // Show the current line and column in a status area.  
         $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())  
   
-* `jqconsole.GetLine`: Returns the 0-based number of the line on which the  
-  cursor currently is. Takes no parameters.  
+###jqconsole.Focus
+Forces the focus onto the console so events can be captured.  
+Takes no parameters.  
   
-    Example:  
-  
-        // Show the current line and column in a status area.  
-        $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())  
-  
-* `jqconsole.Focus`: Forces the focus onto the console so events can be  
-  captured. Takes no parameters.  
-  
-    Example:  
+  Example:  
   
         // Redirect focus to the console whenever the user clicks anywhere.  
         $(window).click(function() {  
           jqconsole.Focus();  
         })  
-  
-* `jqconsole.GetIndentWidth`: Returns the number of spaces inserted when  
-  indenting. Takes no parameters.  
-  
-    Example:  
+
+
+###jqconsole.GetIndentWidth
+Returns the number of spaces inserted when indenting. Takes no parameters.    
+    
+  Example:  
   
         jqconsole.SetIndentWidth(4);  
         console.assert(jqconsole.GetIndentWidth() == 4);  
+
   
-* `jqconsole.RegisterMatching`: Registers an opening and closing characters to   
-  match and wraps each of the opening and closing characters with a span with   
-  the specified class. Takes one parameters:  
-      
-    * `char open`: The opening character of a "block".  
-    * `char close`: The closing character of a "block".  
-    * `string class`: The css class that is applied to the matched characters.  
+###jqconsole.UnRegisterMatching
+Deletes a certain matching settings set by `jqconsole.RegisterMatching`.  
+Takes two paramaters:  
   
-    Example:  
-  
-        jqconsole.RegisterMatching('{', '}', 'brackets');  
-  
-* `jqconsole.UnRegisterMatching`: Deletes a certain matching settings set by  
-  `jqconsole.RegisterMatching`. Takes two paramaters:  
-  
-    * `char open`: The opening character of a "block".  
-    * `char close`: The closing character of a "block".  
-  
-    Example:  
+  * __char__ *open*: The opening character of a "block".  
+  * __char__ *close*: The closing character of a "block".  
+
+
+  Example:  
   
         jqconsole.UnRegisterMatching('{', '}');  
+
   
-* `jqconsole.Dump`: Returns the text content of the console.    
+###jqconsole.Dump
+Returns the text content of the console.    
   
-* `jqconsole.GetState`: Returns the current state of the console. Could be one  
-    of the following:    
-      
-    * Input: `input`    
-    * Output: `output`  
-    * Prompt: `prompt`  
+###jqconsole.GetState
+Returns the current state of the console. Could be one of the following:  
+
+  * Input: `"input"`    
+  * Output: `"output"`  
+  * Prompt: `"prompt"`  
+
   
   Example:
   
         jqconsole.GetState(); //output
-    
-* `jqconsole.MoveToStart`: Moves the cursor to the start of the current line.   
-  Takes one parameter:  
+
+
+###jqconsole.MoveToStart
+Moves the cursor to the start of the current line.   
+Takes one parameter:  
       
-    * `bool all_lines`: If true moves the cursor to the beginning of the first  
-    line in the current prompt. Defaults to false.  
+  * __bool__ *all_lines*: If true moves the cursor to the beginning of the first  
+  line in the current prompt. Defaults to false.  
   
+
   Example:
   
         // Move to line start Ctrl+A.
@@ -347,13 +383,15 @@ or output:
           jqconsole.MoveToStart();
           handler();
         });
+
+
+###jqconsole.MoveToEnd
+Moves the cursor to the end of the current line.  
+Takes one parameter:  
     
-* `jqconsole.MoveToEnd`: Moves the cursor to the end of the current line.  
-  Takes one parameter:  
-    
-    * `bool all_lines`: If true moves the cursor to the end of the first  
-    line in the current prompt. Defaults to false.  
-  
+  * __bool__ *all_lines*: If true moves the cursor to the end of the first  
+  line in the current prompt. Defaults to false.  
+
   Example:
         
         // Move to line end Ctrl+E.
@@ -362,17 +400,29 @@ or output:
           handler();
         });
 
-* `jqconsole.Disable`: Disables input and focus on the console.
+###jqconsole.Disable
+Disables input and focus on the console.
 
-* `jqconsole.Enable`: Enables input and focus on the console.
 
-* `jqconsole.IsDisabled`: Returns true if the console is disabled.
+###jqconsole.Enable
+Enables input and focus on the console.
 
-* `jqconsole.ResetHistory`: Resets the console history.
 
-* `jqconsoe.ResetMatchings`: Resets the character matching configuration.
+###jqconsole.IsDisabled
+Returns true if the console is disabled.
 
-* `jqconsole.ResetShortcuts`: Resets the shortcut configuration.
+
+###jqconsole.ResetHistory
+Resets the console history.
+
+
+###jqconsole.ResetMatchings
+Resets the character matching configuration.
+
+
+###jqconsole.ResetShortcuts
+Resets the shortcut configuration.
+
 
 ##Default Key Config  
   
@@ -416,8 +466,8 @@ Note that the third parameter `escape` must be true which defaults to it.
 You'll need to include the `ansi.css` file for default effects or create your  
 own using the css classes from the table below.
 
-###<a href="http://en.wikipedia.org/wiki/ANSI_escape_code#graphics">SGR</a>
-
+###SGR
+[Reference](http://en.wikipedia.org/wiki/ANSI_escape_code#graphics).
 <table>
   <tr>
     <th>Code</th>
@@ -561,8 +611,8 @@ own using the css classes from the table below.
   </tr>
 </table>
 
-###<a href="http://en.wikipedia.org/wiki/ANSI_escape_code#Colors">Colors</a>
-
+###Colors
+[Reference](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors).
 <table>
   <tr>
     <th>Code offset</th>
