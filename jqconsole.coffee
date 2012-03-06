@@ -703,31 +703,7 @@ class JQConsole
         if @$input_source.val().length
           @_StartComposition()
       setInterval cb, 200
-      
-    if @isMobile
-      @$console.bind 'touchend', =>
-        @$console[0].ontouchmove = null
-      @$console.bind 'touchstart', (e)=>
-        first_change =
-          distanceX: null
-          distanceY: null
-        @$console[0].ontouchmove = (e)=>
-          if e.touches.length != 2 then return true
-          distanceX = Math.abs e.touches[0].pageX - e.touches[1].pageX
-          distanceY = Math.abs e.touches[0].pageX - e.touches[1].pageY
-          if first_change.distanceX and first_change.distanceY
-            diffX = Math.abs distanceX - first_change.distanceX
-            diffY = Math.abs distanceY - first_change.distanceY
-            check = if diffX > diffY then distanceX > first_change.distanceX else distanceY > first_change.distanceY
-            if check
-              @_HistoryPrevious()
-            else
-              @_HistoryNext()
-            @$console[0].ontouchmove = null
-          else
-            first_change.distanceX = distanceX
-            first_change.distanceY = distanceY
-            
+  
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
   _HandleChar: (event) =>
