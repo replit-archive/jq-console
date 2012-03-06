@@ -50,9 +50,11 @@ DEFAULT_INDENT_WIDTH = 2
 
 CLASS_ANSI = "#{CLASS_PREFIX}ansi-" 
 ESCAPE_CHAR = '\033'
-ESCAPE_SYNTAX = /\[(\d+)m/
+ESCAPE_SYNTAX = /\[(\d*)(?:;(\d*))*m/
 
 class Ansi
+  COLORS: ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
+  
   constructor: ->
     @klasses = [];
   
@@ -69,19 +71,14 @@ class Ansi
         klass = "#{CLASS_ANSI}#{klass}"
         @klasses = (cls for cls in @klasses when cls isnt klass)
   
-  _color: (offset) =>
-    switch offset
-      when 0 then 'black'
-      when 1 then 'red'
-      when 2 then 'green'
-      when 3 then 'yellow'
-      when 4 then 'blue'
-      when 5 then 'magenta'
-      when 6 then 'cyan'
-      when 7 then 'white'
+  _color: (i) => @COLORS[i]
   
-  _style: (code) => 
+  _style: (code) =>
+    code = 0 if code == ''
     code = parseInt code
+    
+    return if isNaN code
+    
     switch code
       when 0  then @klasses = []
       when 1  then @_append 'bold'
@@ -125,7 +122,7 @@ class Ansi
     i = 0
     while (i = text.indexOf(ESCAPE_CHAR ,i)) and i isnt -1
       if d = text[i...].match ESCAPE_SYNTAX
-        @_style d[1]
+        @_style code for code in d[1...]
         text = @_closeSpan(text[0...i]) + @_openSpan text[i + 1 + d[0].length...]
       else i++
     
