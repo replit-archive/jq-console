@@ -729,7 +729,6 @@ class JQConsole
          return true
     # Pass control characters which are captured on Opera.
     if $.browser.opera
-       console.log event.altKey, 'fal'
        if event.altKey
          return true
     
