@@ -646,6 +646,7 @@ class JQConsole
         
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
+      @_ScrollToEnd()
       @$console_focused = true
       @$console.removeClass CLASS_BLURRED
       removeClass = =>
@@ -1052,33 +1053,44 @@ class JQConsole
 
   # Scrolls the console area to its bottom;
   # Scrolls the window to the cursor vertical position.
-  # On mobile scrolls the window to the cursor's horizontal position.
+  # Called with every input/output to the console.
   _ScrollToEnd: ->
-    line_height = @$prompt_cursor.height()
-    screen_top = @$window.scrollTop()
-    screen_left = @$window.scrollLeft()
-    doc_height = document.documentElement.clientHeight
-    pos = @$prompt_cursor.offset()
-    rel_pos = @$prompt_cursor.position()
     # Scroll console to the bottom.
     @$console.scrollTop @$console[0].scrollHeight
-    # Move the input element to the cursor position.
-    @$input_container.css
-      left: rel_pos.left 
-      top: rel_pos.top 
     
-    optimal_pos = pos.top - (2 * line_height)
-    # Follow the cursor vertically on mobile and desktop.
-    if @isMobile and orientation?
-      # Since the keyboard takes up most of the screen, we don't care about how
-      # far the the cursor position from the screen top is. We just follow it.
-      if screen_top < pos.top or screen_top > pos.top
-        @$window.scrollTop optimal_pos
-    else  
-      # If the window is scrolled beyond the cursor, scroll to the cursor's
-      # position and give two line to the top. 
-      if screen_top + doc_height < pos.top or screen_top > optimal_pos
-        @$window.scrollTop optimal_pos
+    # The cursor's top position is effected by the scroll-top of the console 
+    # so we need to this asynchronously to give the browser a chance to 
+    # reflow and recaluclate the cursor's possition.
+    cont = =>
+      line_height = @$prompt_cursor.height()
+      screen_top = @$window.scrollTop()
+      screen_left = @$window.scrollLeft()
+      doc_height = document.documentElement.clientHeight
+      pos = @$prompt_cursor.offset()
+      rel_pos = @$prompt_cursor.position()
+      
+      # Move the input element to the cursor position.
+      @$input_container.css
+        left: rel_pos.left 
+        top: rel_pos.top 
+  
+      optimal_pos = pos.top - (2 * line_height)
+      # Follow the cursor vertically on mobile and desktop.
+      if @isMobile and orientation?
+        # Since the keyboard takes up most of the screen, we don't care about how
+        # far the the cursor position from the screen top is. We just follow it.
+        if screen_top < pos.top or screen_top > pos.top
+          @$window.scrollTop optimal_pos
+      else
+        if screen_top + doc_height < pos.top
+          # Scroll just to a place where the cursor is in the view port.
+          @$window.scrollTop pos.top - doc_height + line_height
+        else if screen_top > optimal_pos
+          # If the window is scrolled beyond the cursor, scroll to the cursor's
+          # position and give two line to the top.
+          @$window.scrollTop pos.top
+    
+    setTimeout cont, 0
       
   # Selects the prompt label appropriate to the current mode.
   #   @arg continuation: If true, returns the continuation prompt rather than
