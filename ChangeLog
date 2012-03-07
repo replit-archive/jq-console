@@ -42,3 +42,7 @@ info.
 2011.12.28 Version 2.7
 * Implement ANSI graphics, Issue #12
 * Fix issue #25
+
+2012.3.7 Version 2.7.1
+* Fix issue #26
+* Complete issue #12 by adding stacking graphics support.
