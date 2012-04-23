@@ -127,7 +127,7 @@ Takes two arguments:
   Example:  
 
         // Ctrl+R: resets the console.  
-        jqconsole.RegisterShortCut('R', function() {  
+        jqconsole.RegisterShortcut('R', function() {
           this.Reset();  
         });  
 
