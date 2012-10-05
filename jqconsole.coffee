@@ -277,6 +277,18 @@ class JQConsole
     @Write @header, CLASS_HEADER
     return undefined
   
+  ###------------------------- History Methods -----------------------------###
+  
+  # Get the current history
+  GetHistory: ->
+  	@history
+  
+  # Set the history
+  SetHistory: (history) ->
+  	@ResetHistory()
+  	@history = history.splice(0)
+  	@history_index = @history.length
+    
   ###------------------------ Shortcut Methods -----------------------------###
   
   # Checks the type/value of key codes passed in for registering/unregistering
