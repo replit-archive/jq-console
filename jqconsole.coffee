@@ -420,11 +420,11 @@ class JQConsole
       
     span = $(EMPTY_SPAN).html text
     if cls? then span.addClass cls
-    @AddNode span
+    @Append span
     
   # Adds a dom node, where any text would have been inserted 
   #   @arg node: The node to insert.
-  AddNode: (node) ->
+  Append: (node) ->
   	($ node).insertBefore @$prompt
   	@_ScrollToEnd()
   	# Force reclaculation of the cursor's position.
