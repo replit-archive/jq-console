@@ -49,7 +49,7 @@ DEFAULT_PROMPT_CONINUE_LABEL = '... '
 DEFAULT_INDENT_WIDTH = 2
 
 CLASS_ANSI = "#{CLASS_PREFIX}ansi-" 
-ESCAPE_CHAR = '\033'
+ESCAPE_CHAR = '\x1B'
 ESCAPE_SYNTAX = /\[(\d*)(?:;(\d*))*m/
 
 class Ansi
