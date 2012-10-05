@@ -253,6 +253,23 @@ before it. Takes two arguments:
         jqconsole.Write(output, 'my-output-class')  
         jqconsole.Write(err.message, 'my-error-class')  
 
+###jqconsole.Append
+Append the given node to the DOM. If a prompt is currently being shown, the
+text is inserted before it. Takes a single argument:
+
+   * *node*: The DOM node to append. Can be wrapped by jquery.
+
+   Example:
+
+        // Add a div with the text 'hello' on a red background using jquery
+        jqconsole.Append($('<div>hello</div>').css('background-color', 'red'));
+
+        // We can also use document.createElement
+        node = document.createElement("div");
+        content = document.createTextNode("hello");
+        node.appendChild(content);
+        jqconsole.Append(node);
+
 
 ###jqconsole.SetPromptText
 Sets the text currently in the input prompt. Takes one parameter:  
@@ -410,6 +427,22 @@ Enables input and focus on the console.
 
 ###jqconsole.IsDisabled
 Returns true if the console is disabled.
+
+
+###jqconsole.GetHistory
+Returns the contents of the history buffer.
+
+
+###jqconsole.SetHistory
+Set the history buffer to the given array.
+
+Takes one parameter:
+
+  * __array__ *history*: The history buffer to use.
+
+  Example:
+
+        jqconsole.SetHistory(['a = 3', 'a + 3']);
 
 
 ###jqconsole.ResetHistory
