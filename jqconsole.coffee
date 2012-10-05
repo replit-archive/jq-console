@@ -286,7 +286,7 @@ class JQConsole
   # Set the history
   SetHistory: (history) ->
   	@ResetHistory()
-  	@history = history.splice(0)
+  	@history = history.slice()
   	@history_index = @history.length
     
   ###------------------------ Shortcut Methods -----------------------------###
