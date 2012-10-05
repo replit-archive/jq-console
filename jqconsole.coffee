@@ -408,12 +408,17 @@ class JQConsole
       
     span = $(EMPTY_SPAN).html text
     if cls? then span.addClass cls
-    span.insertBefore @$prompt
-    @_ScrollToEnd()
-    # Force reclaculation of the cursor's position.
-    @$prompt_cursor.detach().insertAfter @$prompt_left
-    return undefined
-
+    @AddNode span
+    
+  # Adds a dom node, where any text would have been inserted 
+  #   @arg node: The node to insert.
+  AddNode: (node) ->
+  	($ node).insertBefore @$prompt
+  	@_ScrollToEnd()
+  	# Force reclaculation of the cursor's position.
+  	@$prompt_cursor.detach().insertAfter @$prompt_left
+  	return undefined
+  
   # Starts an input operation. If another input or prompt operation is currently
   # underway, the new input operation is enqueued and will be called when the
   # current operation and all previously enqueued operations finish.
