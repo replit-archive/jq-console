@@ -242,11 +242,11 @@ class JQConsole
     # Save this instance to be accessed if lost.
     $(@container).data 'jqconsole', this
 
+  #### Reset methods
+
   # Resets the history into intitial state.
   ResetHistory: ->
-    @history = []
-    @history_index = 0
-    @history_current = ''
+    @SetHistory []
 
   # Resets the shortcut configuration.
   ResetShortcuts: ->
@@ -277,7 +277,7 @@ class JQConsole
     @Write @header, CLASS_HEADER
     return undefined
   
-  ###------------------------- History Methods -----------------------------###
+  #### History Methods
   
   # Get the current history
   GetHistory: ->
@@ -285,7 +285,6 @@ class JQConsole
   
   # Set the history
   SetHistory: (history) ->
-  	@ResetHistory()
   	@history = history.slice()
   	@history_index = @history.length
     
