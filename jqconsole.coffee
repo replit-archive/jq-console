@@ -424,11 +424,11 @@ class JQConsole
   # Adds a dom node, where any text would have been inserted 
   #   @arg node: The node to insert.
   Append: (node) ->
-  	($ node).insertBefore @$prompt
+  	$node = $(node).insertBefore @$prompt
   	@_ScrollToEnd()
   	# Force reclaculation of the cursor's position.
   	@$prompt_cursor.detach().insertAfter @$prompt_left
-  	return undefined
+  	return $node
   
   # Starts an input operation. If another input or prompt operation is currently
   # underway, the new input operation is enqueued and will be called when the
