@@ -49,7 +49,7 @@ DEFAULT_PROMPT_CONINUE_LABEL = '... '
 DEFAULT_INDENT_WIDTH = 2
 
 CLASS_ANSI = "#{CLASS_PREFIX}ansi-" 
-ESCAPE_CHAR = '\033'
+ESCAPE_CHAR = '\x1B'
 ESCAPE_SYNTAX = /\[(\d*)(?:;(\d*))*m/
 
 class Ansi
@@ -277,6 +277,18 @@ class JQConsole
     @Write @header, CLASS_HEADER
     return undefined
   
+  ###------------------------- History Methods -----------------------------###
+  
+  # Get the current history
+  GetHistory: ->
+  	@history
+  
+  # Set the history
+  SetHistory: (history) ->
+  	@ResetHistory()
+  	@history = history.slice()
+  	@history_index = @history.length
+    
   ###------------------------ Shortcut Methods -----------------------------###
   
   # Checks the type/value of key codes passed in for registering/unregistering
@@ -408,12 +420,17 @@ class JQConsole
       
     span = $(EMPTY_SPAN).html text
     if cls? then span.addClass cls
-    span.insertBefore @$prompt
-    @_ScrollToEnd()
-    # Force reclaculation of the cursor's position.
-    @$prompt_cursor.detach().insertAfter @$prompt_left
-    return undefined
-
+    @Append span
+    
+  # Adds a dom node, where any text would have been inserted 
+  #   @arg node: The node to insert.
+  Append: (node) ->
+  	($ node).insertBefore @$prompt
+  	@_ScrollToEnd()
+  	# Force reclaculation of the cursor's position.
+  	@$prompt_cursor.detach().insertAfter @$prompt_left
+  	return undefined
+  
   # Starts an input operation. If another input or prompt operation is currently
   # underway, the new input operation is enqueued and will be called when the
   # current operation and all previously enqueued operations finish.
