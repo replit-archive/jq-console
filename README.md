@@ -257,7 +257,8 @@ before it. Takes two arguments:
 Append the given node to the DOM. If a prompt is currently being shown, the
 text is inserted before it. Takes a single argument:
 
-   * *node*: The DOM node to append. Can be wrapped by jquery.
+   * __(string|Element)__ *node*: The DOM Element or html string to append to
+     the console just before the prompt.
 
    Example:
 
