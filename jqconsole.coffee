@@ -152,7 +152,10 @@ class JQConsole
     @header = header or ''
 
     # The prompt label used by Prompt().
-    @prompt_label_main = prompt_label or DEFAULT_PROMPT_LABEL
+    @prompt_label_main = if typeof prompt_label == 'string'
+      prompt_label 
+    else 
+      DEFAULT_PROMPT_LABEL
     @prompt_label_continue = ' \n' + (prompt_continue_label or
                                       DEFAULT_PROMPT_CONINUE_LABEL)
 
