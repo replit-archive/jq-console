@@ -46,3 +46,11 @@ info.
 2012.3.7 Version 2.7.1
 * Fix issue #26
 * Complete issue #12 by adding stacking graphics support.
+
+2012.10.28 Version 2.7.2
+* Add set / get History methods.
+* Add Append method.
+
+2012.11.10 Version 2.7.3
+* Allow empty string in prompt.
+
