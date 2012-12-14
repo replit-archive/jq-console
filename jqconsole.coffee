@@ -91,6 +91,7 @@ class Ansi
       when 9  then @_append 'line-through'
       when 10 then @_remove 'fonts'
       when 11,12,13,14,15,16,17,18,19
+        @_remove 'fonts'
         @_append "fonts-#{code - 10}"
       when 20 then @_append 'fraktur'
       when 21 then @_remove 'bold', 'lighter'
@@ -101,9 +102,11 @@ class Ansi
       when 28 then @_remove 'hidden'
       when 29 then @_remove 'line-through'
       when 30,31,32,33,34,35,36,37
+        @_remove 'color'
         @_append 'color-' + @_color code - 30
       when 39 then @_remove 'color'
       when 40,41,42,43,44,45,46,47
+        @_remove 'background-color'
         @_append 'background-color-' + @_color code - 40
       when 49 then @_remove 'background-color'
       when 51 then @_append 'framed'
