@@ -696,15 +696,7 @@ class JQConsole
 
     # Actual key-by-key handling.
     @$input_source.keypress @_HandleChar
-
-    # FF & opera fires keydown events only once (even when holding) and 
-    # also delegates control keys to keypress that *is* fired more than 
-    # once on holding down the key.
-    key_event = if $.browser.mozilla or $.browser.opera
-      E_KEYPRESS
-    else
-      'keydown'
-    @$input_source[key_event] @_HandleKey
+    @$input_source.keydown @_HandleKey
     @$input_source.keydown @_CheckComposition
     
     # Firefox don't fire any key event for composition characters, so we listen
