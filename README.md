@@ -16,10 +16,11 @@ NOTE: This info is for jq-console v2.0. For jq-console v1.0 see README-v1.md.
   
 The plugin has been tested on the following browsers:  
   
-* IE 9-10
-* Chrome 10-14
-* Firefox 3.6-6
-* Opera 11  
+* IE 9+
+* Chrome 10+
+* Firefox 4+
+* Opera 11+
+* iOS 4+
   
   
 ##Getting Started  
