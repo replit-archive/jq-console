@@ -285,13 +285,15 @@ Sets the text currently in the input prompt. Takes one parameter:
 
 
 ###jqconsole.SetPromptLabel
-Replaces the main prompt label.
+Replaces the main prompt label. Takes two parameters:
 
-  * __string__ *label*: String to replace the main promot label.
+  * __string__ *main_label*: String to replace the main prompt label.
+  * __string__ *continuation_label*: String to replace the continuation prompt label. Optional.
 
   Examples:  
 
         jqconsole.SetPromptLabel('$')
+        jqconsole.SetPromptLabel(' $','..')
 
 
 ###jqconsole.ClearPromptText 
