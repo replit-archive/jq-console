@@ -417,9 +417,12 @@ class JQConsole
     return undefined
   
   # Replaces the main prompt label.
-  #   @arg label: The new label for the next prompt.
-  SetPromptLabel: (label) ->
-    @prompt_label_main = label
+  #   @arg main_label: The new main label for the next prompt.
+  #   @arg continue_label: The new continuation label for the next prompt. Optional.
+  SetPromptLabel: (main_label, continue_label) ->
+    @prompt_label_main = main_label
+    if continue_label?
+      @prompt_label_continue = continue_label
     return undefined
 
   # Writes the given text to the console in a <span>, with an optional class.
