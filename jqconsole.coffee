@@ -159,8 +159,8 @@ class JQConsole
       prompt_label 
     else 
       DEFAULT_PROMPT_LABEL
-    @prompt_label_continue = ' \n' + (prompt_continue_label or
-                                      DEFAULT_PROMPT_CONINUE_LABEL)
+    @prompt_label_continue = (prompt_continue_label or
+                              DEFAULT_PROMPT_CONINUE_LABEL)
 
     # How many spaces are inserted when a tab character is pressed.
     @indent_width = DEFAULT_INDENT_WIDTH
@@ -417,9 +417,12 @@ class JQConsole
     return undefined
   
   # Replaces the main prompt label.
-  #   @arg label: The new label for the next prompt.
-  SetPromptLabel: (label) ->
-    @prompt_label_main = label
+  #   @arg main_label: The new main label for the next prompt.
+  #   @arg continue_label: The new continuation label for the next prompt. Optional.
+  SetPromptLabel: (main_label, continue_label) ->
+    @prompt_label_main = main_label
+    if continue_label?
+      @prompt_label_continue = continue_label
     return undefined
 
   # Writes the given text to the console in a <span>, with an optional class.
@@ -1117,7 +1120,7 @@ class JQConsole
   #     the main one.
   _SelectPromptLabel: (continuation) ->
     if @state == STATE_PROMPT
-      return if continuation then @prompt_label_continue else @prompt_label_main
+      return if continuation then (' \n' + @prompt_label_continue) else @prompt_label_main
     else
       return if continuation then '\n ' else ' '
   
