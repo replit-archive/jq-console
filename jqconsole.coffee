@@ -415,6 +415,12 @@ class JQConsole
     @_AppendPromptText text
     @_ScrollToEnd()
     return undefined
+  
+  # Replaces the main prompt label.
+  #   @arg label: The new label for the next prompt.
+  SetPromptLabel: (label) ->
+    @prompt_label_main = label
+    return undefined
 
   # Writes the given text to the console in a <span>, with an optional class.
   #   @arg text: The text to write.
