@@ -284,6 +284,16 @@ Sets the text currently in the input prompt. Takes one parameter:
         jqconsole.SetPromptText('print [i ** 2 for i in range(10)]')  
 
 
+###jqconsole.SetPromptLabel
+Replaces the main prompt label.
+
+  * __string__ *label*: String to replace the main promot label.
+
+  Examples:  
+
+        jqconsole.SetPromptLabel('$')
+
+
 ###jqconsole.ClearPromptText 
 Clears all the text currently in the input prompt. Takes one parameter:  
 

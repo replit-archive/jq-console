@@ -58,3 +58,5 @@ info.
 * Fix issue #36
 * Fix issue #35
 
+2013.1.21 Version 2.7.5
+* Add SetPromptLabel method.
