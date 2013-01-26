@@ -668,12 +668,17 @@ class JQConsole
         @Focus()
     else
       @$console.mouseup (e) =>
-        fn = =>
-          if not window.getSelection().toString()
-            e.preventDefault()
-            @Focus()
-        # Force selection update.
-        setTimeout fn, 0
+        # Focus immediatly when it's the middle click to support
+        # paste on linux desktop.
+        if e.which == 2
+          @Focus()
+        else 
+          fn = =>
+            if not window.getSelection().toString()
+              e.preventDefault()
+              @Focus()
+          # Force selection update.
+          setTimeout fn, 0
         
     # Mark the console with a style when it loses focus.
     @$input_source.focus =>
