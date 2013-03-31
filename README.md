@@ -7,9 +7,7 @@ for the <a href="http://repl.it">repl.it</a> project. It tries to simulate a low
 raw input/output streams as well as input and output states.  
   
 Version 2.0 adds baked-in support for rich multi-line prompting and operation  
-queueing.  
-  
-NOTE: This info is for jq-console v2.0. For jq-console v1.0 see README-v1.md.  
+queueing.
   
   
 ##Tested Browsers  

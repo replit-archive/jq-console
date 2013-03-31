@@ -11,10 +11,13 @@
     }
     /* The console container element */
     #console {
-      position: absolute;
-      width: 400px;
-      height: 500px;
-      background-color:black;
+      height: 400px;
+      width: 750px;
+      position:relative;
+      background-color: black;
+      border: 2px solid #CCC;
+      margin: 0 auto;
+      margin-top: 50px;
     }
     /* The inner console element. */
     .jqconsole {
@@ -55,10 +58,10 @@
   <body>
     <div id="console"></div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../jqconsole-2.7.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../lib/jqconsole.js" type="text/javascript" charset="utf-8"></script>
     <script>
       $(function () {
-        var jqconsole = $('#console').jqconsole('Hi\n', '>>>');
+        var jqconsole = $('#console').jqconsole('Hi\n', '>>> ');
         var startPrompt = function () {
           // Start the prompt with history enabled.
           jqconsole.Prompt(true, function (input) {
