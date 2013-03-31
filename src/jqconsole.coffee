@@ -1305,3 +1305,6 @@ class JQConsole
   
 $.fn.jqconsole = (header, prompt_main, prompt_continue) ->
   new JQConsole this, header, prompt_main, prompt_continue
+
+$.fn.jqconsole.JQConsole = JQConsole
+$.fn.jqconsole.Ansi = Ansi
