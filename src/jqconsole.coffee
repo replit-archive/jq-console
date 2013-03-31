@@ -324,7 +324,7 @@ class JQConsole
   #     point to the JQConsole object.
   RegisterShortcut: (key_code, callback) ->
     key_code = @_CheckKeyCode key_code
-    if not callback instanceof Function
+    if typeof callback != 'function'
       throw new Error 'Callback must be a function, not ' + callback + '.'
 
     addShortcut = (key) =>
