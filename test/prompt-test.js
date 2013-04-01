@@ -119,7 +119,7 @@
         return equal(jqconsole.GetPromptText(), 'foo');
       });
     });
-    return describe('Control Keys', function() {
+    describe('Control Keys', function() {
       beforeEach(function() {
         return jqconsole.Prompt(true, function() {});
       });
@@ -169,6 +169,208 @@
           metaKey: true
         });
         return equal(jqconsole.$prompt.text().trim(), 'prompt_label');
+      });
+    });
+    return describe('Moving', function() {
+      beforeEach(function() {
+        return jqconsole.Prompt(true, function() {});
+      });
+      afterEach(function() {
+        return jqconsole.AbortPrompt();
+      });
+      it('moves to the left', function() {
+        type('xyz');
+        keyDown(37);
+        equal(jqconsole.$prompt_left.text().trim(), 'xy');
+        keyDown(37);
+        equal(jqconsole.$prompt_left.text().trim(), 'x');
+        keyDown(37);
+        equal(jqconsole.$prompt_left.text().trim(), '');
+        keyDown(37);
+        return equal(jqconsole.$prompt_left.text().trim(), '');
+      });
+      it('moves to the right', function() {
+        type('xyz');
+        keyDown(37);
+        keyDown(37);
+        equal(jqconsole.$prompt_left.text().trim(), 'x');
+        keyDown(39);
+        equal(jqconsole.$prompt_left.text().trim(), 'xy');
+        keyDown(39);
+        equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+        keyDown(39);
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+      });
+      it('moves to the prev line when at the first char of the line moving left', function() {
+        type('xyz');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('abc');
+        equal(jqconsole.$prompt_left.text().trim(), 'abc');
+        keyDown(37);
+        keyDown(37);
+        keyDown(37);
+        keyDown(37);
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+      });
+      it('moves to the next line when at the last char of the line moving right', function() {
+        type('xyz');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('abc');
+        equal(jqconsole.$prompt_left.text().trim(), 'abc');
+        keyDown(37);
+        keyDown(37);
+        keyDown(37);
+        keyDown(37);
+        equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+        keyDown(39);
+        return equal(jqconsole.$prompt_right.text().trim(), 'abc');
+      });
+      it('moves to the start of the word', function() {
+        type('xyz abc');
+        keyDown(37, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'abc');
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+      });
+      it('moves to the end of the word', function() {
+        type('xyz abc');
+        keyDown(37, {
+          metaKey: true
+        });
+        keyDown(37, {
+          metaKey: true
+        });
+        keyDown(39, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'abc');
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+      });
+      it('moves to the end of the word', function() {
+        type('xyz abc');
+        keyDown(37, {
+          metaKey: true
+        });
+        keyDown(37, {
+          metaKey: true
+        });
+        keyDown(39, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'abc');
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz');
+      });
+      it('moves to the start of the line', function() {
+        type('xyz abc');
+        keyDown(36);
+        return equal(jqconsole.$prompt_right.text().trim(), 'xyz abc');
+      });
+      it('moves to the end of the line', function() {
+        type('xyz abc');
+        keyDown(36);
+        equal(jqconsole.$prompt_right.text().trim(), 'xyz abc');
+        keyDown(35);
+        equal(jqconsole.$prompt_right.text().trim(), '');
+        return equal(jqconsole.$prompt_left.text().trim(), 'xyz abc');
+      });
+      it('moves to the start of the prompt', function() {
+        type('xyz abc');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('hafm olim');
+        keyDown(36, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'xyz abc');
+        return equal(jqconsole.$prompt_after.text().trim(), 'prompt_continuehafm olim');
+      });
+      it('moves to the end of the prompt', function() {
+        type('xyz abc');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('hafm olim');
+        keyDown(36, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'xyz abc');
+        equal(jqconsole.$prompt_after.text().trim(), 'prompt_continuehafm olim');
+        keyDown(35, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_left.text().trim(), 'hafm olim');
+        return equal(jqconsole.$prompt_before.text().trim(), 'prompt_labelxyz abc');
+      });
+      it('moves up one line', function() {
+        type('xyz');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('a');
+        keyDown(38, {
+          shiftKey: true
+        });
+        return equal(jqconsole.$prompt_right.text().trim(), 'yz');
+      });
+      it('moves down one line', function() {
+        type('xyz');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('a');
+        keyDown(38, {
+          metaKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'yz');
+        keyDown(40, {
+          metaKey: true
+        });
+        return equal(jqconsole.$prompt_right.text().trim(), '');
+      });
+      it('respects the column when moving vertically', function() {
+        type('xyz');
+        keyDown(13, {
+          shiftKey: true
+        });
+        type('ab');
+        keyDown(38, {
+          shiftKey: true
+        });
+        equal(jqconsole.$prompt_right.text().trim(), 'z');
+        keyDown(40, {
+          shiftKey: true
+        });
+        keyDown(37);
+        keyDown(37);
+        equal(jqconsole.$prompt_right.text().trim(), 'ab');
+        keyDown(38, {
+          shiftKey: true
+        });
+        return equal(jqconsole.$prompt_right.text().trim(), 'xyz');
+      });
+      it('deletes a char', function() {
+        type('xyz');
+        keyDown(37);
+        equal(jqconsole.$prompt_right.text().trim(), 'z');
+        keyDown(46);
+        return equal(jqconsole.$prompt_right.text().trim(), '');
+      });
+      return it('deletes a word', function() {
+        type('xyz abc');
+        keyDown(37);
+        keyDown(37);
+        keyDown(37);
+        equal(jqconsole.$prompt_right.text().trim(), 'abc');
+        keyDown(46, {
+          metaKey: true
+        });
+        return equal(jqconsole.$prompt_right.text().trim(), '');
       });
     });
   });
