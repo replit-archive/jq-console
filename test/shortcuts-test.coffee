@@ -1,4 +1,4 @@
-{jqconsole} = jqconsoleSetup()
+{jqconsole, typer: {keyDown}} = jqconsoleSetup()
 
 describe 'Shortcuts', ->
   describe '#RegisterShortcut', ->
@@ -38,3 +38,23 @@ describe 'Shortcuts', ->
       jqconsole.RegisterShortcut 'a', bCb
       jqconsole.UnRegisterShortcut 'a', aCb
       deepEqual jqconsole.shortcuts['a'.charCodeAt(0)], [bCb]
+
+  describe '#ResetShortcuts', ->
+
+    it 'resets all shortcuts', ->
+      cb1 = ->
+      cb2 = ->
+      jqconsole.RegisterShortcut 'a', cb1
+      jqconsole.RegisterShortcut 'b', cb2
+      jqconsole.ResetShortcuts()
+      deepEqual jqconsole.shortcuts, {}
+
+  describe 'Invoking Shortcuts', ->
+    it 'invokes shortcuts', ->
+      jqconsole.Prompt true, ->
+      counter = 0
+      jqconsole.RegisterShortcut 'a', ->
+        strictEqual this, jqconsole
+        counter++
+      keyDown 'a'.charCodeAt(0), metaKey: on
+      ok counter
