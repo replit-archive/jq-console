@@ -5,15 +5,14 @@
 // base path, that will be used to resolve files and exclude
 basePath = '';
 
-
 // list of files / patterns to load in the browser
 files = [
   MOCHA,
   MOCHA_ADAPTER,
   'test/vendor/*.js',
   'lib/*.js',
-  'test/setup.js',
-  'test/*.js'
+  'test/setup.coffee',
+  'test/*-test.coffee',
 ];
 
 

@@ -14,12 +14,24 @@
     <script src="../lib/jqconsole.js"></script>
     <script src="vendor/assert.js"></script>
     <script src="setup.js"></script>
-    <script src="ansi-test.js"></script>
-    <script src="jqconsole-test.js"></script>
-    <script src="prompt-test.js"></script>
-    <script src="shortcuts-test.js"></script>
+    <script src="coffeescript.js"></script>
+
     <script>
-      mocha.run();
+    var tests = [ 'ansi-test.coffee'
+                , 'jqconsole-test.coffee'
+                , 'prompt-test.coffee'
+                , 'shortcuts-test.coffee'
+                , 'history-test.coffee'
+                ]
+    tests.forEach(function (test) {
+      CoffeeScript.load(test, start)
+    })
+    function start () {
+      if (start.called == null) start.called = 0;
+      if (++start.called == tests.length) {
+        mocha.run();
+      }
+    }
     </script>
   </body>
 </html>
