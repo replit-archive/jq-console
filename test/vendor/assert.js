@@ -70,7 +70,7 @@ if (typeof module === 'object' && typeof module.exports === 'object') {
 
 assert.AssertionError = function AssertionError(options) {
   this.name = 'AssertionError';
-  this.message = options.message;
+  this.message = options.message || (options.actual + ' ' + options.operator +  ' ' +options.expected)
   this.actual = options.actual;
   this.expected = options.expected;
   this.operator = options.operator;
