@@ -1,4 +1,4 @@
-{jqconsole, typer: {typeA, keyDown, type}} = jqconsoleSetup()
+{jqconsole, createScroll, typer: {typeA, keyDown, type}} = jqconsoleSetup()
 
 describe 'Prompt Interaction', ->
   describe '#Prompt', ->
@@ -283,19 +283,23 @@ describe 'Prompt Interaction', ->
       keyDown 46, metaKey: on
       equal jqconsole.$prompt_right.text().trim(), ''
 
-    it 'scrolls up', (done) ->
-      # Make sure the console has a scroll.
-      line_height = jqconsole.$prompt.height()
-      console_height = jqconsole.$console.height()
-      lines_per_page = Math.ceil(console_height / line_height)
+  describe 'scrolling', ->
+    console_height = null
+    _fast = null
 
-      for i in [0..lines_per_page * 5]
-        jqconsole.SetPromptText('foo')
-        jqconsole._HandleEnter()
-        jqconsole.Prompt true, ->
-
-      before = jqconsole.$console[0].scrollTop
+    before ->
       jQuery.fx.speeds.fast = 10
+    after ->
+      jQuery.fx.speeds.fast = _fast
+
+    beforeEach ->
+      jqconsole.Reset()
+      jqconsole.Prompt true, ->
+      # Make sure the console has a scroll.
+      { console_height } = createScroll()
+
+    it 'scrolls up', (done) ->
+      before = jqconsole.$console[0].scrollTop
       keyDown 33
       cb = ->
         equal jqconsole.$console[0].scrollTop, before - console_height

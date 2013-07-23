@@ -1,4 +1,5 @@
 window.equal = assert.equal
+window.notEqual = assert.notEqual
 window.deepEqual = assert.deepEqual
 window.strictEqual = assert.strictEqual
 window.ok = assert.ok
@@ -30,4 +31,14 @@ window.jqconsoleSetup = ->
         jqconsole.$input_source.trigger(e)
       type chr for chr in str
 
-  {$container, jqconsole, typer}
+  createScroll = ->
+    line_height = jqconsole.$prompt.height()
+    console_height = jqconsole.$console.height()
+    lines_per_page = Math.ceil(console_height / line_height)
+    for i in [0..lines_per_page * 5]
+      jqconsole.SetPromptText('foo')
+      jqconsole._HandleEnter()
+      jqconsole.Prompt true, ->
+    {line_height, console_height, lines_per_page}
+
+  {$container, jqconsole, typer, createScroll}
