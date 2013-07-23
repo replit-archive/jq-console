@@ -282,3 +282,24 @@ describe 'Prompt Interaction', ->
       equal jqconsole.$prompt_right.text().trim(), 'abc'
       keyDown 46, metaKey: on
       equal jqconsole.$prompt_right.text().trim(), ''
+
+    it 'scrolls up', (done) ->
+      # Make sure the console has a scroll.
+      line_height = jqconsole.$prompt.height()
+      console_height = jqconsole.$console.height()
+      lines_per_page = Math.ceil(console_height / line_height)
+
+      for i in [0..lines_per_page * 5]
+        jqconsole.SetPromptText('foo')
+        jqconsole._HandleEnter()
+        jqconsole.Prompt true, ->
+
+      before = jqconsole.$console[0].scrollTop
+      jQuery.fx.speeds.fast = 10
+      keyDown 33
+      cb = ->
+        equal jqconsole.$console[0].scrollTop, before - console_height
+        done()
+      # * 2 is some arbitrary number otherwise it fails.
+      setTimeout cb, jQuery.fx.speeds.fast * 2
+

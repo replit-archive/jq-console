@@ -4,10 +4,14 @@ window.strictEqual = assert.strictEqual
 window.ok = assert.ok
 JQConsole = $().jqconsole.JQConsole
 
-window.jqconsoleSetup = ->  
-  $container = $('<div/>')
+window.jqconsoleSetup = ->
+  $container = $('<div/>').css
+    height: '100px'
+    widht: '200px'
+    position: 'relative'
+  $container.appendTo('body')
   jqconsole = new JQConsole($container, 'header', 'prompt_label', 'prompt_continue')
-  typer =   
+  typer =
     typeA: ->
       e = $.Event('keypress')
       e.which = 'a'.charCodeAt(0)
