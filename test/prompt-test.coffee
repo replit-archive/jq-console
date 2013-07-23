@@ -35,24 +35,6 @@ describe 'Prompt Interaction', ->
       strictEqual jqconsole.history_active, true
       jqconsole.AbortPrompt()
 
-  describe 'Typing', ->
-    beforeEach -> jqconsole.Prompt true, ->
-    afterEach -> jqconsole.AbortPrompt()
-
-    it 'handles chars', ->
-      str = ''
-      test = (ch) ->
-        str += ch
-        e = $.Event('keypress')
-        e.which = ch.charCodeAt(0)
-        jqconsole.$input_source.trigger e
-        equal jqconsole.$prompt.text().trim(), 'prompt_label' + str
-
-      test 'a'
-      test 'Z'
-      test '$'
-      test 'ƒ'
-
   describe '#GetPromptText', ->
     beforeEach -> jqconsole.Prompt true, ->
     afterEach -> jqconsole.AbortPrompt()
@@ -306,4 +288,107 @@ describe 'Prompt Interaction', ->
         done()
       # * 2 is some arbitrary number otherwise it fails.
       setTimeout cb, jQuery.fx.speeds.fast * 2
+
+    it 'scrolls up twice', (done) ->
+      before = jqconsole.$console[0].scrollTop
+      keyDown 33
+      cb = ->
+        keyDown 33
+        cb = ->
+          equal jqconsole.$console[0].scrollTop, before - (console_height * 2)
+          done()
+        setTimeout cb, jQuery.fx.speeds.fast * 2
+      # * 2 is some arbitrary number otherwise it fails.
+      setTimeout cb, jQuery.fx.speeds.fast * 2
+
+    it 'scrolls down', (done) ->
+      before = jqconsole.$console[0].scrollTop
+      keyDown 33
+      cb = ->
+        keyDown 34
+        cb = ->
+          equal jqconsole.$console[0].scrollTop, before
+          done()
+        setTimeout cb, jQuery.fx.speeds.fast * 2
+      # * 2 is some arbitrary number otherwise it fails.
+      setTimeout cb, jQuery.fx.speeds.fast * 2
+
+  describe 'Typing', ->
+    beforeEach -> jqconsole.Prompt true, ->
+    afterEach -> jqconsole.AbortPrompt()
+
+    it 'handles chars', ->
+      str = ''
+      test = (ch) ->
+        str += ch
+        e = $.Event('keypress')
+        e.which = ch.charCodeAt(0)
+        jqconsole.$input_source.trigger e
+        equal jqconsole.$prompt.text().trim(), 'prompt_label' + str
+
+      test 'a'
+      test 'Z'
+      test '$'
+      test 'ƒ'
+
+    it 'scrolls all the way down when typing', (done) ->
+      createScroll()
+      keyDown 33
+      cb = ->
+        before = jqconsole.$console[0].scrollTop
+        type('a')
+        cb = ->
+          notEqual jqconsole.$console[0].scrollTop, before
+          done()
+        setTimeout cb, 0
+      setTimeout cb, jQuery.fx.speeds.fast * 2
+
+  describe 'Multiline', ->
+    beforeEach ->
+      if jqconsole.GetState() is 'prompt'
+        jqconsole.AbortPrompt()
+
+    it 'executes multiline callback', (done) ->
+      jqconsole.Prompt true, (-> ), ->
+        done()
+      type('foo')
+      keyDown 13
+
+    it 'indents', ->
+      jqconsole.Prompt true, (-> ), ->
+        return 2
+      type('foo')
+      keyDown 13
+      equal jqconsole.GetState(), 'prompt'
+      equal jqconsole.GetPromptText(), 'foo\n    '
+
+    it 'keeps indentation on shift+enter', ->
+      jqconsole.Prompt true, (-> ), ->
+        return 2
+      type('foo')
+      keyDown 9
+      keyDown 13, shiftKey: on
+      equal jqconsole.GetState(), 'prompt'
+      equal jqconsole.GetPromptText(), '  foo\n  '
+
+    it 'unindents', ->
+      jqconsole.Prompt true, (-> ), ->
+        return -2
+      type('foo')
+      keyDown 9
+      keyDown 13
+      equal jqconsole.GetPromptText(), '  foo\n'
+
+    it 'skip indent callback', (done) ->
+      jqconsole.Prompt true, done.bind(null, null), ->
+        return false
+      type('foo')
+      keyDown 13
+
+    it 'handles async treatment', (done) ->
+      jqconsole.Prompt true, done.bind(null, null), ((text, cb) -> cb false), on
+      type('foo')
+      keyDown 13
+
+
 
