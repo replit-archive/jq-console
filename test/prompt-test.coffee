@@ -92,46 +92,6 @@ describe 'Prompt Interaction', ->
       jqconsole.SetPromptText('foo')
       equal jqconsole.GetPromptText(), 'foo'
 
-  describe 'Control Keys', ->
-    beforeEach -> jqconsole.Prompt true, ->
-    afterEach -> jqconsole.AbortPrompt()
-
-    it 'handles enter', ->
-      jqconsole.AbortPrompt()
-      counter = 0
-      jqconsole.Prompt true, -> counter++
-      typeA()
-      keyDown 13
-      ok counter
-      equal jqconsole.$console.find('.jqconsole-old-prompt').last().text().trim(), 'prompt_labela'
-      # Restart the prompt for other tests.
-      jqconsole.Prompt true, ->
-
-    it 'handles shift+enter', ->
-      keyDown 13, shiftKey: on
-      equal jqconsole.$prompt.text().trim(), 'prompt_label \nprompt_continue'
-
-    it 'handles tab', ->
-      typeA()
-      keyDown 9
-      equal jqconsole.$prompt.text().trim(), 'prompt_label  a'
-
-    it 'handles shift+tab', ->
-      typeA()
-      keyDown 9, shiftKey: on
-      equal jqconsole.$prompt.text().trim(), 'prompt_labela'
-
-    it 'backspace', ->
-      typeA()
-      keyDown 8
-      equal jqconsole.$prompt.text().trim(), 'prompt_label'
-
-    it 'cntrl+backspace', ->
-      typeA()
-      typeA()
-      keyDown 8, metaKey: on
-      equal jqconsole.$prompt.text().trim(), 'prompt_label'
-
   describe 'Moving', ->
     beforeEach -> jqconsole.Prompt true, ->
     afterEach -> jqconsole.AbortPrompt()
@@ -267,14 +227,53 @@ describe 'Prompt Interaction', ->
       keyDown 38, shiftKey: on
       equal jqconsole.$prompt_right.text().trim(), 'xyz'
 
-    # We can't test this in control key because it needs to move the cursor.
+  describe 'Control Keys', ->
+    beforeEach -> jqconsole.Prompt true, ->
+    afterEach -> jqconsole.AbortPrompt()
+
+    it 'handles enter', ->
+      jqconsole.AbortPrompt()
+      counter = 0
+      jqconsole.Prompt true, -> counter++
+      typeA()
+      keyDown 13
+      ok counter
+      equal jqconsole.$console.find('.jqconsole-old-prompt').last().text().trim(), 'prompt_labela'
+      # Restart the prompt for other tests.
+      jqconsole.Prompt true, ->
+
+    it 'handles shift+enter', ->
+      keyDown 13, shiftKey: on
+      equal jqconsole.$prompt.text().trim(), 'prompt_label \nprompt_continue'
+
+    it 'handles tab', ->
+      typeA()
+      keyDown 9
+      equal jqconsole.$prompt.text().trim(), 'prompt_label  a'
+
+    it 'handles shift+tab', ->
+      typeA()
+      keyDown 9, shiftKey: on
+      equal jqconsole.$prompt.text().trim(), 'prompt_labela'
+
+    it 'backspace', ->
+      typeA()
+      keyDown 8
+      equal jqconsole.$prompt.text().trim(), 'prompt_label'
+
+    it 'cntrl+backspace', ->
+      typeA()
+      typeA()
+      keyDown 8, metaKey: on
+      equal jqconsole.$prompt.text().trim(), 'prompt_label'
+
     it 'deletes a char', ->
       type 'xyz'
       keyDown 37
       equal jqconsole.$prompt_right.text().trim(), 'z'
       keyDown 46
       equal jqconsole.$prompt_right.text().trim(), ''
-    
+
     it 'deletes a word', ->
       type 'xyz abc'
       keyDown 37
@@ -283,5 +282,3 @@ describe 'Prompt Interaction', ->
       equal jqconsole.$prompt_right.text().trim(), 'abc'
       keyDown 46, metaKey: on
       equal jqconsole.$prompt_right.text().trim(), ''
-
-
