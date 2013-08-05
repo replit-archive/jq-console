@@ -217,7 +217,13 @@ class JQConsole
       height: 0
       overflow: 'hidden'
     @$input_source = $('<textarea/>')
-    @$input_source.attr('wrap', 'off').css
+    @$input_source.attr
+      wrap: 'off'
+      autocapitalize: 'off'
+      autocorrect: 'off'
+      spellcheck: 'false'
+      autocomplete: 'off'
+    @$input_source.css
       position: 'absolute'
       width: 2
     @$input_source.appendTo @$input_container
