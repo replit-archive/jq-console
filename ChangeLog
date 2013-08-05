@@ -66,3 +66,7 @@ info.
 
 2013.1.26 Version 2.7.7
 * Support for middle click paste on linux. #47.
+
+2013.8.5 Version 2.7.8
+* Fix issue #51.
+
