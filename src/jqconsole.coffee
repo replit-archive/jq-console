@@ -3,6 +3,43 @@ Copyrights 2011, the repl.it project.
 Licensed under the MIT license
 ###
 
+###
+Use of jQuery.browser is frowned upon.
+More details: http://api.jquery.com/jQuery.browser
+jQuery.uaMatch maintained for back-compat
+###
+jQuery.uaMatch = (ua) ->
+  ua = ua.toLowerCase()
+  match = /(chrome)[ \/]([\w.]+)/.exec(ua) or /(webkit)[ \/]([\w.]+)/.exec(ua) or /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) or /(msie) ([\w.]+)/.exec(ua) or ua.indexOf("compatible") < 0 and /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) or []
+  browser: match[1] or ""
+  version: match[2] or "0"
+
+matched = jQuery.uaMatch(navigator.userAgent)
+browser = {}
+if matched.browser
+  browser[matched.browser] = true
+  browser.version = matched.version
+###Chrome is Webkit, but Webkit is also Safari.###
+if browser.chrome
+  browser.webkit = true
+else browser.safari = true  if browser.webkit
+jQuery.browser = browser
+jQuery.sub = ->
+  jQuerySub = (selector, context) ->
+    new jQuerySub.fn.init(selector, context)
+  jQuery.extend true, jQuerySub, this
+  jQuerySub.superclass = this
+  jQuerySub.fn = jQuerySub:: = this()
+  jQuerySub.fn.constructor = jQuerySub
+  jQuerySub.sub = @sub
+  jQuerySub.fn.init = init = (selector, context) ->
+    context = jQuerySub(context)  if context and context instanceof jQuery and (context not instanceof jQuerySub)
+    jQuery.fn.init.call this, selector, context, rootjQuerySub
+
+  jQuerySub.fn.init:: = jQuerySub.fn
+  rootjQuerySub = jQuerySub(document)
+  jQuerySub
+
 # Shorthand for jQuery.
 $ = jQuery
 
