@@ -3,19 +3,28 @@ Copyrights 2011, the repl.it project.
 Licensed under the MIT license
 ###
 
+# Shorthand for jQuery.
+$ = jQuery
+
 ###
 Use of jQuery.browser is frowned upon.
 More details: http://api.jquery.com/jQuery.browser
 jQuery.uaMatch maintained for back-compat
 ###
-if !JQuery.browser
-  jQuery.uaMatch = (ua) ->
+if !$.browser
+  $.uaMatch = (ua) ->
     ua = ua.toLowerCase()
-    match = /(chrome)[ \/]([\w.]+)/.exec(ua) or /(webkit)[ \/]([\w.]+)/.exec(ua) or /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) or /(msie) ([\w.]+)/.exec(ua) or ua.indexOf("compatible") < 0 and /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) or []
+    match = /(chrome)[ \/]([\w.]+)/.exec(ua) or
+            /(webkit)[ \/]([\w.]+)/.exec(ua) or
+            /(opera)(?:.*version|)[ \/]([\w.]+)/.exec(ua) or
+            /(msie) ([\w.]+)/.exec(ua) or
+            ua.indexOf("compatible") < 0 and
+            /(mozilla)(?:.*? rv:([\w.]+)|)/.exec(ua) or []
+    
     browser: match[1] or ""
     version: match[2] or "0"
   
-  matched = jQuery.uaMatch(navigator.userAgent)
+  matched = $.uaMatch(navigator.userAgent)
   browser = {}
   if matched.browser
     browser[matched.browser] = true
@@ -23,11 +32,10 @@ if !JQuery.browser
   ###Chrome is Webkit, but Webkit is also Safari.###
   if browser.chrome
     browser.webkit = true
-  else browser.safari = true  if browser.webkit
-  jQuery.browser = browser
-
-# Shorthand for jQuery.
-$ = jQuery
+  else if browser.webkit 
+    browser.safari = true
+  
+  $.browser = browser
 
 # The states in which the console can be.
 STATE_INPUT = 0
