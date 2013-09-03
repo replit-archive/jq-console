@@ -134,8 +134,7 @@ Takes two arguments:
 Sets the number of spaces inserted when indenting and removed when unindenting.  
 Takes one argument:  
   
-  * __int__ *width*: The code of the key pressing which (when Ctrl is held) will  
-    trigger this shortcut.  
+  * __int__ *width*: The number of spaces in each indentation level.  
 
 
   Example:  
