@@ -33,7 +33,7 @@ window.jqconsoleSetup = ->
 
   createScroll = ->
     line_height = jqconsole.$prompt.height()
-    console_height = jqconsole.$console.height()
+    console_height = jqconsole.$container.height()
     lines_per_page = Math.ceil(console_height / line_height)
     for i in [0..lines_per_page * 5]
       jqconsole.SetPromptText('foo')

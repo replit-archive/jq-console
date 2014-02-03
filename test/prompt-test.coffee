@@ -281,33 +281,33 @@ describe 'Prompt Interaction', ->
       { console_height } = createScroll()
 
     it 'scrolls up', (done) ->
-      before = jqconsole.$console[0].scrollTop
+      before = jqconsole.$container[0].scrollTop
       keyDown 33
       cb = ->
-        equal jqconsole.$console[0].scrollTop, before - console_height
+        equal jqconsole.$container[0].scrollTop, before - console_height
         done()
       # * 2 is some arbitrary number otherwise it fails.
       setTimeout cb, jQuery.fx.speeds.fast * 2
 
     it 'scrolls up twice', (done) ->
-      before = jqconsole.$console[0].scrollTop
+      before = jqconsole.$container[0].scrollTop
       keyDown 33
       cb = ->
         keyDown 33
         cb = ->
-          equal jqconsole.$console[0].scrollTop, before - (console_height * 2)
+          equal jqconsole.$container[0].scrollTop, before - (console_height * 2)
           done()
         setTimeout cb, jQuery.fx.speeds.fast * 2
       # * 2 is some arbitrary number otherwise it fails.
       setTimeout cb, jQuery.fx.speeds.fast * 2
 
     it 'scrolls down', (done) ->
-      before = jqconsole.$console[0].scrollTop
+      before = jqconsole.$container[0].scrollTop
       keyDown 33
       cb = ->
         keyDown 34
         cb = ->
-          equal jqconsole.$console[0].scrollTop, before
+          equal jqconsole.$container[0].scrollTop, before
           done()
         setTimeout cb, jQuery.fx.speeds.fast * 2
       # * 2 is some arbitrary number otherwise it fails.
@@ -335,10 +335,10 @@ describe 'Prompt Interaction', ->
       createScroll()
       keyDown 33
       cb = ->
-        before = jqconsole.$console[0].scrollTop
+        before = jqconsole.$container[0].scrollTop
         type('a')
         cb = ->
-          notEqual jqconsole.$console[0].scrollTop, before
+          notEqual jqconsole.$container[0].scrollTop, before
           done()
         setTimeout cb, 0
       setTimeout cb, jQuery.fx.speeds.fast * 2

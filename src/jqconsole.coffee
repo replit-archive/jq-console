@@ -143,7 +143,7 @@ class JQConsole
   #     Defaults to DEFAULT_PROMPT_LABEL.
   #   @arg prompt_continue: The label to show before continuation lines of the
   #     command prompt. Optional. Defaults to DEFAULT_PROMPT_CONINUE_LABEL.
-  constructor: (@container, header, prompt_label, prompt_continue_label) ->
+  constructor: (outer_container, header, prompt_label, prompt_continue_label) ->
     # Mobile devices supported sniff.
     @isMobile = !!navigator.userAgent.match /iPhone|iPad|iPod|Android/i
     @isIos = !!navigator.userAgent.match /iPhone|iPad|iPod/i
@@ -194,25 +194,33 @@ class JQConsole
     # A table of custom shortcuts, mapping character codes to callbacks.
     @shortcuts = {}
 
+    @$container = $('<div/>').appendTo outer_container
+    @$container.css
+      'top': 0
+      'left': 0
+      'right': 0
+      'bottom': 0
+      'position': 'absolute'
+      'overflow': 'auto'
+
     # The main console area. Everything else happens inside this.
-    @$console = $('<pre class="jqconsole"/>').appendTo @container
+    @$console = $('<pre class="jqconsole"/>').appendTo @$container
     @$console.css
-      position: 'absolute'
-      top: 0
-      bottom: 0
-      right: 0
-      left: 0
-      margin: 0
-      overflow: 'auto'
+      'margin': 0
+      'position': 'relative'
+      'min-height': '100%'
+      'box-sizing': 'border-box'
+      '-moz-box-sizing': 'border-box'
+      '-webkit-box-sizing': 'border-box'
 
     # Whether the console currently has focus.
     @$console_focused = true
 
     # On screen somehow invisible textbox for input.
     # Copied from codemirror2, this works for both mobile and desktop browsers.
-    @$input_container = $(EMPTY_DIV).appendTo @container
+    @$input_container = $(EMPTY_DIV).appendTo @$container
     @$input_container.css
-      position: 'relative'
+      position: 'absolute'
       width: 1
       height: 0
       overflow: 'hidden'
@@ -252,7 +260,7 @@ class JQConsole
     @Write @header, CLASS_HEADER
 
     # Save this instance to be accessed if lost.
-    $(@container).data 'jqconsole', this
+    $(outer_container).data 'jqconsole', this
 
   #### Reset methods
 
@@ -285,7 +293,7 @@ class JQConsole
     @$input_container.detach()
     @$console.html ''
     @$prompt.appendTo @$console
-    @$input_container.appendTo @container
+    @$input_container.appendTo @$container
     @Write @header, CLASS_HEADER
     return undefined
 
@@ -774,8 +782,8 @@ class JQConsole
         when KEY_TAB then @_Unindent()
         when KEY_UP then  @_MoveUp()
         when KEY_DOWN then @_MoveDown()
-        when KEY_PAGE_UP then @_ScrollUp()
-        when KEY_PAGE_DOWN then @_ScrollDown()
+        when KEY_PAGE_UP then @_ScrollPage 'up'
+        when KEY_PAGE_DOWN then @_ScrollPage 'down'
         # Allow other Shift shortcuts to pass through to the browser.
         else return true
       return false
@@ -792,8 +800,8 @@ class JQConsole
         when KEY_DOWN then @_HistoryNext()
         when KEY_HOME then @MoveToStart false
         when KEY_END then @MoveToEnd false
-        when KEY_PAGE_UP then @_ScrollUp()
-        when KEY_PAGE_DOWN then @_ScrollDown()
+        when KEY_PAGE_UP then @_ScrollPage 'up'
+        when KEY_PAGE_DOWN then @_ScrollPage 'down'
         # Let any other key continue its way to keypress.
         else return true
       return false
@@ -1054,56 +1062,56 @@ class JQConsole
       @_InsertNewLine()
       @$prompt_left.text line
 
-  # Scrolls the console area up one page (with animation).
-  _ScrollUp: ->
-    target = @$console[0].scrollTop - @$console.height()
-    @$console.stop().animate {scrollTop: target}, 'fast'
-
-  # Scrolls the console area down one page (with animation).
-  _ScrollDown: ->
-    target = @$console[0].scrollTop + @$console.height()
-    @$console.stop().animate {scrollTop: target}, 'fast'
+  # Scrolls the console area down/up one page (with animation).
+  _ScrollPage: (dir) ->
+    target = @$container[0].scrollTop
+    if dir == 'up'
+      target -= @$container.height()
+    else
+      target += @$container.height()
+    @$container.stop().animate {scrollTop: target}, 'fast'
 
   # Scrolls the console area to its bottom;
   # Scrolls the window to the cursor vertical position.
   # Called with every input/output to the console.
   _ScrollToEnd: ->
     # Scroll console to the bottom.
-    @$console.scrollTop @$console[0].scrollHeight
+    @$container.scrollTop @$container[0].scrollHeight
 
+    # Move the input element to the cursor position.
+    pos = @$prompt_cursor.position()
+    @$input_container.css
+      left: pos.left
+      top: pos.top
+
+    setTimeout @ScrollWindowToPrompt.bind(@), 0
+
+  ScrollWindowToPrompt: ->
     # The cursor's top position is effected by the scroll-top of the console
     # so we need to this asynchronously to give the browser a chance to
     # reflow and recaluclate the cursor's possition.
-    cont = =>
-      line_height = @$prompt_cursor.height()
-      screen_top = @$window.scrollTop()
-      screen_left = @$window.scrollLeft()
-      doc_height = document.documentElement.clientHeight
-      pos = @$prompt_cursor.offset()
-      rel_pos = @$prompt_cursor.position()
+    line_height = @$prompt_cursor.height()
+    screen_top = @$window.scrollTop()
+    screen_left = @$window.scrollLeft()
+    doc_height = document.documentElement.clientHeight
+    pos = @$prompt_cursor.offset()
 
-      # Move the input element to the cursor position.
-      @$input_container.css
-        left: rel_pos.left
-        top: rel_pos.top
+    optimal_pos = pos.top - (2 * line_height)
 
-      optimal_pos = pos.top - (2 * line_height)
-      # Follow the cursor vertically on mobile and desktop.
-      if @isMobile and orientation?
-        # Since the keyboard takes up most of the screen, we don't care about how
-        # far the the cursor position from the screen top is. We just follow it.
-        if screen_top < pos.top or screen_top > pos.top
-          @$window.scrollTop optimal_pos
-      else
-        if screen_top + doc_height < pos.top
-          # Scroll just to a place where the cursor is in the view port.
-          @$window.scrollTop pos.top - doc_height + line_height
-        else if screen_top > optimal_pos
-          # If the window is scrolled beyond the cursor, scroll to the cursor's
-          # position and give two line to the top.
-          @$window.scrollTop pos.top
-
-    setTimeout cont, 0
+    # Follow the cursor vertically on mobile and desktop.
+    if @isMobile and orientation?
+      # Since the keyboard takes up most of the screen, we don't care about how
+      # far the the cursor position from the screen top is. We just follow it.
+      if screen_top < pos.top or screen_top > pos.top
+        @$window.scrollTop optimal_pos
+    else
+      if screen_top + doc_height < pos.top
+        # Scroll just to a place where the cursor is in the view port.
+        @$window.scrollTop pos.top - doc_height + line_height
+      else if screen_top > optimal_pos
+        # If the window is scrolled beyond the cursor, scroll to the cursor's
+        # position and give two line to the top.
+        @$window.scrollTop pos.top
 
   # Selects the prompt label appropriate to the current mode.
   #   @arg continuation: If true, returns the continuation prompt rather than
