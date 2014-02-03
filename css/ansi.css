@@ -1,17 +1,17 @@
 .jqconsole-ansi-bold {
-  font-weight: bold!important;
+  font-weight: bold;
 }
 
 .jqconsole-ansi-lighter {
-  font-weight: lighter!important;
+  font-weight: lighter;
 }
 
 .jqconsole-ansi-italic {
-  font-style: italic!important;
+  font-style: italic;
 }
 
 .jqconsole-ansi-underline {
-  text-decoration: underline!important;
+  text-decoration: underline;
 }
 
 @-webkit-keyframes blinker {  
@@ -74,7 +74,7 @@
 
 
 .jqconsole-ansi-hidden {
-  visibility:hidden!important;
+  visibility:hidden;
 }
 
 .jqconsole-ansi-line-through {
@@ -114,59 +114,59 @@
 }
 
 .jqconsole-ansi-color-black {
-  color: black!important;
+  color: black;
 }
 .jqconsole-ansi-color-red {
-  color: red!important;
+  color: red;
 }
 .jqconsole-ansi-color-green {
-  color: green!important;
+  color: green;
 }
 .jqconsole-ansi-color-yellow {
-  color: yellow!important;
+  color: yellow;
 }
 .jqconsole-ansi-color-blue {
-  color: blue!important;
+  color: blue;
 }
 .jqconsole-ansi-color-magenta {
-  color: magenta!important;
+  color: magenta;
 }
 .jqconsole-ansi-color-cyan {
-  color: cyan!important;
+  color: cyan;
 }
 .jqconsole-ansi-color-white {
-  color: white!important;
+  color: white;
 }
 
 .jqconsole-ansi-background-color-black {
-  background-color: black!important;
+  background-color: black;
 }
 .jqconsole-ansi-background-color-red {
-  background-color: red!important;
+  background-color: red;
 }
 .jqconsole-ansi-background-color-green {
-  background-color: green!important;
+  background-color: green;
 }
 .jqconsole-ansi-background-color-yellow {
-  background-color: yellow!important;
+  background-color: yellow;
 }
 .jqconsole-ansi-background-color-blue {
-  background-color: blue!important;
+  background-color: blue;
 }
 .jqconsole-ansi-background-color-magenta {
-  background-color: magenta!important;
+  background-color: magenta;
 }
 .jqconsole-ansi-background-color-cyan {
-  background-color: cyan!important;
+  background-color: cyan;
 }
 .jqconsole-ansi-background-color-white {
-  background-color: white!important;
+  background-color: white;
 }
 
 .jqconsole-ansi-framed {
-  border: 1px solid!important;
+  border: 1px solid;
 }
 .jqconsole-ansi-overline {
-  text-decoration: overline!important;
+  text-decoration: overline;
 }
 
