@@ -224,7 +224,9 @@ class JQConsole
       width: 1
       height: 0
       overflow: 'hidden'
-    @$input_source = $('<textarea/>')
+
+    # On android autocapitlize works for input.
+    @$input_source = if @isAndroid then $('<input/>') else $('<textarea/>')
     @$input_source.attr
       wrap: 'off'
       autocapitalize: 'off'
@@ -732,8 +734,20 @@ class JQConsole
     # Firefox don't fire any key event for composition characters, so we listen
     # for the unstandard composition-events.
     @$input_source.bind 'compositionstart', @_StartComposition
-    @$input_source.bind 'compositionend', @_EndCommposition
-    @$input_source.bind 'text', @_UpdateComposition
+    @$input_source.bind 'compositionend', (e) =>
+      # Wait for the input element to update so we don't rely on buggy e.data
+      setTimeout((=> @_EndComposition(e)), 0)
+
+    # Android has an out of screen text input for autocorrect and autocomplete
+    # and since it doesn't allow disabling we use composition events and more
+    # hacks to get input to work.
+    if @isAndroid
+      # Text is handled via composition events but for things like spaces
+      # we need to emulate a composition start.
+      @$input_source.bind 'input', @_StartComposition
+      @$input_source.bind 'input', @_UpdateComposition
+    else
+      @$input_source.bind 'text', @_UpdateComposition
 
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
@@ -832,6 +846,7 @@ class JQConsole
   # Handles the user pressing the Enter key.
   #   @arg shift: Whether the shift key is held.
   _HandleEnter: (shift) ->
+    @_EndComposition()
     if shift
       @_InsertNewLine true
     else
@@ -1084,7 +1099,8 @@ class JQConsole
       left: pos.left
       top: pos.top
 
-    setTimeout @ScrollWindowToPrompt.bind(@), 0
+    # Give time for mobile browsers to zoom in on textarea
+    setTimeout @ScrollWindowToPrompt.bind(@), 50
 
   ScrollWindowToPrompt: ->
     # The cursor's top position is effected by the scroll-top of the console
@@ -1264,7 +1280,6 @@ class JQConsole
   # Starts a multibyte character composition.
   _StartComposition: =>
     return if @in_composition
-    @$input_source.bind E_KEYPRESS, @_EndComposition
     @in_composition = true
     @_ShowComposition()
     setTimeout @_UpdateComposition, 0
@@ -1272,10 +1287,11 @@ class JQConsole
   # Ends a multibyte character composition.
   _EndComposition: =>
     return if not @in_composition
-    @$input_source.unbind E_KEYPRESS, @_EndComposition
-    @in_composition = false
     @_HideComposition()
+    @$prompt_left.text @$prompt_left.text() + @$composition.text()
+    @$composition.text ''
     @$input_source.val ''
+    @in_composition = false
 
   # Updates a multibyte character composition.
   _UpdateComposition: (e) =>
