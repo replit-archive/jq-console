@@ -706,8 +706,7 @@ class JQConsole
       setTimeout addClass, 100
 
     # Intercept pasting.
-    paste_event = if $.browser.opera then 'input' else 'paste'
-    @$input_source.bind paste_event, =>
+    @$input_source.bind 'paste', =>
       handlePaste = =>
         # Opera fires input on composition end.
         return if @in_composition
@@ -724,20 +723,9 @@ class JQConsole
 
     # Firefox don't fire any key event for composition characters, so we listen
     # for the unstandard composition-events.
-    if $.browser.mozilla?
-      @$input_source.bind 'compositionstart', @_StartComposition
-      @$input_source.bind 'compositionend', @_EndCommposition
-      @$input_source.bind 'text', @_UpdateComposition
-
-    # There is no way to detect compositionstart in opera so we poll for it.
-    if $.browser.opera?
-      cb = =>
-        return if @in_composition
-        # if there was characters that actually escaped to the input source
-        # then its most probably a multibyte char.
-        if @$input_source.val().length
-          @_StartComposition()
-      setInterval cb, 200
+    @$input_source.bind 'compositionstart', @_StartComposition
+    @$input_source.bind 'compositionend', @_EndCommposition
+    @$input_source.bind 'text', @_UpdateComposition
 
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
@@ -757,15 +745,6 @@ class JQConsole
     # Skip Enter on IE and Chrome and Tab & backspace on Opera.
     # These are handled in _HandleKey().
     if char_code in [8, 9, 13] then return false
-
-    # Pass control characters which are captured on Mozilla/Safari.
-    if $.browser.mozilla
-       if event.keyCode or event.altKey
-         return true
-    # Pass control characters which are captured on Opera.
-    if $.browser.opera
-       if event.altKey
-         return true
 
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
@@ -1271,13 +1250,12 @@ class JQConsole
   # Check if this could be the start of a composition or an update to it.
   _CheckComposition: (e) =>
     key = e.keyCode or e.which
-    if $.browser.opera? and @in_composition
-      @_UpdateComposition()
     if key == 229
       if @in_composition then @_UpdateComposition() else @_StartComposition()
 
   # Starts a multibyte character composition.
   _StartComposition: =>
+    return if @in_composition
     @$input_source.bind E_KEYPRESS, @_EndComposition
     @in_composition = true
     @_ShowComposition()
@@ -1285,6 +1263,7 @@ class JQConsole
 
   # Ends a multibyte character composition.
   _EndComposition: =>
+    return if not @in_composition
     @$input_source.unbind E_KEYPRESS, @_EndComposition
     @in_composition = false
     @_HideComposition()
