@@ -15,10 +15,11 @@ queueing.
 The plugin has been tested on the following browsers:  
   
 * IE 9+
-* Chrome 10+
-* Firefox 4+
-* Opera 11+
-* iOS 4+
+* Chrome
+* Firefox
+* Opera
+* iOS Safari and Chrome
+* Android Chrome
   
   
 ##Getting Started  
