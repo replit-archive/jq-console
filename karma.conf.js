@@ -10,6 +10,7 @@ module.exports = function(config) {
       'test/prompt-test.coffee',
       'test/shortcuts-test.coffee',
       'test/history-test.coffee',
+      'test/matching-test.coffee'
     ],
     browsers: ['Chrome'],
     reporters: ['dots'],
