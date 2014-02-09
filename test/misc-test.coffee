@@ -41,7 +41,9 @@ describe 'Misc methods', ->
 
   describe '#SetPromptLabel', ->
     it 'Sets the prompt label for the next prompt', ->
-      jqconsole.SetPromptLabel 'foobar123'
+      jqconsole.SetPromptLabel 'foobar123', 'shitmang'
+      keyDown 13, shiftKey: on
       jqconsole.AbortPrompt()
       jqconsole.Prompt true, ->
       assert.ok jqconsole.Dump().indexOf 'foobar123' > -1
+      assert.ok jqconsole.Dump().indexOf 'shitmang' > -1
