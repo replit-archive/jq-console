@@ -4,8 +4,6 @@ describe 'Misc methods', ->
   beforeEach ->
     {jqconsole, typer: {keyDown, type}} = jqconsoleSetup()
     jqconsole.Prompt true, ->
-  afterEach ->
-    jqconsole.AbortPrompt()
 
   describe '#GetColumn', ->
     it 'should get the column number of the cursor', ->
@@ -33,3 +31,10 @@ describe 'Misc methods', ->
     it 'gets the indent width', ->
       jqconsole.SetIndentWidth 20
       assert.equal jqconsole.GetIndentWidth(), 20
+
+  describe '#Dump', ->
+    it 'dumps the console content', ->
+      type 'foo'
+      keyDown 13
+      jqconsole.Write('wat')
+      assert.equal jqconsole.Dump(), 'headerprompt_labelfoo\nwat'

@@ -573,7 +573,10 @@ class JQConsole
 
   # Dumps the content of the console before the current prompt.
   Dump: ->
-    $elems = @$console.find(".#{CLASS_HEADER}").nextUntil(".#{CLASS_PROMPT}")
+    $elems = @$console
+      .find(".#{CLASS_HEADER}")
+      .nextUntil(".#{CLASS_PROMPT}")
+      .addBack()
 
     return (
       for elem in $elems
@@ -581,7 +584,7 @@ class JQConsole
           $(elem).text().replace /^\s+/, '>>> '
         else
           $(elem).text()
-    ).join ' '
+    ).join ''
 
   # Gets the current prompt state.
   GetState: ->
