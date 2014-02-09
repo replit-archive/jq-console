@@ -374,9 +374,11 @@ class JQConsole
 
   # Returns the 0-based number of the column on which the cursor currently is.
   GetColumn: ->
+    @$prompt_right.detach()
     @$prompt_cursor.text ''
     lines = @$console.text().split NEWLINE
     @$prompt_cursor.html '&nbsp;'
+    @$prompt_cursor.after @$prompt_right
     return lines[lines.length - 1].length
 
   # Returns the 0-based number of the line on which the cursor currently is.
