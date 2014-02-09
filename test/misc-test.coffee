@@ -38,3 +38,10 @@ describe 'Misc methods', ->
       keyDown 13
       jqconsole.Write('wat')
       assert.equal jqconsole.Dump(), 'headerprompt_labelfoo\nwat'
+
+  describe '#SetPromptLabel', ->
+    it 'Sets the prompt label for the next prompt', ->
+      jqconsole.SetPromptLabel 'foobar123'
+      jqconsole.AbortPrompt()
+      jqconsole.Prompt true, ->
+      assert.ok jqconsole.Dump().indexOf 'foobar123' > -1
