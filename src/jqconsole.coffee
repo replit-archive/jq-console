@@ -1143,13 +1143,6 @@ class JQConsole
     else
       return if continuation then '\n ' else ' '
 
-  # Cross-browser outerHTML
-  _outerHTML: ($elem) ->
-    if document.body.outerHTML
-      return $elem.get(0).outerHTML
-    else
-      return $(EMPTY_DIV).append($elem.eq(0).clone()).html()
-
   # Wraps a single character in an element with a <span> having a class
   #   @arg $elem: The JqDom element in question
   #   @arg index: the index of the character to be wrapped
