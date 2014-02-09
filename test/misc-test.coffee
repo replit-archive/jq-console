@@ -21,3 +21,15 @@ describe 'Misc methods', ->
       assert.equal jqconsole.GetLine(), 1
       keyDown 13, shiftKey: on
       assert.equal jqconsole.GetLine(), 2
+
+  describe '#SetIndentWidth', ->
+    it 'changes the indent width', ->
+      l = jqconsole.GetColumn()
+      jqconsole.SetIndentWidth 10
+      keyDown 9
+      assert.equal jqconsole.GetColumn(), l + 10
+
+  describe '#GetIndentWidth', ->
+    it 'gets the indent width', ->
+      jqconsole.SetIndentWidth 20
+      assert.equal jqconsole.GetIndentWidth(), 20
