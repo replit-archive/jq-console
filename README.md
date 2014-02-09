@@ -469,6 +469,9 @@ Resets the character matching configuration.
 Resets the shortcut configuration.
 
 
+###jqconsole.Clear
+Clears the console's content excluding the current prompt
+
 ##Default Key Config  
   
 The console responds to the followind keys and key combinations by default:  

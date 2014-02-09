@@ -620,6 +620,17 @@ class JQConsole
     @_MoveTo all_lines, false
     return undefined
 
+  # Clear the console keeping only the prompt.
+  Clear: ->
+    @$console
+      .find(".#{CLASS_HEADER}")
+      .nextUntil(".#{CLASS_PROMPT}")
+      .addBack()
+      .text ''
+    # Bug in Chrome were the cursor's position is not recalculated
+    @$prompt_cursor.detach()
+    @$prompt_after.before @$prompt_cursor
+
   ###------------------------ Private Methods -------------------------------###
 
   _CheckInputQueue: ->

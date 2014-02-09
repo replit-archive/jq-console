@@ -58,3 +58,8 @@ describe 'Misc methods', ->
       jqconsole.Disable()
       jqconsole.Enable()
       assert.ok not jqconsole.$input_source.attr 'disabled'
+
+  describe '#Clear', ->
+    it 'clears the console', ->
+      jqconsole.Clear()
+      assert.equal jqconsole.Dump(), ''
