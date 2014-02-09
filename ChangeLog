@@ -79,3 +79,6 @@ info.
 * Fixed `GetColumn` method to return the column number up until the cursor.
 * `Dump`: Add header contents in console dump and remove extra spaces.
 
+2014.2.8 Version 2.10.0
+* Add `Clear` method to clear the console
+
