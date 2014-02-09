@@ -75,8 +75,7 @@ info.
 * Update android support. Fix #41
 * Add wrapper div for padding/styling of console. Fix #40
 
-Version 3.0
-
-* Fixed `GetColumn` method to return the correct column. It used to return the
-last character number of the last line and not the cursor's column.
+2014.2.8 Version 2.9.0
+* Fixed `GetColumn` method to return the column number up until the cursor.
+* `Dump`: Add header contents in console dump and remove extra spaces.
 
