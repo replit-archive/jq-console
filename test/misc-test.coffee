@@ -1,14 +1,18 @@
-{jqconsole, createScroll, typer: {typeA, keyDown, type}} = jqconsoleSetup()
+jqconsole = type = keyDown = null
 
 describe 'Misc methods', ->
   beforeEach ->
+    {jqconsole, typer: {keyDown, type}} = jqconsoleSetup()
     jqconsole.Prompt true, ->
+  afterEach ->
+    jqconsole.AbortPrompt()
 
   describe '#GetColumn', ->
     it 'should get the column number of the cursor', ->
-      assert.equal jqconsole.GetColumn(), 0
+      label_length = 'headerprompt_label'.length
+      assert.equal jqconsole.GetColumn(), label_length
       type '   '
-      assert.equal jqconsole.GetColumn(), 3
+      assert.equal jqconsole.GetColumn(), label_length + 3
 
   describe '#GetLine', ->
     it 'should get the line number of the cursor', ->
