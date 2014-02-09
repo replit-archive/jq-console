@@ -47,3 +47,14 @@ describe 'Misc methods', ->
       jqconsole.Prompt true, ->
       assert.ok jqconsole.Dump().indexOf 'foobar123' > -1
       assert.ok jqconsole.Dump().indexOf 'shitmang' > -1
+
+  describe '#Disable', ->
+    it 'disables the console', ->
+      jqconsole.Disable()
+      assert.ok jqconsole.$input_source.attr 'disabled'
+
+  describe '#Enable', ->
+    it 'enables the console', ->
+      jqconsole.Disable()
+      jqconsole.Enable()
+      assert.ok not jqconsole.$input_source.attr 'disabled'
