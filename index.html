@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Jq-console : Feature complete web terminal" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jq-console</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/replit/jq-console">View on GitHub</a>
+
+          <h1 id="project_title">Jq-console</h1>
+          <h2 id="project_tagline">Feature complete web terminal</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/replit/jq-console/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/replit/jq-console/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="jq-console" class="anchor" href="#jq-console"><span class="octicon octicon-link"></span></a>jq-console</h1>
+
+<p>A jQuery terminal plugin written in CoffeeScript.  </p>
+
+<p>This project was spawned because of our need for a simple web terminal plugin<br>
+for the <a href="http://repl.it">repl.it</a> project. It tries to simulate a low level terminal by providing (almost)<br>
+raw input/output streams as well as input and output states.  </p>
+
+<p>Version 2.0 adds baked-in support for rich multi-line prompting and operation<br>
+queueing.</p>
+
+<h2>
+<a name="tested-browsers" class="anchor" href="#tested-browsers"><span class="octicon octicon-link"></span></a>Tested Browsers</h2>
+
+<p>The plugin has been tested on the following browsers:  </p>
+
+<ul>
+<li>IE 9+</li>
+<li>Chrome</li>
+<li>Firefox</li>
+<li>Opera</li>
+<li>iOS Safari and Chrome</li>
+<li>Android Chrome</li>
+</ul><h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting Started</h2>
+
+<h3>
+<a name="echo-example" class="anchor" href="#echo-example"><span class="octicon octicon-link"></span></a>Echo example</h3>
+
+<div class="highlight highlight-css"><pre>    <span class="c">/* The console container element */</span>
+    <span class="nf">#console</span> <span class="p">{</span>
+      <span class="k">position</span><span class="o">:</span> <span class="k">absolute</span><span class="p">;</span>
+      <span class="k">width</span><span class="o">:</span> <span class="m">400px</span><span class="p">;</span>
+      <span class="k">height</span><span class="o">:</span> <span class="m">500px</span><span class="p">;</span>
+      <span class="k">background-color</span><span class="o">:</span><span class="nb">black</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The inner console element. */</span>
+    <span class="nc">.jqconsole</span> <span class="p">{</span>
+        <span class="k">padding</span><span class="o">:</span> <span class="m">10px</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The cursor. */</span>
+    <span class="nc">.jqconsole-cursor</span> <span class="p">{</span>
+        <span class="k">background-color</span><span class="o">:</span> <span class="nb">gray</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The cursor color when the console looses focus. */</span>
+    <span class="nc">.jqconsole-blurred</span> <span class="nc">.jqconsole-cursor</span> <span class="p">{</span>
+        <span class="k">background-color</span><span class="o">:</span> <span class="m">#666</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The current prompt text color */</span>
+    <span class="nc">.jqconsole-prompt</span> <span class="p">{</span>
+        <span class="k">color</span><span class="o">:</span> <span class="m">#0d0</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The command history */</span>
+    <span class="nc">.jqconsole-old-prompt</span> <span class="p">{</span>
+        <span class="k">color</span><span class="o">:</span> <span class="m">#0b0</span><span class="p">;</span>
+        <span class="k">font-weight</span><span class="o">:</span> <span class="k">normal</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The text color when in input mode. */</span>
+    <span class="nc">.jqconsole-input</span> <span class="p">{</span>
+        <span class="k">color</span><span class="o">:</span> <span class="m">#dd0</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* Previously entered input. */</span>
+    <span class="nc">.jqconsole-old-input</span> <span class="p">{</span>
+        <span class="k">color</span><span class="o">:</span> <span class="m">#bb0</span><span class="p">;</span>
+        <span class="k">font-weight</span><span class="o">:</span> <span class="k">normal</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c">/* The text color of the output. */</span>
+    <span class="nc">.jqconsole-output</span> <span class="p">{</span>
+        <span class="k">color</span><span class="o">:</span> <span class="nb">white</span><span class="p">;</span>
+    <span class="p">}</span>
+</pre></div>
+
+<div class="highlight highlight-html"><pre>    <span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"console"</span><span class="nt">&gt;&lt;/div&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"jquery.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"jqconsole.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;script&gt;</span>
+      <span class="nx">$</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">jqconsole</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">'#console'</span><span class="p">).</span><span class="nx">jqconsole</span><span class="p">(</span><span class="s1">'Hi\n'</span><span class="p">,</span> <span class="s1">'&gt;&gt;&gt;'</span><span class="p">);</span>
+        <span class="kd">var</span> <span class="nx">startPrompt</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+          <span class="c1">// Start the prompt with history enabled.</span>
+          <span class="nx">jqconsole</span><span class="p">.</span><span class="nx">Prompt</span><span class="p">(</span><span class="kc">true</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Output input with the class jqconsole-output.</span>
+            <span class="nx">jqconsole</span><span class="p">.</span><span class="nx">Write</span><span class="p">(</span><span class="nx">input</span> <span class="o">+</span> <span class="s1">'\n'</span><span class="p">,</span> <span class="s1">'jqconsole-output'</span><span class="p">);</span>
+            <span class="c1">// Restart the prompt.</span>
+            <span class="nx">startPrompt</span><span class="p">();</span>
+          <span class="p">});</span>
+        <span class="p">};</span>
+        <span class="nx">startPrompt</span><span class="p">();</span>
+      <span class="p">});</span>
+    <span class="nt">&lt;/script&gt;</span>
+</pre></div>
+
+
+
+  
+
+<h3>
+<a name="instantiating" class="anchor" href="#instantiating"><span class="octicon octicon-link"></span></a>Instantiating</h3>
+
+<div class="highlight highlight-javascript"><pre>    <span class="nx">$</span><span class="p">(</span><span class="nx">div</span><span class="p">).</span><span class="nx">jqconsole</span><span class="p">(</span><span class="nx">welcomeString</span><span class="p">,</span> <span class="nx">promptLabel</span><span class="p">,</span> <span class="nx">continueLabel</span><span class="p">);</span>
+</pre></div>
+
+<ul>
+<li>
+<code>div</code> is the div element or selector. Note that this element must be
+explicity sized and positioned <code>absolute</code> or <code>relative</code>.</li>
+<li>
+<code>welcomeString</code> is the string to be shown when the terminal is first rendered.<br>
+</li>
+<li>
+<code>promptLabel</code> is the label to be shown before the input when using Prompt().<br>
+</li>
+<li>
+<code>continueLabel</code> is the label to be shown before the continued lines of the<br>
+input when using Prompt().</li>
+</ul><h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>There isn't much initial configuration needed, because the user must supply<br>
+options and callbacks with each state change. There are a few config methods<br>
+provided to create custom shortcuts and change indentation width:  </p>
+
+<h3>
+<a name="jqconsoleregistershortcut" class="anchor" href="#jqconsoleregistershortcut"><span class="octicon octicon-link"></span></a>jqconsole.RegisterShortcut</h3>
+
+<p>Registers a callback for a keyboard shortcut.
+Takes two arguments:  </p>
+
+<ul>
+<li><p><strong>(int|string)</strong> <em>keyCode</em>: The code of the key pressing which (when Ctrl is<br>
+held) will trigger this shortcut. If a string is provided, the ASCII code<br>
+of the first character is taken.  </p></li>
+<li>
+<p><strong>function</strong> <em>callback</em>: A function called when the shortcut is pressed;<br>
+"this" will point to the JQConsole object.  </p>
+
+<p>Example:  </p>
+
+<pre><code>  // Ctrl+R: resets the console.  
+  jqconsole.RegisterShortcut('R', function() {
+    this.Reset();  
+  });  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolesetindentwidth" class="anchor" href="#jqconsolesetindentwidth"><span class="octicon octicon-link"></span></a>jqconsole.SetIndentWidth</h3>
+
+<p>Sets the number of spaces inserted when indenting and removed when unindenting.<br>
+Takes one argument:  </p>
+
+<ul>
+<li>
+<p><strong>int</strong> <em>width</em>: The number of spaces in each indentation level.  </p>
+
+<p>Example:  </p>
+
+<pre><code>  // Sets the indent width to 4 spaces.  
+  jqconsole.SetIndentWidth(4);  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleregistermatching" class="anchor" href="#jqconsoleregistermatching"><span class="octicon octicon-link"></span></a>jqconsole.RegisterMatching</h3>
+
+<p>Registers an opening and closing characters to match and wraps each of the<br>
+opening and closing characters with a span with the specified class.<br>
+Takes one parameters:  </p>
+
+<ul>
+<li>
+<strong>char</strong> <em>open</em>: The opening character of a "block".<br>
+</li>
+<li>
+<strong>char</strong> <em>close</em>: The closing character of a "block".<br>
+</li>
+<li>
+<p><strong>string</strong> <em>class</em>: The css class that is applied to the matched characters.  </p>
+
+<p>Example:  </p>
+
+<pre><code>  jqconsole.RegisterMatching('{', '}', 'brackets');
+</code></pre>
+</li>
+</ul><h2>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<p>Unlike most terminal plugins, jq-console gives you complete low-level control<br>
+over the execution; you have to call the appropriate methods to start input<br>
+or output:  </p>
+
+<h3>
+<a name="jqconsoleinput" class="anchor" href="#jqconsoleinput"><span class="octicon octicon-link"></span></a>jqconsole.Input:</h3>
+
+<p>Asks user for input. If another input or prompt operation is currently underway,<br>
+the new input operation is enqueued and will be called when the current<br>
+operation and all previously enqueued operations finish. Takes one argument:  </p>
+
+<ul>
+<li>
+<p><strong>function</strong> <em>input_callback</em>: A function called with the user's input when<br>
+the user presses Enter and the input operation is complete.  </p>
+
+<p>Example:  </p>
+
+<pre><code>  // Echo the input.  
+  jqconsole.Input(function(input) {  
+    jqconsole.Write(input);  
+  });  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleprompt" class="anchor" href="#jqconsoleprompt"><span class="octicon octicon-link"></span></a>jqconsole.Prompt</h3>
+
+<p>Asks user for input. If another input or prompt operation is currently underway<br>
+the new prompt operation is enqueued and will be called when the current<br>
+peration and all previously enqueued operations finish. Takes three arguments:  </p>
+
+<ul>
+<li><p><strong>bool</strong> <em>history_enabled</em>: Whether this input should use history. If true,<br>
+the user can select the input from history, and their input will also be<br>
+added as a new history item.  </p></li>
+<li><p><strong>function</strong> <em>result_callback</em>: A function called with the user's input when<br>
+the user presses Enter and the prompt operation is complete.  </p></li>
+<li>
+<p><strong>function</strong> <em>multiline_callback</em>: If specified, this function is called when<br>
+the user presses Enter to check whether the input should continue to the<br>
+next line. The function must return one of the following values:  </p>
+
+<ul>
+<li><p><code>false</code>: the input operation is completed.  </p></li>
+<li><p><code>0</code>: the input continues to the next line with the current indent.  </p></li>
+<li><p><code>N</code> (int): the input continues to the next line, and the current<br>
+indent is adjusted by <code>N</code>, e.g. <code>-2</code> to unindent two levels.  </p></li>
+</ul>
+</li>
+<li>
+<p><strong>bool</strong> <em>async_multiline</em>: Whether the multiline callback function should<br>
+be treated as an asynchronous operation and be passed a continuation<br>
+function that should be called with one of the return values mentioned<br>
+above: <code>false</code>/<code>0</code>/<code>N</code>.  </p>
+
+<p>Example:  </p>
+
+<pre><code>  jqconsole.Prompt(true, function(input) {  
+    // Alert the user with the command.  
+    alert(input);  
+  }, function (input) {  
+    // Continue if the last character is a backslash.  
+    return /\\$/.test(input);  
+  });  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleabortprompt" class="anchor" href="#jqconsoleabortprompt"><span class="octicon octicon-link"></span></a>jqconsole.AbortPrompt</h3>
+
+<p>Aborts the current prompt operation and returns to output mode or the next<br>
+queued input/prompt operation. Takes no arguments.  </p>
+
+<p>Example:  </p>
+
+<pre><code>    jqconsole.Prompt(true, function(input) {  
+      alert(input);  
+    });  
+    // Give the user 2 seconds to enter the command.  
+    setTimeout(function() {  
+      jqconsole.AbortPrompt();  
+    }, 2000);  
+</code></pre>
+
+<h3>
+<a name="jqconsolewrite" class="anchor" href="#jqconsolewrite"><span class="octicon octicon-link"></span></a>jqconsole.Write</h3>
+
+<p>Writes the given text to the console in a <code>&lt;span&gt;</code>, with an<br>
+optional class. If a prompt is currently being shown, the text is inserted<br>
+before it. Takes two arguments:  </p>
+
+<ul>
+<li><p><strong>string</strong> <em>text</em>: The text to write.  </p></li>
+<li><p><strong>string</strong> <em>cls</em>: The class to give the span containing the text. Optional.  </p></li>
+<li>
+<p><strong>bool</strong> <em>escape</em>: Whether the text to write should be html escaped.<br>
+Optional, defaults to true.  </p>
+
+<p>Examples:  </p>
+
+<pre><code>  jqconsole.Write(output, 'my-output-class')  
+  jqconsole.Write(err.message, 'my-error-class')  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleappend" class="anchor" href="#jqconsoleappend"><span class="octicon octicon-link"></span></a>jqconsole.Append</h3>
+
+<p>Append the given node to the DOM. If a prompt is currently being shown, the
+text is inserted before it. Takes a single argument:</p>
+
+<ul>
+<li>
+<p><strong>(string|Element)</strong> <em>node</em>: The DOM Element or html string to append to
+ the console just before the prompt.</p>
+
+<p>Example:</p>
+
+<pre><code>// Add a div with the text 'hello' on a red background using jquery
+jqconsole.Append($('&lt;div&gt;hello&lt;/div&gt;').css('background-color', 'red'));
+
+// We can also use document.createElement
+node = document.createElement("div");
+content = document.createTextNode("hello");
+node.appendChild(content);
+jqconsole.Append(node);
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolesetprompttext" class="anchor" href="#jqconsolesetprompttext"><span class="octicon octicon-link"></span></a>jqconsole.SetPromptText</h3>
+
+<p>Sets the text currently in the input prompt. Takes one parameter:  </p>
+
+<ul>
+<li>
+<p><strong>string</strong> <em>text</em>: The text to put in the prompt.  </p>
+
+<p>Examples:  </p>
+
+<pre><code>  jqconsole.SetPromptText('ls')  
+  jqconsole.SetPromptText('print [i ** 2 for i in range(10)]')  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolesetpromptlabel" class="anchor" href="#jqconsolesetpromptlabel"><span class="octicon octicon-link"></span></a>jqconsole.SetPromptLabel</h3>
+
+<p>Replaces the main prompt label. Takes two parameters:</p>
+
+<ul>
+<li>
+<strong>string</strong> <em>main_label</em>: String to replace the main prompt label.</li>
+<li>
+<p><strong>string</strong> <em>continuation_label</em>: String to replace the continuation prompt label. Optional.</p>
+
+<p>Examples:  </p>
+
+<pre><code>  jqconsole.SetPromptLabel('$')
+  jqconsole.SetPromptLabel(' $','..')
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleclearprompttext" class="anchor" href="#jqconsoleclearprompttext"><span class="octicon octicon-link"></span></a>jqconsole.ClearPromptText</h3>
+
+<p>Clears all the text currently in the input prompt. Takes one parameter:  </p>
+
+<ul>
+<li>
+<p><strong>bool</strong> <em>clear_label</em>: If specified and true, also clears the main prompt<br>
+label (e.g. "&gt;&gt;&gt;").  </p>
+
+<p>Example:  </p>
+
+<pre><code>  jqconsole.ClearPromptText()  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolegetprompttext" class="anchor" href="#jqconsolegetprompttext"><span class="octicon octicon-link"></span></a>jqconsole.GetPromptText</h3>
+
+<p>Returns the contents of the prompt. Takes one parameter:  </p>
+
+<ul>
+<li>
+<p><strong>bool</strong> <em>full</em>: If specified and true, also includes the prompt labels<br>
+(e.g. "&gt;&gt;&gt;").  </p>
+
+<p>Examples:  </p>
+
+<pre><code>  var currentCommand = jqconsole.GetPromptText()  
+  var logEntry = jqconsole.GetPromptText(true)  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolereset" class="anchor" href="#jqconsolereset"><span class="octicon octicon-link"></span></a>jqconsole.Reset</h3>
+
+<p>Resets the console to its initial state, cancelling all current and pending<br>
+operations. Takes no parameters.  </p>
+
+<p>Example:  </p>
+
+<pre><code>    jqconsole.Reset()  
+</code></pre>
+
+<h3>
+<a name="jqconsolegetcolumn" class="anchor" href="#jqconsolegetcolumn"><span class="octicon octicon-link"></span></a>jqconsole.GetColumn</h3>
+
+<p>Returns the 0-based number of the column on which the cursor currently is.<br>
+Takes no parameters.  </p>
+
+<p>Example:  </p>
+
+<pre><code>    // Show the current line and column in a status area.  
+    $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())  
+</code></pre>
+
+<h3>
+<a name="jqconsolegetline" class="anchor" href="#jqconsolegetline"><span class="octicon octicon-link"></span></a>jqconsole.GetLine</h3>
+
+<p>Returns the 0-based number of the line on which the cursor currently is.<br>
+Takes no parameters.  </p>
+
+<p>Example:  </p>
+
+<pre><code>    // Show the current line and column in a status area.  
+    $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())  
+</code></pre>
+
+<h3>
+<a name="jqconsolefocus" class="anchor" href="#jqconsolefocus"><span class="octicon octicon-link"></span></a>jqconsole.Focus</h3>
+
+<p>Forces the focus onto the console so events can be captured.<br>
+Takes no parameters.  </p>
+
+<p>Example:  </p>
+
+<pre><code>    // Redirect focus to the console whenever the user clicks anywhere.  
+    $(window).click(function() {  
+      jqconsole.Focus();  
+    })  
+</code></pre>
+
+<h3>
+<a name="jqconsolegetindentwidth" class="anchor" href="#jqconsolegetindentwidth"><span class="octicon octicon-link"></span></a>jqconsole.GetIndentWidth</h3>
+
+<p>Returns the number of spaces inserted when indenting. Takes no parameters.    </p>
+
+<p>Example:  </p>
+
+<pre><code>    jqconsole.SetIndentWidth(4);  
+    console.assert(jqconsole.GetIndentWidth() == 4);  
+</code></pre>
+
+<h3>
+<a name="jqconsoleunregistermatching" class="anchor" href="#jqconsoleunregistermatching"><span class="octicon octicon-link"></span></a>jqconsole.UnRegisterMatching</h3>
+
+<p>Deletes a certain matching settings set by <code>jqconsole.RegisterMatching</code>.<br>
+Takes two paramaters:  </p>
+
+<ul>
+<li>
+<strong>char</strong> <em>open</em>: The opening character of a "block".<br>
+</li>
+<li>
+<p><strong>char</strong> <em>close</em>: The closing character of a "block".  </p>
+
+<p>Example:  </p>
+
+<pre><code>  jqconsole.UnRegisterMatching('{', '}');  
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoledump" class="anchor" href="#jqconsoledump"><span class="octicon octicon-link"></span></a>jqconsole.Dump</h3>
+
+<p>Returns the text content of the console.    </p>
+
+<h3>
+<a name="jqconsolegetstate" class="anchor" href="#jqconsolegetstate"><span class="octicon octicon-link"></span></a>jqconsole.GetState</h3>
+
+<p>Returns the current state of the console. Could be one of the following:  </p>
+
+<ul>
+<li>Input: <code>"input"</code><br>
+</li>
+<li>Output: <code>"output"</code><br>
+</li>
+<li>
+<p>Prompt: <code>"prompt"</code>  </p>
+
+<p>Example:</p>
+
+<pre><code>  jqconsole.GetState(); //output
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolemovetostart" class="anchor" href="#jqconsolemovetostart"><span class="octicon octicon-link"></span></a>jqconsole.MoveToStart</h3>
+
+<p>Moves the cursor to the start of the current line.<br>
+Takes one parameter:  </p>
+
+<ul>
+<li>
+<p><strong>bool</strong> <em>all_lines</em>: If true moves the cursor to the beginning of the first<br>
+line in the current prompt. Defaults to false.  </p>
+
+<p>Example:</p>
+
+<pre><code>  // Move to line start Ctrl+A.
+  jqconsole.RegisterShortcut('A', function() {
+    jqconsole.MoveToStart();
+    handler();
+  });
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsolemovetoend" class="anchor" href="#jqconsolemovetoend"><span class="octicon octicon-link"></span></a>jqconsole.MoveToEnd</h3>
+
+<p>Moves the cursor to the end of the current line.<br>
+Takes one parameter:  </p>
+
+<ul>
+<li>
+<p><strong>bool</strong> <em>all_lines</em>: If true moves the cursor to the end of the first<br>
+line in the current prompt. Defaults to false.  </p>
+
+<p>Example:</p>
+
+<pre><code>  // Move to line end Ctrl+E.
+  jqconsole.RegisterShortcut('E', function() {
+    jqconsole.MoveToEnd();
+    handler();
+  });
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoledisable" class="anchor" href="#jqconsoledisable"><span class="octicon octicon-link"></span></a>jqconsole.Disable</h3>
+
+<p>Disables input and focus on the console.</p>
+
+<h3>
+<a name="jqconsoleenable" class="anchor" href="#jqconsoleenable"><span class="octicon octicon-link"></span></a>jqconsole.Enable</h3>
+
+<p>Enables input and focus on the console.</p>
+
+<h3>
+<a name="jqconsoleisdisabled" class="anchor" href="#jqconsoleisdisabled"><span class="octicon octicon-link"></span></a>jqconsole.IsDisabled</h3>
+
+<p>Returns true if the console is disabled.</p>
+
+<h3>
+<a name="jqconsolegethistory" class="anchor" href="#jqconsolegethistory"><span class="octicon octicon-link"></span></a>jqconsole.GetHistory</h3>
+
+<p>Returns the contents of the history buffer.</p>
+
+<h3>
+<a name="jqconsolesethistory" class="anchor" href="#jqconsolesethistory"><span class="octicon octicon-link"></span></a>jqconsole.SetHistory</h3>
+
+<p>Set the history buffer to the given array.</p>
+
+<p>Takes one parameter:</p>
+
+<ul>
+<li>
+<p><strong>array</strong> <em>history</em>: The history buffer to use.</p>
+
+<p>Example:</p>
+
+<pre><code>  jqconsole.SetHistory(['a = 3', 'a + 3']);
+</code></pre>
+</li>
+</ul><h3>
+<a name="jqconsoleresethistory" class="anchor" href="#jqconsoleresethistory"><span class="octicon octicon-link"></span></a>jqconsole.ResetHistory</h3>
+
+<p>Resets the console history.</p>
+
+<h3>
+<a name="jqconsoleresetmatchings" class="anchor" href="#jqconsoleresetmatchings"><span class="octicon octicon-link"></span></a>jqconsole.ResetMatchings</h3>
+
+<p>Resets the character matching configuration.</p>
+
+<h3>
+<a name="jqconsoleresetshortcuts" class="anchor" href="#jqconsoleresetshortcuts"><span class="octicon octicon-link"></span></a>jqconsole.ResetShortcuts</h3>
+
+<p>Resets the shortcut configuration.</p>
+
+<h2>
+<a name="default-key-config" class="anchor" href="#default-key-config"><span class="octicon octicon-link"></span></a>Default Key Config</h2>
+
+<p>The console responds to the followind keys and key combinations by default:  </p>
+
+<ul>
+<li>
+<code>Delete</code>: Delete the following character.<br>
+</li>
+<li>
+<code>Ctrl+Delete</code>: Delete the following word.<br>
+</li>
+<li>
+<code>Backspace</code>: Delete the preceding character.<br>
+</li>
+<li>
+<code>Ctrl+Backspace</code>: Delete the preceding word.<br>
+</li>
+<li>
+<code>Ctrl+Left</code>: Move one word to the left.<br>
+</li>
+<li>
+<code>Ctrl+Right</code>: Move one word to the right.<br>
+</li>
+<li>
+<code>Home</code>: Move to the beginning of the current line.<br>
+</li>
+<li>
+<code>Ctrl+Home</code>: Move to the beginnig of the first line.<br>
+</li>
+<li>
+<code>End</code>: Move to the end of the current line.<br>
+</li>
+<li>
+<code>Ctrl+End</code>: Move to the end of the last line.<br>
+</li>
+<li>
+<code>Shift+Up</code>, <code>Ctrl+Up</code>: Move cursor to the line above the current one.<br>
+</li>
+<li>
+<code>Shift+Down</code>, <code>Ctrl+Down</code>: Move cursor to the line below the current one.<br>
+</li>
+<li>
+<code>Tab</code>: Indent.<br>
+</li>
+<li>
+<code>Shift+Tab</code>: Unindent.<br>
+</li>
+<li>
+<code>Up</code>: Previous history item.<br>
+</li>
+<li>
+<code>Down</code>: Next history item.<br>
+</li>
+<li>
+<code>Enter</code>: Finish input/prompt operation. See Input() and Prompt() for details.<br>
+</li>
+<li>
+<code>Shift+Enter</code>: New line.<br>
+</li>
+<li>
+<code>Page Up</code>: Scroll console one page up.<br>
+</li>
+<li>
+<code>Page Down</code>: Scroll console one page down.<br>
+</li>
+</ul><h2>
+<a name="ansi-escape-code-sgr-support" class="anchor" href="#ansi-escape-code-sgr-support"><span class="octicon octicon-link"></span></a>ANSI escape code SGR support</h2>
+
+<p>jq-console implements a large subset of the ANSI escape code graphics.<br>
+Using the <code>.Write</code> method you could add style to the console using<br>
+the following syntax: </p>
+
+<p><code>ASCII 27 (decimal) or 0x1b (hex)</code>  <code>[</code>  <code>SGR code</code> <code>m</code></p>
+
+<p>Example:</p>
+
+<pre><code>jqconsole.Write('\033[31mRed Text');
+</code></pre>
+
+<p>Note that the third parameter <code>escape</code> must be true which defaults to it.</p>
+
+<p>You'll need to include the <code>ansi.css</code> file for default effects or create your<br>
+own using the css classes from the table below.</p>
+
+<h3>
+<a name="sgr" class="anchor" href="#sgr"><span class="octicon octicon-link"></span></a>SGR</h3>
+
+<p><a href="http://en.wikipedia.org/wiki/ANSI_escape_code#graphics">Reference</a>.</p>
+
+<table>
+<tr>
+<th>Code</th>
+    <th>Effect</th>
+    <th>Class</th>
+  </tr>
+<tr>
+<td>0</td>
+    <td>Reset / Normal</td>
+    <td></td>
+  </tr>
+<tr>
+<td>1</td>
+    <td>Bold</td>
+    <td>`jqconsole-ansi-bold`</td>
+  </tr>
+<tr>
+<td>2</td>
+    <td>Faint</td>
+    <td>`jqconsole-ansi-lighter`</td>
+  </tr>
+<tr>
+<td>3</td>
+    <td>Italic</td>
+    <td>`jqconsole-ansi-italic`</td>
+  </tr>
+<tr>
+<td>4</td>
+    <td>Line below text</td>
+    <td>`jqconsole-ansi-underline`</td>
+  </tr>
+<tr>
+<td>5</td>
+    <td>Blink: 1s delay</td>
+    <td>`jqconsole-ansi-blink`</td>
+  </tr>
+<tr>
+<td>6</td>
+    <td>Blink: 0.5s delay</td>
+    <td>`jqconsole-ansi-blink-rapid`</td>
+  </tr>
+<tr>
+<td>8</td>
+    <td>Hide text</td>
+    <td>`jqconsole-ansi-hidden`</td>
+  </tr>
+<tr>
+<td>9</td>
+    <td>Line through text</td>
+    <td>`jqconsole-ansi-line-through`</td>
+  </tr>
+<tr>
+<td>10</td>
+    <td>Remove all fonts</td>
+    <td></td>
+  </tr>
+<tr>
+<td>11-19</td>
+    <td>Add custom font</td>
+    <td>`jqconsole-ansi-fonts-{N}` where N is code - 10</td>
+  </tr>
+<tr>
+<td>20</td>
+    <td>Add Fraktur font (not implemented in ansi.css)</td>
+    <td>`jqconsole-ansi-fraktur`</td>
+  </tr>
+<tr>
+<td>21</td>
+    <td>Remove Bold and Faint effects</td>
+    <td></td>
+  </tr>
+<tr>
+<td>22</td>
+    <td>Same as 21</td>
+    <td></td>
+  </tr>
+<tr>
+<td>23</td>
+    <td>Remove italic and fraktur effects</td>
+    <td></td>
+  </tr>
+<tr>
+<td>24</td>
+    <td>Remove underline effect</td>
+    <td></td>
+  </tr>
+<tr>
+<td>25</td>
+    <td>Remove blinking effect(s).</td>
+    <td></td>
+  </tr>
+<tr>
+<td>28</td>
+    <td>Reveal text</td>
+    <td></td>
+  </tr>
+<tr>
+<td>29</td>
+    <td>Remove line-through effect</td>
+    <td></td>
+  </tr>
+<tr>
+<td>30-37</td>
+    <td>Set foreground color to color from the color table below</td>
+    <td>jqconsole-ansi-color-{COLOR} where {COLOR} is the color name</td>
+  </tr>
+<tr>
+<td>39</td>
+    <td>Restore default foreground color</td>
+    <td></td>
+  </tr>
+<tr>
+<td>40-47</td>
+    <td>Set background color to color from the color table below</td>
+    <td>`jqconsole-ansi-background-color-{COLOR}` where {COLOR} is the color name</td>
+  </tr>
+<tr>
+<td>49</td>
+    <td>Restore default background color</td>
+    <td></td>
+  </tr>
+<tr>
+<td>51</td>
+    <td>Adds a frame around the text</td>
+    <td>`jqconsole-ansi-framed`</td>
+  </tr>
+<tr>
+<td>53</td>
+    <td>Line above text</td>
+    <td>jqconsole-ansi-overline</td>
+  </tr>
+<tr>
+<td>54</td>
+    <td>Remove frame effect</td>
+    <td></td>
+  </tr>
+<tr>
+<td>55</td>
+    <td>Remove over-line effect</td>
+    <td></td>
+  </tr>
+</table><h3>
+<a name="colors" class="anchor" href="#colors"><span class="octicon octicon-link"></span></a>Colors</h3>
+
+<p><a href="http://en.wikipedia.org/wiki/ANSI_escape_code#Colors">Reference</a>.</p>
+
+<table>
+<tr>
+<th>Code offset</th>
+    <th>Color</th>
+  </tr>
+<tr>
+<td>0</td>
+    <td>Black</td>
+  </tr>
+<tr>
+<td>1</td>
+    <td>Red</td>
+  </tr>
+<tr>
+<td>2</td>
+    <td>Green</td>
+  </tr>
+<tr>
+<td>3</td>
+    <td>Yellow</td>
+  </tr>
+<tr>
+<td>4</td>
+    <td>Blue</td>
+  </tr>
+<tr>
+<td>5</td>
+    <td>Magenta</td>
+  </tr>
+<tr>
+<td>6</td>
+    <td>Cyan</td>
+  </tr>
+<tr>
+<td>7</td>
+    <td>White</td>
+  </tr>
+</table><h2>
+<a name="css-classes" class="anchor" href="#css-classes"><span class="octicon octicon-link"></span></a>CSS Classes</h2>
+
+<p>Several CSS classes are provided to help stylize the console:  </p>
+
+<ul>
+<li>
+<code>jqconsole</code>: The main console container.<br>
+</li>
+<li>
+<code>jqconsole, jqconsole-blurred</code>: The main console container, when not in focus.<br>
+</li>
+<li>
+<code>jqconsole-cursor</code>: The cursor.<br>
+</li>
+<li>
+<code>jqconsole-header</code>: The welcome message at the top of the console.<br>
+</li>
+<li>
+<code>jqconsole-input</code>: The prompt area during input. May have multiple lines.<br>
+</li>
+<li>
+<code>jqconsole-old-input</code>: Previously-entered inputs.<br>
+</li>
+<li>
+<code>jqconsole-prompt</code>: The prompt area during prompting. May have multiple lines.<br>
+</li>
+<li>
+<code>jqconsole-old-prompt</code>: Previously-entered prompts.<br>
+</li>
+<li>
+<code>jqconsole-composition</code>: The div encapsulating the composition of multi-byte<br>
+characters.</li>
+</ul><p>Of course, custom classes may be specified when using <code>jqconsole.Write()</code> for<br>
+further customization.  </p>
+
+<h2>
+<a name="contributors" class="anchor" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h2>
+
+<p><a href="http://max99x.com/">Max Shawabkeh</a><br><a href="http://twitter.com/amasad">Amjad Masad</a>  </p>
+
+<h2>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p><a href="http://opensource.org/licenses/MIT">MIT</a></p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jq-console maintained by <a href="https://github.com/replit">replit</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
