@@ -1,6 +1,6 @@
 {
   "name": "jq-console",
-  "version": "2.8.0",
+  "version": "2.10.0",
   "description": "Feature complete web terminal",
   "main": "jqconsole.min.js",
   "directories": {
