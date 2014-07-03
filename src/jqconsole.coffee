@@ -629,7 +629,7 @@ class JQConsole
       .text ''
     # Bug in Chrome were the cursor's position is not recalculated
     @$prompt_cursor.detach()
-    @$prompt_after.before @$prompt_cursor
+    @$prompt_right.before @$prompt_cursor
 
   ###------------------------ Private Methods -------------------------------###
 
