@@ -13,9 +13,10 @@ window.jqconsoleSetup = ->
   $container.appendTo('body')
   jqconsole = new JQConsole($container, 'header', 'prompt_label', 'prompt_continue')
   typer =
-    typeA: ->
+    typeA: (options = {}) ->
       e = $.Event('keypress')
       e.which = 'a'.charCodeAt(0)
+      e[k] = v for k, v of options
       jqconsole.$input_source.trigger e
 
     keyDown: (code, options = {}) ->
