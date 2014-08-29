@@ -36,6 +36,8 @@
     "karma-phantomjs-launcher": "~0.1.1",
     "karma": "~0.12.8",
     "karma-mocha": "~0.1.1",
-    "karma-coverage": "~0.1.5"
+    "karma-coverage": "~0.1.5",
+    "coffee-script": "~1.6.3",
+    "uglify-js": "~2.4.15"
   }
 }
