@@ -1,4 +1,4 @@
-{jqconsole, typer: {keyDown}} = jqconsoleSetup()
+{jqconsole, typer: {typeA, keyDown}} = jqconsoleSetup()
 
 describe 'Shortcuts', ->
   describe '#RegisterShortcut', ->
@@ -58,3 +58,14 @@ describe 'Shortcuts', ->
         counter++
       keyDown 'a'.charCodeAt(0), metaKey: on
       ok counter
+
+    it 'altgr inputs character instead of invoking shortcut', ->
+      jqconsole.Prompt true, ->
+      counter = 0
+      jqconsole.RegisterShortcut 'a', ->
+        strictEqual this, jqconsole
+        counter++
+      keyDown 'a'.charCodeAt(0), ctrlKey: on, altKey: on
+      typeA(altKey: on, ctrlKey: on)
+      equal counter, 0
+      equal jqconsole.$prompt.text().trim(), 'prompt_labela'

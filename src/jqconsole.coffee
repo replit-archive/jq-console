@@ -771,7 +771,7 @@ class JQConsole
     # We let the browser take over during output mode.
     # Skip everything when a modifier key other than shift is held.
     # Allow alt key to pass through for unicode & multibyte characters.
-    if @state == STATE_OUTPUT or event.metaKey or event.ctrlKey
+    if @state == STATE_OUTPUT or event.metaKey or (event.ctrlKey and !event.altKey)
       return true
 
     # IE & Chrome capture non-control characters and Enter.
