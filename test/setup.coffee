@@ -12,6 +12,12 @@ window.jqconsoleSetup = ->
     position: 'relative'
   $container.appendTo('body')
   jqconsole = new JQConsole($container, 'header', 'prompt_label', 'prompt_continue')
+  createEvent = (type, charCode, options) ->
+    e = $.Event(type)
+    e.which = charCode
+    e[k] = v for k, v of options
+    jqconsole.$input_source.trigger(e)
+
   typer =
     typeA: ->
       e = $.Event('keypress')
@@ -24,12 +30,13 @@ window.jqconsoleSetup = ->
       e[k] = v for k, v of options
       jqconsole.$input_source.trigger e
 
-    type: (str) ->
-      type = (chr) ->
+    type: (str, options = {}) ->
+      createEventForChar = (chr) ->
         e = $.Event('keypress')
         e.which = chr.charCodeAt(0)
+        e[k] = v for k, v of options
         jqconsole.$input_source.trigger(e)
-      type chr for chr in str
+      createEventForChar chr for chr in str
 
   createScroll = ->
     line_height = jqconsole.$prompt.height()

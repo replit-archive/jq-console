@@ -52,6 +52,9 @@ CLASS_ANSI = "#{CLASS_PREFIX}ansi-"
 ESCAPE_CHAR = '\x1B'
 ESCAPE_SYNTAX = /\[(\d*)(?:;(\d*))*m/
 
+isBracket = (char) ->
+  /[\<\>\{\}\[\]\(\)]/.test char
+
 class Ansi
   COLORS: ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
 
@@ -768,11 +771,6 @@ class JQConsole
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
   _HandleChar: (event) =>
-    # We let the browser take over during output mode.
-    # Skip everything when a modifier key other than shift is held.
-    # Allow alt key to pass through for unicode & multibyte characters.
-    if @state == STATE_OUTPUT or event.metaKey or event.ctrlKey
-      return true
 
     # IE & Chrome capture non-control characters and Enter.
     # Mozilla and Opera capture everything.
@@ -784,7 +782,15 @@ class JQConsole
     # These are handled in _HandleKey().
     if char_code in [8, 9, 13] then return false
 
-    @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
+    char = String.fromCharCode char_code
+
+    # We let the browser take over during output mode.
+    # Skip everything when a modifier key other than shift is held.
+    # Allow alt key to pass through for unicode & multibyte characters.
+    if @state == STATE_OUTPUT or event.metaKey or (event.ctrlKey && ! isBracket char)
+      return true
+
+    @$prompt_left.text @$prompt_left.text() + char
     @_ScrollToEnd()
     return false
 
