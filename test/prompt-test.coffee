@@ -68,7 +68,7 @@ describe 'Prompt Interaction', ->
   describe '#SetPromptText', ->
     beforeEach -> jqconsole.Prompt true, ->
     afterEach -> jqconsole.AbortPrompt()
-    
+
     it 'sets the current prompt text', ->
       type 'bar'
       jqconsole.SetPromptText('foo')
@@ -342,6 +342,37 @@ describe 'Prompt Interaction', ->
           done()
         setTimeout cb, 0
       setTimeout cb, jQuery.fx.speeds.fast * 2
+
+    describe 'Brackets', ->
+      it 'adds [ ]', ->
+        type('[')
+        type(']')
+        equal jqconsole.GetPromptText(), '[]'
+      it 'adds {}', ->
+        type '{'
+        type '}'
+        equal jqconsole.GetPromptText(), '{}'
+      it 'adds <>', ->
+        type '<'
+        type '>'
+        equal jqconsole.GetPromptText(), '<>'
+
+      describe 'windows for Chrome', ->
+        it 'adds {}', ->
+          type '{',
+            ctrlKey: true
+          type '}',
+            ctrlKey: true
+          equal jqconsole.GetPromptText(), '{}'
+        it 'adds []', ->
+          type '[',
+            ctrlKey: true
+          type ']',
+            ctrlKey: true
+          equal jqconsole.GetPromptText(), '[]'
+
+
+
 
   describe 'Multiline', ->
     beforeEach ->
