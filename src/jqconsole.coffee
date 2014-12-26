@@ -24,6 +24,10 @@ KEY_HOME = 36
 KEY_END = 35
 KEY_PAGE_UP = 33
 KEY_PAGE_DOWN = 34
+KEY_A = 65
+KEY_E = 69
+KEY_K = 75
+KEY_U = 85
 
 # CSS classes
 CLASS_PREFIX = 'jqconsole-'
@@ -846,8 +850,10 @@ class JQConsole
       when KEY_RIGHT then @_MoveRight true
       when KEY_UP then  @_MoveUp()
       when KEY_DOWN then @_MoveDown()
-      when KEY_END then @MoveToEnd true
-      when KEY_HOME then @MoveToStart true
+      when KEY_END, KEY_E then @MoveToEnd true
+      when KEY_HOME, KEY_A then @MoveToStart true
+      when KEY_K then @_Delete(false, true)
+      when KEY_U then @_Backspace(false, true)
       else
         if key of @shortcuts
           # Execute custom shortcuts.
@@ -1021,10 +1027,13 @@ class JQConsole
 
   # Deletes the character or word following the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
-  _Delete: (whole_word) ->
+  #   @arg whole_line: Whether to delete the whole line after cursor (Ctrl-K)
+  _Delete: (whole_word, whole_line) ->
     text = @$prompt_right.text()
     if text
-      if whole_word
+      if whole_line
+        @$prompt_right.text ''
+      else if whole_word
         word = text.match /^\w*\W*/
         if not word then return
         word = word[0]
@@ -1037,11 +1046,14 @@ class JQConsole
 
   # Deletes the character or word preceding the cursor.
   #   @arg whole_word: Whether to delete a whole word rather than a character.
-  _Backspace: (whole_word) ->
+  #   @arg whole_line: Whether to delete the whole line before cursor (Ctrl-U)
+  _Backspace: (whole_word, whole_line) ->
     setTimeout $.proxy(@_ScrollToEnd, @), 0
     text = @$prompt_left.text()
     if text
-      if whole_word
+      if whole_line
+        @$prompt_left.text ''
+      else if whole_word
         word = text.match /\w*\W*$/
         if not word then return
         word = word[0]
