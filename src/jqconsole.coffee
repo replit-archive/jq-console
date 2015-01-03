@@ -439,8 +439,6 @@ class JQConsole
   #   @arg continue_label: The new continuation label for the next prompt. Optional.
   SetPromptLabel: (main_label, continue_label) ->
     @prompt_label_main = main_label
-    prompt_selector = '>span+span>span:first-child'
-    $('.' + CLASS_PROMPT + prompt_selector).text(main_label);
     if continue_label?
       @prompt_label_continue = continue_label
     return undefined
@@ -449,7 +447,7 @@ class JQConsole
   UpdatePromptLabel: ->
     prompt_selector = '>span+span>span:first-child'
     full_selector = '.' + CLASS_PROMPT + prompt_selector
-    $(full_selector).text(@prompt_label_main)
+    @$console.find(full_selector).text(@prompt_label_main)
 
   # Writes the given text to the console in a <span>, with an optional class.
   #   @arg text: The text to write.
