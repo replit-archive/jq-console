@@ -443,6 +443,12 @@ class JQConsole
       @prompt_label_continue = continue_label
     return undefined
 
+  # Update the main prompt label.
+  UpdatePromptLabel: ->
+    prompt_selector = '>span+span>span:first-child'
+    full_selector = '.' + CLASS_PROMPT + prompt_selector
+    @$console.find(full_selector).text(@prompt_label_main)
+
   # Writes the given text to the console in a <span>, with an optional class.
   #   @arg text: The text to write.
   #   @arg cls: The class to give the span containing the text. Optional.
