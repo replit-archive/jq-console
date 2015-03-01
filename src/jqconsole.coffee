@@ -539,7 +539,9 @@ class JQConsole
   AbortPrompt: ->
     if @state == STATE_OUTPUT
       throw new Error 'Cannot abort prompt when not in prompt or input state.'
-    @Write @GetPromptText(true) + NEWLINE, CLASS_OLD_PROMPT
+    text = @GetPromptText(true)
+    if text.trim().length != 0
+      @Write @GetPromptText(true) + NEWLINE, CLASS_OLD_PROMPT
     @ClearPromptText true
     @state = STATE_OUTPUT
     @input_callback = @multiline_callback = null
