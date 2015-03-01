@@ -534,8 +534,8 @@ class JQConsole
   # Aborts the current prompt operation and returns to output mode or the next
   # queued input/prompt operation.
   AbortPrompt: ->
-    if @state != STATE_PROMPT
-      throw new Error 'Cannot abort prompt when not in prompt state.'
+    if @state == STATE_OUTPUT
+      throw new Error 'Cannot abort prompt when not in prompt or input state.'
     @Write @GetPromptText(true) + NEWLINE, CLASS_OLD_PROMPT
     @ClearPromptText true
     @state = STATE_OUTPUT
