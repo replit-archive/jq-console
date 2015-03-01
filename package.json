@@ -14,7 +14,7 @@
     "url": "git://github.com/replit/jq-console.git"
   },
   "keywords": [
-    "jq-consoel",
+    "jq-console",
     "console",
     "terminal"
   ],
@@ -36,6 +36,7 @@
     "karma-phantomjs-launcher": "~0.1.1",
     "karma": "~0.10.9",
     "karma-mocha": "~0.1.1",
-    "karma-coverage": "~0.1.5"
+    "karma-coverage": "~0.1.5",
+    "coffee-script": "~1.9.1"
   }
 }
