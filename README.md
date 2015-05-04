@@ -183,7 +183,7 @@ operation and all previously enqueued operations finish. Takes one argument:
 ###jqconsole.Prompt
 Asks user for input. If another input or prompt operation is currently underway  
 the new prompt operation is enqueued and will be called when the current  
-peration and all previously enqueued operations finish. Takes three arguments:  
+peration and all previously enqueued operations finish. Takes four arguments:  
 
   * __bool__ *history_enabled*: Whether this input should use history. If true,  
     the user can select the input from history, and their input will also be  
