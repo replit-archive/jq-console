@@ -96,7 +96,7 @@ The plugin has been tested on the following browsers:
 ###Instantiating  
 
 ```javascript
-    $(div).jqconsole(welcomeString, promptLabel, continueLabel, disableAutoFocus);
+    $(div).jqconsole(welcomeString, promptLabel, continueLabel, disable_auto_focus);
 ```
 
 * `div` is the div element or selector. Note that this element must be
@@ -105,7 +105,8 @@ The plugin has been tested on the following browsers:
 * `promptLabel` is the label to be shown before the input when using Prompt().  
 * `continueLabel` is the label to be shown before the continued lines of the  
   input when using Prompt().
-* `disableAutoFocus` is a boolean indicating whether we should disable the default auto-focus behavior.
+* `disable_auto_focus` will avoid focusing the terminal on startup, defaults to
+   ```false``` (the terminal always auto focus and therefore scrolls the page).
 
 ##Configuration  
   
