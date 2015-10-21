@@ -85,3 +85,7 @@ info.
 2015.3.1 Version 2.11.0
 * `AbortPrompt` method can be used in input state
 
+2015.10.20 Version 2.12
+* Add `disableAutoFocus` option.
+* Add old-input css class
+* `AbortPrompt` should not always create a new line
