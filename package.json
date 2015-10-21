@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run",
-    "compile": "coffee -o lib -c src"
+    "compile": "coffee -o lib -c src",
+    "min": "uglifyjs lib/jqconsole.js > jqconsole.min.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "karma": "~0.10.9",
     "karma-mocha": "~0.1.1",
     "karma-coverage": "~0.1.5",
-    "coffee-script": "~1.9.1"
+    "coffee-script": "~1.9.1",
+    "uglify-js": "~2.4.16"
   }
 }
