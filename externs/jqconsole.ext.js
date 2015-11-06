@@ -82,5 +82,6 @@ JQConsole.prototype.IsDisabled = function() {};
 JQConsole.prototype.MoveToStart = function(all_lines) {};
 JQConsole.prototype.MoveToEnd = function(all_lines) {};
 JQConsole.prototype.Clear = function() {};
+JQConsole.prototype.SetKeyPressPredicate = function(predicate) {};
 
 /*---------------------- END Public Methods --------------------------- */
