@@ -7,6 +7,14 @@ task 'watch', 'Build and watch the CoffeeScript source files', ->
   coffee.stdout.on 'data', log
   test.stdout.on 'data', log
 
+task 'compile', 'Compile to js library', ->
+  console.log 'compiling...'
+  exec 'coffee --compile --output lib/ src/', (err, res)->
+    if err
+      console.error 'failed with', err
+    else
+      console.log 'compile complete', res
+
 task 'build', 'Build minified file with uglify', ->
   console.log 'building...'
   exec 'uglifyjs -m -o jqconsole.min.js lib/jqconsole.js', (err, res)->
