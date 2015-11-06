@@ -34,6 +34,7 @@ CLASS_OLD_PROMPT = "#{CLASS_PREFIX}old-prompt"
 CLASS_INPUT = "#{CLASS_PREFIX}input"
 CLASS_OLD_INPUT = "#{CLASS_PREFIX}old-input"
 CLASS_BLURRED = "#{CLASS_PREFIX}blurred"
+CLASS_USER_TEXT = "#{CLASS_PREFIX}user-text"
 
 # Frequently used string literals
 E_KEYPRESS = 'keypress'
@@ -694,6 +695,7 @@ class JQConsole
     # (e.g. ">>> "), and the editable text to the left and right of the cursor.
     @$prompt_label = $(EMPTY_SPAN).appendTo @$prompt_current
     @$prompt_left = $(EMPTY_SPAN).appendTo @$prompt_current
+    @$prompt_left.attr 'class', CLASS_USER_TEXT
     @$prompt_right = $(EMPTY_SPAN).appendTo @$prompt_current
 
     # Needed for the CSS z-index on the cursor to work.
