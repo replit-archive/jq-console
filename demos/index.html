@@ -62,7 +62,17 @@
     <div id="console"></div>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="../lib/jqconsole.js"></script>
-       <script>
+    <script>
+      propStartingWith = function (obj, prefix) {
+        var res = [];
+        for(var m in obj) {
+          if(m.indexOf(prefix) === 0) {
+            res.push(m);
+          }
+        }
+        return res;
+      };
+
       $(function() {
         // Creating the console.
         var header = 'Welcome to JQConsole!\n' +
@@ -111,6 +121,17 @@
             return false;
           });
         };
+
+        jqconsole.SetKeyPressPredicate(function(current_text, new_char) {
+          input_text = current_text + new_char;
+          methods = propStartingWith(jqconsole, input_text);
+          return input_text.length > 2 && methods.length > 1;
+        });
+
+        $('.jqconsole-user-text').keypress(function (event) {
+          methods = propStartingWith(jqconsole, input_text);
+          jqconsole.Append($("<div>" + methods.join(",") + "</div>").css('background-color', '#333300'));
+        });
 
         // Initiate the first prompt.
         handler();

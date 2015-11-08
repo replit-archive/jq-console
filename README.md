@@ -328,7 +328,28 @@ operations. Takes no parameters.
   
         jqconsole.Reset()  
 
+###jqconsole.SetKeyPressPredicate
+Sets a callback that allows (if return value is true) or avoids (if return
+value is false) launching keypressed events from the `$(.jqconsole-user-text')`
+element.
 
+  * __function__ *predicate*: A function returning true or false. It accepts
+    the current user text and the newly added character (as string)
+  
+  Example:
+  ```javascript
+        jqconsole.SetKeyPressPredicate(function(current_text, new_char) {
+          input_text = current_text + new_char;
+          methods = propStartingWith(jqconsole, input_text);
+          return input_text.length > 2 && methods.length > 1;
+        });
+
+        $('.jqconsole-user-text').keypress(function (event) {
+          methods = propStartingWith(jqconsole, input_text);
+          jqconsole.Append($("<div>" + methods.join(",") + "</div>").css('background-color', '#333300'));
+        });
+   ```
+   
 ###jqconsole.GetColumn
 Returns the 0-based number of the column on which the cursor currently is.  
 Takes no parameters.  
