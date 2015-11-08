@@ -265,13 +265,10 @@ class JQConsole
     @_SetupEvents()
     @Write @header, CLASS_HEADER
 
-    # Key pressed event predicate
-    @keypress_pred = (current_text, new_char) -> false
-
     # Save this instance to be accessed if lost.
     $(outer_container).data 'jqconsole', this
 
-  #### Reset methods
+  # Reset methods
 
   # Resets the history into intitial state.
   ResetHistory: ->
@@ -295,6 +292,8 @@ class JQConsole
     @input_queue = []
     @input_callback = null
     @multiline_callback = null
+    @custom_control_key_handler = null
+    @custom_keypress_handler = null
     @ResetHistory()
     @ResetShortcuts()
     @ResetMatchings()
@@ -768,7 +767,7 @@ class JQConsole
       setTimeout handlePaste, 0
 
     # Actual key-by-key handling.
-    @$input_source.keypress @_EventTriggeringHandleChar
+    @$input_source.keypress @_HandleChar
     @$input_source.keydown @_HandleKey
     @$input_source.keydown @_CheckComposition
 
@@ -790,25 +789,16 @@ class JQConsole
     else
       @$input_source.bind 'text', @_UpdateComposition
 
-  # Sets a callback that allows (if return value is true) or avoids (if return
-  # value is false) launching keypressed events.
-  # @arg predicate A function returning true or false. It should be a
-  #                function(current_text, new_char).
-  SetKeyPressPredicate: (predicate) ->
-    @keypress_pred = predicate
+  # Handle key presses and potentially override internal keypress handler.
+  # @arg handler: function that can be used to handle key presses.
+  #               can override internal handler by returning false.
+  SetKeyPressHandler: (handler) ->
+    @custom_keypress_handler = handler
 
-  # Wraps _HandleChar in order to dispatch keypress events. The event is
-  # triggered iff the @keypress_pred returns true. This function also checks
-  # that the event can be processed normally (not isDefaultPrevented()).
-  #   @arg event: The jQuery keyboard Event object to handle.
-  _EventTriggeringHandleChar: (event) =>
-    # Pass current text and current key string to the predicate
-    if @keypress_pred @$prompt_left.text(), String.fromCharCode event.which
-      @$prompt_left.trigger event
-      if not event.isDefaultPrevented()
-        @_HandleChar event
-    else
-      @_HandleChar event
+  # Handle and potentially override control keys (tab, up, down).
+  # @arg handler: function that can be used to control key events.
+  SetControlKeyHandler: (handler) ->
+    @custom_control_key_handler = handler
 
   # Handles a character key press.
   #   @arg event: The jQuery keyboard Event object to handle.
@@ -829,6 +819,10 @@ class JQConsole
     # These are handled in _HandleKey().
     if char_code in [8, 9, 13] then return false
 
+    if @custom_keypress_handler?
+      if @custom_keypress_handler.call(@, event) == false
+        return false
+
     @$prompt_left.text @$prompt_left.text() + String.fromCharCode char_code
     @_ScrollToEnd()
     return false
@@ -843,6 +837,10 @@ class JQConsole
 
     # Check for char matching next time the callstack unwinds.
     setTimeout $.proxy(@_CheckMatchings, this), 0
+
+    if @custom_control_key_handler?
+      if @custom_control_key_handler.call(@, event) == false
+        return false
 
     # Don't care about alt-modifier.
     if event.altKey
