@@ -122,17 +122,37 @@
           });
         };
 
-        jqconsole.SetKeyPressPredicate(function(current_text, new_char) {
-          input_text = current_text + new_char;
-          methods = propStartingWith(jqconsole, input_text);
-          return input_text.length > 2 && methods.length > 1;
+        jqconsole.SetKeyPressHandler(function(e) {
+          var text = jqconsole.GetPromptText() + String.fromCharCode(e.which);
+          // We'll only suggest things on the window object.
+          if (text.match(/\./)) {
+            return;
+          }
+
+          var props = propStartingWith(window, text);
+          if (props.length) {
+            if (!$('.suggest').length) {
+              $('<div/>').addClass('suggest').appendTo($('.jqconsole'));
+            }
+            $('.suggest').empty().show();
+            props.forEach(function(prop) {
+              $('.suggest').append('<div>' + prop + '</div>');
+            });
+            var pos = $('.jqconsole-cursor').offset();
+            pos.left += 20;
+            $('.suggest').offset(pos);
+          } else {
+            $('.suggest').hide();
+          }
         });
 
-        $('.jqconsole-user-text').keypress(function (event) {
-          methods = propStartingWith(jqconsole, input_text);
-          jqconsole.Append($("<div>" + methods.join(",") + "</div>").css('background-color', '#333300'));
+        jqconsole.SetControlKeyHandler(function(e) {
+          $('.suggest').hide();
+          if (e.which === 9 && $('.suggest div').length) {
+            jqconsole.SetPromptText($('.suggest div').first().text());
+            return false;
+          }
         });
-
         // Initiate the first prompt.
         handler();
       });
