@@ -748,7 +748,7 @@ Several CSS classes are provided to help stylize the console:
 * `jqconsole-old-prompt`: Previously-entered prompts.
 * `jqconsole-composition`: The div encapsulating the composition of multi-byte
     characters.
-
+* `jqconsole-prompt-text`: the text entered in the current prompt
 
 Of course, custom classes may be specified when using `jqconsole.Write()` for
 further customization.

@@ -30,11 +30,11 @@ CLASS_PREFIX = 'jqconsole-'
 CLASS_CURSOR = "#{CLASS_PREFIX}cursor"
 CLASS_HEADER = "#{CLASS_PREFIX}header"
 CLASS_PROMPT = "#{CLASS_PREFIX}prompt"
+CLASS_PROMPT_TEXT = "#{CLASS_PROMPT}-text"
 CLASS_OLD_PROMPT = "#{CLASS_PREFIX}old-prompt"
 CLASS_INPUT = "#{CLASS_PREFIX}input"
 CLASS_OLD_INPUT = "#{CLASS_PREFIX}old-input"
 CLASS_BLURRED = "#{CLASS_PREFIX}blurred"
-CLASS_USER_TEXT = "#{CLASS_PREFIX}user-text"
 
 # Frequently used string literals
 E_KEYPRESS = 'keypress'
@@ -697,11 +697,16 @@ class JQConsole
     # (e.g. ">>> "), and the editable text to the left and right of the cursor.
     @$prompt_label = $(EMPTY_SPAN).appendTo @$prompt_current
     @$prompt_left = $(EMPTY_SPAN).appendTo @$prompt_current
-    @$prompt_left.attr 'class', CLASS_USER_TEXT
     @$prompt_right = $(EMPTY_SPAN).appendTo @$prompt_current
 
     # Needed for the CSS z-index on the cursor to work.
     @$prompt_right.css position: 'relative'
+
+    # To indicate the prompt text (maybe used for highlighting etc)
+    @$prompt_left.addClass(CLASS_PROMPT_TEXT)
+    @$prompt_right.addClass(CLASS_PROMPT_TEXT)
+    @$prompt_before.addClass(CLASS_PROMPT_TEXT)
+    @$prompt_after.addClass(CLASS_PROMPT_TEXT)
 
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
