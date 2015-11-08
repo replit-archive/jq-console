@@ -68,11 +68,31 @@ describe 'Prompt Interaction', ->
   describe '#SetPromptText', ->
     beforeEach -> jqconsole.Prompt true, ->
     afterEach -> jqconsole.AbortPrompt()
-    
+
     it 'sets the current prompt text', ->
       type 'bar'
       jqconsole.SetPromptText('foo')
       equal jqconsole.GetPromptText(), 'foo'
+
+  describe '#SetKeyPressHandler, #SetKeyControlHandler', ->
+    beforeEach -> jqconsole.Prompt true, ->
+    afterEach ->
+      jqconsole.AbortPrompt()
+      jqconsole.SetKeyPressHandler undefined
+      jqconsole.SetControlKeyHandler undefined
+
+    it 'does not allow to type', ->
+      jqconsole.SetKeyPressHandler -> false
+      type 'foo'
+      equal jqconsole.GetPromptText(), ''
+
+    it 'does not allow spaces', ->
+      type 'foo'
+      keyDown 9
+      equal jqconsole.GetPromptText(), '  foo'
+      jqconsole.SetControlKeyHandler (e) -> false if e.which == 9
+      keyDown 9
+      equal jqconsole.GetPromptText(), '  foo'
 
   describe 'Moving', ->
     beforeEach -> jqconsole.Prompt true, ->
