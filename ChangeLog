@@ -89,3 +89,9 @@ info.
 * Add `disableAutoFocus` option.
 * Add old-input css class
 * `AbortPrompt` should not always create a new line
+
+2015.7.11 Version 2.13.1
+* Fix #80
+* Add prompt-text class
+* Add `SetKeyPressHandler` API
+* Add `SetKeyControlHandler` API
