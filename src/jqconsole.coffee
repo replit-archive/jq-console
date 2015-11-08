@@ -645,11 +645,13 @@ class JQConsole
 
   # Clear the console keeping only the prompt.
   Clear: ->
+    prompt_class = if @state == STATE_INPUT then CLASS_INPUT else CLASS_PROMPT
     @$console
       .find(".#{CLASS_HEADER}")
-      .nextUntil(".#{CLASS_PROMPT}")
+      .nextUntil(".#{prompt_class}")
       .addBack()
       .text ''
+
     # Bug in Chrome were the cursor's position is not recalculated
     @$prompt_cursor.detach()
     @$prompt_right.before @$prompt_cursor
