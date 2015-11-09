@@ -1122,7 +1122,7 @@ class JQConsole
     old_prompt = @_SelectPromptLabel not @$prompt_before.is EMPTY_SELECTOR
     $old_line = $(EMPTY_SPAN).appendTo @$prompt_before
     $old_line.append $(EMPTY_SPAN).text old_prompt
-    $old_line.append $(EMPTY_SPAN).text @$prompt_left.text()
+    $old_line.append $(EMPTY_SPAN).addClass(CLASS_PROMPT_TEXT).text @$prompt_left.text()
 
     @$prompt_label.text @_SelectPromptLabel true
     if indent and match = @$prompt_left.text().match /^\s+/
