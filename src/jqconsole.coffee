@@ -706,9 +706,6 @@ class JQConsole
 
     # To indicate the prompt text (maybe used for highlighting etc)
     @$prompt_left.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_right.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_before.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_after.addClass(CLASS_PROMPT_TEXT)
 
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
