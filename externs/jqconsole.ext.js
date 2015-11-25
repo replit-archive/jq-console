@@ -1,5 +1,5 @@
 /**
- * @fileoverview Closure Compiler externs for jqconsole.js 2.11.0
+ * @fileoverview Closure Compiler externs for jqconsole.js 2.12.0
  * @see http://replit.github.io/jq-console
  * @externs
  * @author Andrea Richiardi
@@ -15,9 +15,11 @@
  * @param {?string|undefined} prompt_continue_label The label to
  *     show before continuation lines of the command prompt. Optional. Defaults
  *     to DEFAULT_PROMPT_CONINUE_LABEL.
+ * @param {?boolean|undefined} disable_auto_focus is a boolean indicating
+ *     whether we should disable the default auto-focus behavior.
  * @return {!JQConsole}
  */
-$.prototype.jqconsole = function(header, prompt_main, prompt_continue) {};
+$.prototype.jqconsole = function(header, prompt_main, prompt_continue, disable_auto_focus) {};
 
 /**
  * @constructor
@@ -26,15 +28,16 @@ $.prototype.jqconsole = function(header, prompt_main, prompt_continue) {};
  *     inserted.
  * @param {?string|undefined} header Text to print at the top of the console on
  * reset. Optional. Defaults to an empty string.
- * @param {(Element|jQuery|Document| Object.<string,
- *     (string|function(!jQuery.event=))>)=} prompt_label The label to show
+ * @param {?string|undefined} prompt_label The label to show
  *     before the command prompt. Optional. Defaults to DEFAULT_PROMPT_LABEL.
  * @param {?string|undefined} prompt_continue_label The label to
  *     show before continuation lines of the command prompt. Optional. Defaults
  *     to DEFAULT_PROMPT_CONINUE_LABEL.
+ * @param {?boolean|undefined} disable_auto_focus is a boolean indicating
+ *     whether we should disable the default auto-focus behavior.
  * @return {!JQConsole}
  */
-function JQConsole (outer_container, header, prompt_label, prompt_continue_label) {}
+function JQConsole (outer_container, header, prompt_label, prompt_continue_label, disable_auto_focus) {}
 
 /**
  * @constructor

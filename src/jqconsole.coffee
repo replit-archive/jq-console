@@ -706,9 +706,6 @@ class JQConsole
 
     # To indicate the prompt text (maybe used for highlighting etc)
     @$prompt_left.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_right.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_before.addClass(CLASS_PROMPT_TEXT)
-    @$prompt_after.addClass(CLASS_PROMPT_TEXT)
 
     # The cursor. A span containing a space that shades its following character.
     # If the font of the prompt is not monospace, the content should be set to
@@ -1125,7 +1122,7 @@ class JQConsole
     old_prompt = @_SelectPromptLabel not @$prompt_before.is EMPTY_SELECTOR
     $old_line = $(EMPTY_SPAN).appendTo @$prompt_before
     $old_line.append $(EMPTY_SPAN).text old_prompt
-    $old_line.append $(EMPTY_SPAN).text @$prompt_left.text()
+    $old_line.append $(EMPTY_SPAN).addClass(CLASS_PROMPT_TEXT).text @$prompt_left.text()
 
     @$prompt_label.text @_SelectPromptLabel true
     if indent and match = @$prompt_left.text().match /^\s+/
