@@ -95,3 +95,6 @@ info.
 * Add prompt-text class
 * Add `SetKeyPressHandler` API
 * Add `SetKeyControlHandler` API
+
+2015.25.11 Version 2.13.2
+* Fix for prompt-text
