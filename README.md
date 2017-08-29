@@ -1,4 +1,4 @@
-#jq-console
+# jq-console
 
 A jQuery terminal plugin written in CoffeeScript.
 
@@ -10,7 +10,7 @@ Version 2.0 adds baked-in support for rich multi-line prompting and operation
 queueing.
 
 
-##Tested Browsers
+## Tested Browsers
 
 The plugin has been tested on the following browsers:
 
@@ -22,9 +22,9 @@ The plugin has been tested on the following browsers:
 * Android Chrome
 
 
-##Getting Started
+## Getting Started
 
-###Echo example
+### Echo example
 
 ```css
     /* The console container element */
@@ -93,7 +93,7 @@ The plugin has been tested on the following browsers:
 <iframe src="demo/echo.html" style="width:400px;height:500px">
 </iframe>
 
-###Instantiating
+### Instantiating
 
 ```javascript
     $(div).jqconsole(welcomeString, promptLabel, continueLabel, disableAutoFocus);
@@ -107,13 +107,13 @@ The plugin has been tested on the following browsers:
   input when using Prompt().
 * `disableAutoFocus` is a boolean indicating whether we should disable the default auto-focus behavior.
 
-##Configuration
+## Configuration
 
 There isn't much initial configuration needed, because the user must supply
 options and callbacks with each state change. There are a few config methods
 provided to create custom shortcuts and change indentation width:
 
-###jqconsole.RegisterShortcut
+### jqconsole.RegisterShortcut
 Registers a callback for a keyboard shortcut.
 Takes two arguments:
 
@@ -132,7 +132,7 @@ Takes two arguments:
           this.Reset();
         });
 
-###jqconsole.SetIndentWidth
+### jqconsole.SetIndentWidth
 Sets the number of spaces inserted when indenting and removed when unindenting.
 Takes one argument:
 
@@ -144,7 +144,7 @@ Takes one argument:
         // Sets the indent width to 4 spaces.
         jqconsole.SetIndentWidth(4);
 
-###jqconsole.RegisterMatching
+### jqconsole.RegisterMatching
 Registers an opening and closing characters to match and wraps each of the
 opening and closing characters with a span with the specified class.
 Takes one parameters:
@@ -158,13 +158,13 @@ Takes one parameters:
 
         jqconsole.RegisterMatching('{', '}', 'brackets');
 
-##Usage
+## Usage
 
 Unlike most terminal plugins, jq-console gives you complete low-level control
 over the execution; you have to call the appropriate methods to start input
 or output:
 
-###jqconsole.Input:
+### jqconsole.Input:
 Asks user for input. If another input or prompt operation is currently underway,
 the new input operation is enqueued and will be called when the current
 operation and all previously enqueued operations finish. Takes one argument:
@@ -181,7 +181,7 @@ operation and all previously enqueued operations finish. Takes one argument:
         });
 
 
-###jqconsole.Prompt
+### jqconsole.Prompt
 Asks user for input. If another input or prompt operation is currently underway
 the new prompt operation is enqueued and will be called when the current
 peration and all previously enqueued operations finish. Takes four arguments:
@@ -221,7 +221,7 @@ peration and all previously enqueued operations finish. Takes four arguments:
           return /\\$/.test(input);
         });
 
-###jqconsole.AbortPrompt
+### jqconsole.AbortPrompt
 Aborts the current prompt operation and returns to output mode or the next
 queued input/prompt operation. Takes no arguments.
 
@@ -235,7 +235,7 @@ queued input/prompt operation. Takes no arguments.
           jqconsole.AbortPrompt();
         }, 2000);
 
-###jqconsole.Write
+### jqconsole.Write
 Writes the given text to the console in a `<span>`, with an
 optional class. If a prompt is currently being shown, the text is inserted
 before it. Takes two arguments:
@@ -253,7 +253,7 @@ before it. Takes two arguments:
         jqconsole.Write(output, 'my-output-class')
         jqconsole.Write(err.message, 'my-error-class')
 
-###jqconsole.Append
+### jqconsole.Append
 Append the given node to the DOM. If a prompt is currently being shown, the
 text is inserted before it. Takes a single argument:
 
@@ -272,7 +272,7 @@ text is inserted before it. Takes a single argument:
         jqconsole.Append(node);
 
 
-###jqconsole.SetPromptText
+### jqconsole.SetPromptText
 Sets the text currently in the input prompt. Takes one parameter:
 
   * __string__ *text*: The text to put in the prompt.
@@ -283,7 +283,7 @@ Sets the text currently in the input prompt. Takes one parameter:
         jqconsole.SetPromptText('print [i ** 2 for i in range(10)]')
 
 
-###jqconsole.SetPromptLabel
+### jqconsole.SetPromptLabel
 Replaces the main prompt label. Takes two parameters:
 
   * __string__ *main_label*: String to replace the main prompt label.
@@ -295,7 +295,7 @@ Replaces the main prompt label. Takes two parameters:
         jqconsole.SetPromptLabel(' $','..')
 
 
-###jqconsole.ClearPromptText
+### jqconsole.ClearPromptText
 Clears all the text currently in the input prompt. Takes one parameter:
 
   * __bool__ *clear_label*: If specified and true, also clears the main prompt
@@ -307,7 +307,7 @@ Clears all the text currently in the input prompt. Takes one parameter:
         jqconsole.ClearPromptText()
 
 
-###jqconsole.GetPromptText
+### jqconsole.GetPromptText
 Returns the contents of the prompt. Takes one parameter:
 
   * __bool__ *full*: If specified and true, also includes the prompt labels
@@ -320,7 +320,7 @@ Returns the contents of the prompt. Takes one parameter:
         var logEntry = jqconsole.GetPromptText(true)
 
 
-###jqconsole.Reset
+### jqconsole.Reset
 Resets the console to its initial state, cancelling all current and pending
 operations. Takes no parameters.
 
@@ -328,7 +328,7 @@ operations. Takes no parameters.
 
         jqconsole.Reset()
 
-###jqconsole.SetKeyPressHandler
+### jqconsole.SetKeyPressHandler
 Sets a custom key press handler to be executed before the internal
 jqconsole handler. If it returns false then jqconsole will ignore the
 event. This gives you control over what events jqconsole can handle
@@ -346,7 +346,7 @@ and for you to do your custom work.
         });
    ```
 
-###jqconsole.SetControlKeyHandler
+### jqconsole.SetControlKeyHandler
 Allows you to handle key events that are not characters (keydown events).
 You can return false to prevent the default. See demo for full example.
   * __function__ *handler*: An event handler function returning true or false.
@@ -362,7 +362,7 @@ You can return false to prevent the default. See demo for full example.
         });
    ```
 
-###jqconsole.GetColumn
+### jqconsole.GetColumn
 Returns the 0-based number of the column on which the cursor currently is.
 Takes no parameters.
 
@@ -372,7 +372,7 @@ Takes no parameters.
         $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())
 
 
-###jqconsole.GetLine
+### jqconsole.GetLine
 Returns the 0-based number of the line on which the cursor currently is.
 Takes no parameters.
 
@@ -381,7 +381,7 @@ Takes no parameters.
         // Show the current line and column in a status area.
         $('#status').text(jqconsole.GetLine() + ', ' + jqconsole.GetColumn())
 
-###jqconsole.Focus
+### jqconsole.Focus
 Forces the focus onto the console so events can be captured.
 Takes no parameters.
 
@@ -393,7 +393,7 @@ Takes no parameters.
         })
 
 
-###jqconsole.GetIndentWidth
+### jqconsole.GetIndentWidth
 Returns the number of spaces inserted when indenting. Takes no parameters.
 
   Example:
@@ -402,7 +402,7 @@ Returns the number of spaces inserted when indenting. Takes no parameters.
         console.assert(jqconsole.GetIndentWidth() == 4);
 
 
-###jqconsole.UnRegisterMatching
+### jqconsole.UnRegisterMatching
 Deletes a certain matching settings set by `jqconsole.RegisterMatching`.
 Takes two paramaters:
 
@@ -415,10 +415,10 @@ Takes two paramaters:
         jqconsole.UnRegisterMatching('{', '}');
 
 
-###jqconsole.Dump
+### jqconsole.Dump
 Returns the text content of the console.
 
-###jqconsole.GetState
+### jqconsole.GetState
 Returns the current state of the console. Could be one of the following:
 
   * Input: `"input"`
@@ -431,7 +431,7 @@ Returns the current state of the console. Could be one of the following:
         jqconsole.GetState(); //output
 
 
-###jqconsole.MoveToStart
+### jqconsole.MoveToStart
 Moves the cursor to the start of the current line.
 Takes one parameter:
 
@@ -448,7 +448,7 @@ Takes one parameter:
         });
 
 
-###jqconsole.MoveToEnd
+### jqconsole.MoveToEnd
 Moves the cursor to the end of the current line.
 Takes one parameter:
 
@@ -463,23 +463,23 @@ Takes one parameter:
           handler();
         });
 
-###jqconsole.Disable
+### jqconsole.Disable
 Disables input and focus on the console.
 
 
-###jqconsole.Enable
+### jqconsole.Enable
 Enables input and focus on the console.
 
 
-###jqconsole.IsDisabled
+### jqconsole.IsDisabled
 Returns true if the console is disabled.
 
 
-###jqconsole.GetHistory
+### jqconsole.GetHistory
 Returns the contents of the history buffer.
 
 
-###jqconsole.SetHistory
+### jqconsole.SetHistory
 Set the history buffer to the given array.
 
 Takes one parameter:
@@ -491,22 +491,22 @@ Takes one parameter:
         jqconsole.SetHistory(['a = 3', 'a + 3']);
 
 
-###jqconsole.ResetHistory
+### jqconsole.ResetHistory
 Resets the console history.
 
 
-###jqconsole.ResetMatchings
+### jqconsole.ResetMatchings
 Resets the character matching configuration.
 
 
-###jqconsole.ResetShortcuts
+### jqconsole.ResetShortcuts
 Resets the shortcut configuration.
 
 
-###jqconsole.Clear
+### jqconsole.Clear
 Clears the console's content excluding the current prompt
 
-##Default Key Config
+## Default Key Config
 
 The console responds to the followind keys and key combinations by default:
 
@@ -531,7 +531,7 @@ The console responds to the followind keys and key combinations by default:
 * `Page Up`: Scroll console one page up.
 * `Page Down`: Scroll console one page down.
 
-##ANSI escape code SGR support
+## ANSI escape code SGR support
 
 jq-console implements a large subset of the ANSI escape code graphics.
 Using the `.Write` method you could add style to the console using
@@ -548,7 +548,7 @@ Note that the third parameter `escape` must be true which defaults to it.
 You'll need to include the `ansi.css` file for default effects or create your
 own using the css classes from the table below.
 
-###SGR
+### SGR
 [Reference](http://en.wikipedia.org/wiki/ANSI_escape_code#graphics).
 <table>
   <tr>
@@ -693,7 +693,7 @@ own using the css classes from the table below.
   </tr>
 </table>
 
-###Colors
+### Colors
 [Reference](http://en.wikipedia.org/wiki/ANSI_escape_code#Colors).
 <table>
   <tr>
@@ -734,7 +734,7 @@ own using the css classes from the table below.
   </tr>
 </table>
 
-##CSS Classes
+## CSS Classes
 
 Several CSS classes are provided to help stylize the console:
 
@@ -754,7 +754,7 @@ Of course, custom classes may be specified when using `jqconsole.Write()` for
 further customization.
 
 
-##Contributors
+## Contributors
 
 [Max Shawabkeh](http://max99x.com/)
 [Amjad Masad](http://twitter.com/amasad)
