@@ -52,7 +52,8 @@ DEFAULT_INDENT_WIDTH = 2
 
 CLASS_ANSI = "#{CLASS_PREFIX}ansi-"
 ESCAPE_CHAR = '\x1B'
-ESCAPE_SYNTAX = /\[(\d*)(?:;(\d*))*m/
+SGR_SYNTAX = /\[(\d*)(?:;(\d*))*m/
+CSI_CATCHALL = /\[[0-9;]*[A-Za-z]/
 
 class Ansi
   COLORS: ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white']
@@ -126,9 +127,11 @@ class Ansi
 
     i = 0
     while (i = text.indexOf(ESCAPE_CHAR ,i)) and i isnt -1
-      if d = text[i...].match ESCAPE_SYNTAX
+      if d = text[i...].match SGR_SYNTAX
         @_style code for code in d[1...]
         text = @_closeSpan(text[0...i]) + @_openSpan text[i + 1 + d[0].length...]
+      else if d = text[i...].match CSI_CATCHALL
+        text = text[...i] + text[i + 1 + d[0].length...]
       else i++
 
     return @_closeSpan text
