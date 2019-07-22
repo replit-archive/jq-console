@@ -354,7 +354,7 @@ You can return false to prevent the default. See demo for full example.
   Example:
   ```javascript
         // Show auto-complete on tab keys
-        jqconsole.SetKeyPressHanlder(function(e) {
+        jqconsole.SetControlKeyHandler(function(e) {
           if (e.which === 9) {
             $('.suggestions').show();
             return false;
